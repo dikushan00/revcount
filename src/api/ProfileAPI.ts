@@ -1,11 +1,11 @@
 import Axios from "axios";
 import {instance} from "./API";
-import {ProfileType} from "../types/UserTypes";
+import {ProfileType} from "../types/userTypes";
 
 export const ProfileAPI = {
 
-    getProfile(id: number) {
-        return instance.get(`users/${id}`).then((response) => {
+    getProfile() {
+        return instance.get(`profile`).then((response) => {
             return response.data;
         });
     },

@@ -9,7 +9,7 @@ export type AppInitialStateType = typeof initialState
 type ActionsType = InferActionsTypes<typeof actionsApp>
 type GetThunkType = ThunkType<ActionsType>
 
-let appReducer = (state = initialState, action: ActionsType) => {
+export const app_reducer = (state = initialState, action: ActionsType) => {
 
     switch (action.type) {
 
@@ -49,5 +49,3 @@ export const init = (): GetThunkType => async (dispatch) => {
             dispatch(actionsApp.initialize())
         })
 }
-
-export default appReducer

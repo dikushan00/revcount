@@ -1,0 +1,135 @@
+{
+  "projects": [
+    {
+      "id": 1,
+      "name": "Otava Chemical",
+      "deadline": 14,
+      "addDeadline": 3,
+      "freeEdits": 5,
+      "balance": 1444,
+      "edits": [
+        {
+          "id": 1,
+          "name": "Logo editing",
+          "status": {
+            "id": 1,
+            "name": "Approval"
+          },
+          "description": "Request on offer"
+        },
+        {
+          "id": 2,
+          "name": "Molecular illustration",
+          "status": {
+            "id": 2,
+            "name": "Reservation"
+          },
+          "description": "Make payment"
+        },
+        {
+          "id": 3,
+          "name": "Otava admin panel",
+          "status": {
+            "id": 3,
+            "name": "Performing"
+          },
+          "description": ""
+        },
+        {
+          "id": 4,
+          "name": "Animation",
+          "status": {
+            "id": 4,
+            "name": "Editing is done"
+          },
+          "description": "Hide"
+        }
+      ],
+      "users": [
+        {
+          "id": 32,
+          "name": "Adam Sainer",
+          "isOwner": true
+        },
+        {
+          "id": 45,
+          "name": "John Volley",
+          "isOwner": false
+        }
+      ],
+      "actionsHistory": [
+        {
+          "id": 1,
+          "action": "Adam requested an offer to edit",
+          "time": "21:30",
+          "offer": {
+            "balance": 280,
+            "days": 7,
+            "hours": 24
+          },
+          "edit": {
+            "id": 1,
+            "name": "Logo editing",
+            "status": {
+              "id": 1,
+              "name": "Approval"
+            },
+            "description": "Request on offer"
+          }
+        }
+      ]
+    }
+  ],
+  "statuses": [
+    {
+      "id": 1,
+      "name": "Approval"
+    },
+    {
+      "id": 2,
+      "name": "Reservation"
+    },
+    {
+      "id": 3,
+      "name": "Performing"
+    },
+    {
+      "id": 4,
+      "name": "Editing is done"
+    }
+  ],
+  "profile": {
+    "id": 64,
+    "name": "Adam Sainer",
+    "firstName": "Adam",
+    "lastName": "Sainer",
+    "inviteId": "8884DD",
+    "email": "example@gmail.com",
+    "role": {
+      "id": 1,
+      "name": "Owner"
+    },
+    "avatar": ""
+  },
+  "invitations": [
+    {
+      "id": 2,
+      "name": "Path of building Redesign",
+      "deadline": 21,
+      "addDeadline": 4,
+      "freeEdits": 6,
+      "balance": 2500,
+      "edits": [
+        {
+          "id": 1,
+          "name": "Write text",
+          "status": {
+            "id": 1,
+            "name": "Approval"
+          },
+          "description": "Request on offer"
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import {InferActionsTypes, ThunkType} from "./store-redux";
-import {ProfileType} from "../types/UserTypes";
+import {ProfileType} from "../types/userTypes";
 
 const initialState = {
     profile: null as ProfileType | null,
@@ -10,7 +10,7 @@ type ProfileInitialStateType = typeof initialState;
 type ActionsType = InferActionsTypes<typeof actionsProfile>;
 type GetThunkType = ThunkType<ActionsType>;
 
-export const profile_reducer = (
+export const profileReducer = (
     state = initialState,
     action: ActionsType
 ): ProfileInitialStateType => {

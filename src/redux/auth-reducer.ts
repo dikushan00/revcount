@@ -1,5 +1,5 @@
 import {InferActionsTypes, ThunkType} from "./store-redux"
-import {RoleType} from "../types/UserTypes";
+import {RoleType} from "../types/userTypes";
 
 const initialState = {
     isAuth: false as boolean,
@@ -12,7 +12,7 @@ type AuthInitialStateType = typeof initialState
 type ActionsType = InferActionsTypes<typeof actionsAuth>
 type GetThunkType = ThunkType<ActionsType>
 
-const authReducer = (state = initialState, action: ActionsType): AuthInitialStateType => {
+export const auth_reducer = (state = initialState, action: ActionsType): AuthInitialStateType => {
 
     switch (action.type) {
 
@@ -54,6 +54,3 @@ export const checkAuthMe = (): GetThunkType => async (dispatch) => {
     //     dispatch(actionsAuth.setNewAuth(localStorage?.getItem("client_token") || "", true, roles, id))
     // }
 }
-
-
-export default authReducer

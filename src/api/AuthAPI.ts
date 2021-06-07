@@ -1,5 +1,5 @@
 import {instance, loginInstance} from "./API"
-import {LoginType} from "../types/UserTypes";
+import {LoginType} from "../types/userTypes";
 
 export const AuthAPI = {
     //check client auth

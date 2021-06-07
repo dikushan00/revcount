@@ -1,10 +1,21 @@
 import React from "react"
 import Link from 'next/link'
 import {CreateNewProjectModal} from "../projects/addProject/CreateNewProjectModal";
+import {ProjectType} from "../../src/types/projectTypes";
+import {useDispatch, useSelector} from "react-redux";
+import {AppStateType} from "../../src/redux/store-redux";
+import {actionsProjects} from "../../src/redux/projects-reducer";
+import {ProjectAPI} from "../../src/api/ProjectAPI";
+
+type ActionNamesType = "projects" | "invitations"
 
 export const Sidebar = () => {
 
     const [isAddNewProjectModalMode, setIsAddNewProjectModalMode] = React.useState(false)
+    const [activeAction, setActiveAction] = React.useState<ActionNamesType>("projects")
+
+    const projects = useSelector((state: AppStateType) => state.projects.projects)
+    const invitations = useSelector((state: AppStateType) => state.projects.invitations)
 
     const handleAddNewProject = () => {
         setIsAddNewProjectModalMode(true)
@@ -12,6 +23,10 @@ export const Sidebar = () => {
     const handleCloseModal = () => {
         setIsAddNewProjectModalMode(false)
     }
+    const handleChangeAction = (action: ActionNamesType) => {
+        setActiveAction(action)
+    }
+
     return <>
         <aside className="sidebar">
             <div className="sidebar__header">
@@ -27,22 +42,23 @@ export const Sidebar = () => {
             </div>
             <div className="sidebar__content">
                 <div className="sidebar__actions">
-                    <button className="sidebar__btn sidebar__btn--1 btn-3">Projects</button>
-                    <button className="sidebar__btn sidebar__btn--2 btn-3">Invitations<span
-                        className="sidebar__span">2</span></button>
+                    <button onClick={() => handleChangeAction("projects")}
+                            className={"sidebar__btn sidebar__btn--1 btn-3 " + (activeAction === "projects" ? "active" : "")}>Projects
+                    </button>
+                    <button onClick={() => handleChangeAction("invitations")}
+                            className={"sidebar__btn sidebar__btn--2 btn-3 " + (activeAction === "invitations" ? "active" : "")}>
+                        Invitations
+                        {invitations && invitations?.length > 0 &&
+                        <span className="sidebar__span">{invitations?.length}</span>}
+                    </button>
                 </div>
-                <ul className="sidebar__block block-sidebar">
-                    <li className="block-sidebar__item">
-                        <button className="block-sidebar__btn">
-                            <span/>Otava Chemical
-                        </button>
-                    </li>
-                    <li className="block-sidebar__item">
-                        <button onClick={handleAddNewProject} className="block-sidebar__btn-add">
-                            <span>+</span>Add new project
-                        </button>
-                    </li>
-                </ul>
+                {
+                    activeAction === "projects" &&
+                    <Projects projects={projects} handleAddNewProject={handleAddNewProject}/>
+                }
+                {
+                    activeAction === "invitations" && <InvitationProjects/>
+                }
             </div>
             <div className="sidebar__footer">
                 <button className="sidebar__footer-btn ">
@@ -54,7 +70,82 @@ export const Sidebar = () => {
             </div>
         </aside>
         {
-            isAddNewProjectModalMode && <CreateNewProjectModal hideBlock={handleCloseModal} />
+            isAddNewProjectModalMode && <CreateNewProjectModal hideBlock={handleCloseModal}/>
         }
     </>
+}
+
+type InvitationProjectsPropsType = {}
+
+const InvitationProjects: React.FC<InvitationProjectsPropsType> = () => {
+
+    const dispatch = useDispatch()
+
+    const invitations = useSelector((state: AppStateType) => state.projects.invitations)
+
+    const handleAcceptProject = (projectId: number) => {
+        ProjectAPI.acceptProject(projectId).then(res => {
+            if (!res?.error) {
+                dispatch(actionsProjects.acceptProject(projectId))
+            }
+        }).catch(error => {
+            console.log(error)
+            throw error
+        })
+    }
+    const handleDeclineProject = (projectId: number) => {
+        ProjectAPI.acceptProject(projectId).then(res => {
+            if (!res?.error) {
+                dispatch(actionsProjects.declineProject(projectId))
+            }
+        }).catch(error => {
+            console.log(error)
+            throw error
+        })
+    }
+
+    return <ul className="sidebar__block block-sidebar block-sidebar__invitation">
+        {
+            invitations?.map((item, index) => {
+                return <li key={item.id || index} className="block-sidebar__item">
+                    <button className="block-sidebar__btn block-sidebar-open">
+                        <span/> {item.name}
+                    </button>
+                    <div className="block-sidebar__body">
+                        <button onClick={() => handleAcceptProject(item.id)}
+                                className="block-sidebar__button block-sidebar__button--accept">Accept
+                        </button>
+                        <button onClick={() => handleDeclineProject(item.id)}
+                                className="block-sidebar__button block-sidebar__button--decline">Decline
+                        </button>
+                    </div>
+                </li>
+            })
+        }
+    </ul>
+}
+
+const Projects: React.FC<{ projects: ProjectType[] | null, handleAddNewProject: () => void }> = ({
+                                                                                                     handleAddNewProject,
+                                                                                                     projects
+                                                                                                 }) => {
+
+    return <ul className="sidebar__block block-sidebar">
+        {
+            projects?.map((item, index) => {
+                return <Link key = {item.id} href={"/projects/" + item.id}>
+                    <li className="block-sidebar__item">
+                        <button className="block-sidebar__btn">
+                            <span/> {item.name}
+                        </button>
+                    </li>
+                </Link>
+            })
+        }
+        <li className="block-sidebar__item">
+            <button onClick={handleAddNewProject} className="block-sidebar__btn-add">
+                <span>+</span>Add new project
+            </button>
+        </li>
+    </ul>
 }

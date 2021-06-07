@@ -1,16 +1,18 @@
 import {Action, applyMiddleware, combineReducers, createStore, Store} from 'redux'
 import thunkMiddleWare, {ThunkAction} from 'redux-thunk'
-import appReducer from './app-reducer';
-import {profile_reducer} from "./profile_reducer";
-import authReducer from "./auth-reducer";
+import {profileReducer} from "./profile-reducer";
 import {composeWithDevTools} from 'redux-devtools-extension'
 import {useMemo} from "react";
+import {projects_reducer} from "./projects-reducer";
+import {app_reducer} from "./app-reducer";
+import {auth_reducer} from "./auth-reducer";
 
 let store: Store | undefined
 let reducers = combineReducers({
-    app: appReducer,
-    profile: profile_reducer,
-    auth: authReducer,
+    app: app_reducer,
+    profile: profileReducer,
+    auth: auth_reducer,
+    projects: projects_reducer
 })
 
 type RootReducerType = typeof reducers
