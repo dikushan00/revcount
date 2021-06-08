@@ -9,6 +9,11 @@ export const ProfileAPI = {
             return response.data;
         });
     },
+    getContacts() {
+        return instance.get(`contacts`).then((response) => {
+            return response.data;
+        });
+    },
 
     editProfile(id: number, body: ProfileType) {
         return instance.put(`users/${id}`, body).then((response) => {

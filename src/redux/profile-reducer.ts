@@ -1,8 +1,9 @@
 import {InferActionsTypes, ThunkType} from "./store-redux";
-import {ProfileType} from "../types/userTypes";
+import {ProfileType, UserType} from "../types/userTypes";
 
 const initialState = {
     profile: null as ProfileType | null,
+    contacts: null as UserType[] | null,
     isFetching: false
 };
 
@@ -23,6 +24,12 @@ export const profileReducer = (
                 profile: action.profile,
             };
         }
+        case "REVCOUNT/PROFILE/SET_CONTACTS": {
+            return {
+                ...state,
+                contacts: action.contacts,
+            };
+        }
         case "REVCOUNT/PROFILE/TOGGLE_FETCHING": {
             return {...state, isFetching: action.isFetching}
         }
@@ -34,6 +41,8 @@ export const profileReducer = (
 export const actionsProfile = {
     setProfile: (profile: ProfileType) =>
         ({type: "REVCOUNT/PROFILE/SET_PROFILE", profile} as const),
+    setContacts: (contacts: UserType[] | null) =>
+        ({type: "REVCOUNT/PROFILE/SET_CONTACTS", contacts} as const),
     toggleIsFetching: (isFetching: boolean) =>
         ({
             type: "REVCOUNT/PROFILE/TOGGLE_FETCHING",

@@ -1,10 +1,17 @@
 import Link from "next/link";
 import {useSelector} from "react-redux";
 import {AppStateType} from "../../src/redux/store-redux";
+import React from "react";
+import {copyTextToClipboard} from "../../src/utils/copyToClipboard";
 
 export const Header = () => {
 
     const profile = useSelector((state: AppStateType) => state.profile.profile)
+    const [isCopied, setIsCopied] = React.useState(false)
+
+    const copyText = (text: string | number) => {
+        copyTextToClipboard(text.toString(), setIsCopied)
+    }
 
     return <header className="header">
         <div className="header__menu menu">
@@ -44,23 +51,21 @@ export const Header = () => {
             <div className="header__indexer">
                 your invite id - {profile?.inviteId}
             </div>
+            <span onMouseLeave={() => isCopied && setIsCopied(false)}
+                  onClick={() => profile?.inviteId && copyText(profile?.inviteId)}
+                  className="header__registration-icon">
+                <span className="tooltip">
+                    <CopyTextClipboardIcon/>
+                    <span className={"tooltiptext"}>
+                        {isCopied ? "Copied!" : "Copy"}
+                    </span>
+                </span>
+            </span>
             <Link href="/">
-                <a className="header__registration-icon">
+                <a className="header__user">
                     {profile?.avatar
                         ? <img src={profile?.avatar} alt="profile ava"/>
                         : <DefaultProfileAvatar/>}
-                </a>
-            </Link>
-            <Link href="/">
-                <a className="header__user">
-                    <svg width={40} height={40} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx={20} cy={20} r={20} fill="#E6E8EF"/>
-                        <path
-                            d="M26 15C26 18.3137 23.3137 21 20 21C16.6863 21 14 18.3137 14 15C14 11.6863 16.6863 9 20 9C23.3137 9 26 11.6863 26 15Z"
-                            fill="#868594"/>
-                        <path d="M5 33C5 33 10 40 20 40V24C11.5 24 5 33 5 33Z" fill="#868594"/>
-                        <path d="M35 33C35 33 30 40 20 40V24C28.5 24 35 33 35 33Z" fill="#868594"/>
-                    </svg>
                 </a>
             </Link>
         </div>
@@ -68,6 +73,16 @@ export const Header = () => {
 }
 
 export const DefaultProfileAvatar = () => {
+    return <svg width={40} height={40} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx={20} cy={20} r={20} fill="#E6E8EF"/>
+        <path
+            d="M26 15C26 18.3137 23.3137 21 20 21C16.6863 21 14 18.3137 14 15C14 11.6863 16.6863 9 20 9C23.3137 9 26 11.6863 26 15Z"
+            fill="#868594"/>
+        <path d="M5 33C5 33 10 40 20 40V24C11.5 24 5 33 5 33Z" fill="#868594"/>
+        <path d="M35 33C35 33 30 40 20 40V24C28.5 24 35 33 35 33Z" fill="#868594"/>
+    </svg>
+}
+export const CopyTextClipboardIcon = () => {
     return <svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g clipPath="url(#clip0)">
             <path

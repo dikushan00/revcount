@@ -13,8 +13,10 @@
           "name": "Logo editing",
           "status": {
             "id": 1,
-            "name": "Approval"
+            "name": "Approval",
+            "isAccepted": true
           },
+          "workspace": [],
           "description": "Request on offer"
         },
         {
@@ -22,8 +24,16 @@
           "name": "Molecular illustration",
           "status": {
             "id": 2,
-            "name": "Reservation"
+            "name": "Reservation",
+            "isAccepted": false
           },
+          "workspace": [
+            {
+              "id": 1,
+              "message": "John offered — $280 for 21 hours of work with a deadline of 7 days",
+              "date": "13:30 (08 of May)"
+            }
+          ],
           "description": "Make payment"
         },
         {
@@ -31,8 +41,21 @@
           "name": "Otava admin panel",
           "status": {
             "id": 3,
-            "name": "Performing"
+            "name": "Performing",
+            "isAccepted": false
           },
+          "workspace": [
+            {
+              "id": 1,
+              "message": "John offered — $280 for 21 hours of work with a deadline of 7 days",
+              "date": "13:30 (08 of May)"
+            },
+            {
+              "id": 2,
+              "message": "Adam accepted the offer — $280 for 21 hours of work with a deadline of 7 days. Do not begin work before the end of the reservation of funds.",
+              "date": "16:23 (08 of May)"
+            }
+          ],
           "description": ""
         },
         {
@@ -40,8 +63,26 @@
           "name": "Animation",
           "status": {
             "id": 4,
-            "name": "Editing is done"
+            "name": "Editing is done",
+            "isAccepted": true
           },
+          "workspace": [
+            {
+              "id": 1,
+              "message": "John offered — $280 for 21 hours of work with a deadline of 7 days",
+              "date": "13:30 (08 of May)"
+            },
+            {
+              "id": 2,
+              "message": "Adam accepted the offer — $280 for 21 hours of work with a deadline of 7 days. Do not begin work before the end of the reservation of funds.",
+              "date": "16:23 (08 of May)"
+            },
+            {
+              "id": 3,
+              "message": "Adam set aside $280 for the service, which will go to John when the job is done",
+              "date": "16:54 (08 of May)"
+            }
+          ],
           "description": "Hide"
         }
       ],
@@ -83,19 +124,23 @@
   "statuses": [
     {
       "id": 1,
-      "name": "Approval"
+      "name": "Approval",
+      "key": "approval"
     },
     {
       "id": 2,
-      "name": "Reservation"
+      "name": "Reservation",
+      "key": "reservation"
     },
     {
       "id": 3,
-      "name": "Performing"
+      "name": "Performing",
+      "key": "performing"
     },
     {
       "id": 4,
-      "name": "Editing is done"
+      "name": "Editing is done",
+      "key": "editing"
     }
   ],
   "profile": {
@@ -130,6 +175,20 @@
           "description": "Request on offer"
         }
       ]
+    }
+  ],
+  "contacts": [
+    {
+      "id": 646,
+      "name": "Samuel Finnes"
+    },
+    {
+      "id": 546,
+      "name": "Sophie Archduches"
+    },
+    {
+      "id": 446,
+      "name": "Denzel Forman"
     }
   ]
 }

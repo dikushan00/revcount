@@ -648,10 +648,9 @@ img {
 }
 
 .id-block {
-    cursor: none;
     position: absolute;
     z-index: 1;
-    width: 100%;
+    width: 92%;
     height: 100%;
     left: 0;
     top: 50%;
@@ -683,13 +682,14 @@ img {
     -webkit-box-flex: 0;
     -ms-flex: 0 0 auto;
     flex: 0 0 auto;
+    height: 80%;
 }
 
 .id-block__item:last-child {
     margin: 0 0 0 0;
 }
 
-.id-block__numer {
+.id-block__number {
     font-size: 18px;
     line-height: 100%;
     text-transform: uppercase;
@@ -711,6 +711,13 @@ img {
     justify-content: center;
     border-radius: 50%;
     margin-left: 5px;
+    cursor: pointer;
+}
+
+.input_tag {
+    height: 100%;
+    width: 100%;
+    min-width: 100px;
 }
 
 .id-block__btn svg {
@@ -958,6 +965,7 @@ img {
     -webkit-transition: all 0.3s ease 0s;
     -o-transition: all 0.3s ease 0s;
     transition: all 0.3s ease 0s;
+    cursor: pointer;
 }
 
 .actions-popup__item:last-child {
@@ -1148,15 +1156,20 @@ img {
 }
 
 .popup__invite .popup__input--id {
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
     width: 436px;
     height: 60px;
     background: #ffffff;
     border: 1px solid #0076ff;
     border-radius: 30px;
+    padding: 0 20px;
 }
 
 .popup__invite .id-block {
     left: 13px;
+    overflow-x: auto;
 }
 
 .popup__invite .tabs-popup__column {
@@ -1291,6 +1304,7 @@ img {
 }
 
 .header__registration-icon {
+    cursor: pointer;
     display: block;
     margin-left: calc(1px + 9 * ((100vw - 320px) / 1600));
     width: calc(12px + 4 * ((100vw - 320px) / 1600));
@@ -3452,6 +3466,47 @@ img {
     flex: 0 1 75.1%;
 }
 
+/*Tools*/
+.tooltip {
+    position: relative;
+    display: inline-block;
+    /*border-bottom: 1px dotted rgba(33,37,41,0.9);*/
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: rgba(33,37,41,0.9);
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+}
+.tooltip .tooltiptext {
+    width: 120px;
+    top: 100%;
+    left: 50%;
+    margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+}
+.tooltip .tooltiptext::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%;  /* At the top of the tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent rgba(33,37,41,0.9) transparent;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+/*Tools*/
 @media screen and (min-width: 991.98px) {
     .popup__close {
         opacity: 0.5;
