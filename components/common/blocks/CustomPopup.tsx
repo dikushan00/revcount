@@ -5,7 +5,7 @@ type PropsType = {
     className?: CustomPopupClassNameType
 }
 
-type CustomPopupClassNameType = "popup__invite" | "popup__create" | "popup__invitation" | "popup__join" | "popup__team"
+type CustomPopupClassNameType = "popup__invite" | "popup__create" | "popup__invitation" | "popup__join" | "popup__team" | "popup__payment"
 
 export const CustomPopup: React.FC<PropsType> = (props) => {
     return <>

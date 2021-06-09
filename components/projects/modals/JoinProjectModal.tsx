@@ -1,6 +1,6 @@
 import React from 'react';
-import {CustomPopup} from "../common/blocks/CustomPopup";
-import {useOutsideAlerter} from '../../src/utils/hooks/outsideClick';
+import {CustomPopup} from "../../common/blocks/CustomPopup";
+import {useOutsideAlerter} from '../../../src/utils/hooks/outsideClick';
 
 type PropsType = {
     hideBlock: () => void

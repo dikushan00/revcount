@@ -3,7 +3,7 @@ import {FilledButton} from "../components/common/blocks/buttons/FilledButton";
 import {BorderedButton} from "../components/common/blocks/buttons/BorderedButton";
 import React from "react";
 import {CreateNewProjectModal} from "../components/projects/addProject/CreateNewProjectModal";
-import {JoinProjectModal} from "../components/projects/JoinProjectModal";
+import {JoinProjectModal} from "../components/projects/modals/JoinProjectModal";
 
 export default function Home() {
 

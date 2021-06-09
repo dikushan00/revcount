@@ -5,21 +5,36 @@ import {ProjectsButton} from "../../components/common/blocks/buttons/ProjectsBut
 import {ProjectAPI} from "../../src/api/ProjectAPI";
 import {EditType, ProjectType, StatusesNamesType} from "../../src/types/projectTypes"
 import {ProjectStatsInfo} from "../../components/projects/ProjectStatsInfo";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {actionsProjects} from "../../src/redux/projects-reducer";
 import {Edit} from "../../components/projects/Edits/Edit";
+import {useRouter} from "next/router";
+import {AppStateType} from "../../src/redux/store-redux";
 
-const Project: React.FC<{ project: ProjectType }> = ({project}) => {
+const Project: React.FC<{ project: ProjectType }> = () => {
     const dispatch = useDispatch()
+    const router = useRouter()
+    const {projectId} = router.query
 
     const [isEditMode, setIsEditMode] = React.useState(false)
     const [activeEdit, setActiveEdit] = React.useState<EditType | null>(null)
+
+    const project = useSelector((state: AppStateType) => state.projects.activeProject)
+
+    React.useEffect(() => {
+        if (projectId ) {
+            !project && ProjectAPI.getProject(+projectId).then(res => {
+                !res?.error && dispatch(actionsProjects.setActiveProject(res))
+            })
+        }
+    }, [projectId])
+
     React.useEffect(() => {
         project && dispatch(actionsProjects.setActiveProject(project))
 
-        return () => {
-            project && dispatch(actionsProjects.setActiveProject(null))
-        }
+        // return () => {
+        //     project && dispatch(actionsProjects.setActiveProject(null))
+        // }
     }, [project])
 
     const handleDisableEditMode = () => setIsEditMode(false)
@@ -35,8 +50,8 @@ const Project: React.FC<{ project: ProjectType }> = ({project}) => {
                 : <>
                     <div className="projects">
                         <div className="projects__header">
-                            <Link href="/add-new-edit">
-                                <a>
+                            <Link href={"/projects/add-new-edit/" + projectId}>
+                                <a className={"next_link_tag"}>
                                     <ProjectsButton>Add new correction<span>+</span></ProjectsButton>
                                 </a>
                             </Link>
@@ -50,7 +65,7 @@ const Project: React.FC<{ project: ProjectType }> = ({project}) => {
                     </div>
                     <ul className="my-corrections__list">
                         {
-                            project.edits?.map(edit => {
+                            project?.edits?.map(edit => {
                                 const statusImgPath = getStatusImg(edit.status?.name)
                                 return <li key={edit.id} className="my-corrections__item">
                                     <div className="my-corrections__edit" onClick={() => handleEditMode(edit)}>
@@ -69,7 +84,9 @@ const Project: React.FC<{ project: ProjectType }> = ({project}) => {
                                     <div className="my-corrections__descr">
                                         {edit.description}
                                     </div>
-                                    <button className="my-corrections__btn btn-2" onClick={() => handleEditMode(edit)}>see Detail</button>
+                                    <button className="my-corrections__btn btn-2" onClick={() => handleEditMode(edit)}>see
+                                        Detail
+                                    </button>
                                 </li>
                             })
                         }
@@ -95,19 +112,6 @@ const getStatusImg = (status: StatusesNamesType) => {
             return "/img/projects/flag.svg"
         }
     }
-}
-
-export async function getStaticPaths() {
-
-    let projects = await ProjectAPI.getProjects()
-    const paths = await projects?.map((p: any) => `/projects/${p.id}`)
-    return {paths, fallback: false}
-}
-
-export const getStaticProps = async ({params}: { params: { id: number } }) => {
-    let project = await ProjectAPI.getProject(params.id)
-
-    return {props: {project}}
 }
 
 export default Project

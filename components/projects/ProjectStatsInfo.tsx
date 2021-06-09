@@ -2,7 +2,7 @@ import React from "react";
 import {ProjectType} from "../../src/types/projectTypes";
 
 
-export const ProjectStatsInfo:React.FC<{project: ProjectType}> = ({project}) => {
+export const ProjectStatsInfo:React.FC<{project: ProjectType | null}> = ({project}) => {
 
     return <ul className="projects__list projects-list">
         {
@@ -20,7 +20,7 @@ export const ProjectStatsInfo:React.FC<{project: ProjectType}> = ({project}) => 
                         </div>
                         <div className="projects-list__metrics">
                             {/*@ts-ignore*/}
-                            {project[item.field]} d. {item.addInfo && item.addInfo(project.addDeadline)}
+                            {project ? project[item.field] : "-"} d. {item.addInfo && item.addInfo(project?.addDeadline)}
                         </div>
                     </div>
                     {

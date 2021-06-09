@@ -1,7 +1,7 @@
 import React from 'react';
 import {useOutsideAlerter} from '../../../src/utils/hooks/outsideClick';
 import {CustomPopup} from "../../common/blocks/CustomPopup";
-import {CopyInviteItems} from "../TeamSettingsModal";
+import {CopyInviteItems} from "../modals/TeamSettingsModal";
 import {useDispatch, useSelector} from "react-redux";
 import {AppStateType} from "../../../src/redux/store-redux";
 import {ProfileAPI} from "../../../src/api/ProfileAPI";

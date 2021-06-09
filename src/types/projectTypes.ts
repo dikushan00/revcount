@@ -31,19 +31,19 @@ export type WorkspaceMessageType = {
     message: string
 }
 export type EditType = {
-    id: number,
+    id?: number,
     status: EditStatusType
     description: string
-    "offer": OfferType,
+    offer?: OfferType,
     name: string
-    deadline: string
-    workspace: WorkspaceMessageType[]
-    tasks: TaskType[]
+    deadline?: string
+    workspace?: WorkspaceMessageType[]
+    tasks?: TaskType[]
 }
-export type TaskType = {
+export interface TaskType {
     id: number
-    name: string,
-    workspace: WorkspaceMessageType[]
+    description: string,
+    files: File[]
 }
 
 export interface StatusType {

@@ -2,6 +2,7 @@
 export type ProfileType = {
     id: number;
     inviteId: number;
+    balance?: number;
     firstName: string;
     lastName: string;
     email: string;
@@ -17,6 +18,7 @@ export type UserType = {
     name: string,
     avatar: string,
     isOwner?: boolean
+    role: RoleType,
     firstName: string,
     lastName: string
 }

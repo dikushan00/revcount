@@ -14,18 +14,29 @@
           "status": {
             "id": 1,
             "name": "Approval",
-            "isAccepted": true
+            "isAccepted": false
+          },
+          "offer": {
+            "balance": 2500,
+            "days": 7,
+            "hours": 20
           },
           "workspace": [],
           "description": "Request on offer"
         },
         {
-          "id": 2,
-          "name": "Molecular illustration",
+          "id": 10,
+          "name": "buy costumes",
           "status": {
-            "id": 2,
-            "name": "Reservation",
+            "id": 4,
+            "name": "Editing is done",
+            "key": "editing",
             "isAccepted": false
+          },
+          "offer": {
+            "balance": 333,
+            "days": 2,
+            "hours": 20
           },
           "workspace": [
             {
@@ -34,15 +45,21 @@
               "date": "13:30 (08 of May)"
             }
           ],
-          "description": "Make payment"
+          "description": "Hide"
         },
         {
-          "id": 3,
-          "name": "Otava admin panel",
+          "id": 2,
+          "name": "Molecular illustration",
           "status": {
-            "id": 3,
-            "name": "Performing",
+            "id": 4,
+            "name": "Editing is done",
+            "key": "editing",
             "isAccepted": false
+          },
+          "offer": {
+            "balance": 2500,
+            "days": 7,
+            "hours": 20
           },
           "workspace": [
             {
@@ -56,15 +73,21 @@
               "date": "16:23 (08 of May)"
             }
           ],
-          "description": ""
+          "description": "Hide"
         },
         {
-          "id": 4,
-          "name": "Animation",
+          "id": 3,
+          "name": "Otava admin panel",
           "status": {
             "id": 4,
             "name": "Editing is done",
-            "isAccepted": true
+            "key": "editing",
+            "isAccepted": false
+          },
+          "offer": {
+            "balance": 2500,
+            "days": 7,
+            "hours": 20
           },
           "workspace": [
             {
@@ -84,18 +107,83 @@
             }
           ],
           "description": "Hide"
+        },
+        {
+          "id": 4,
+          "name": "Animation",
+          "status": {
+            "id": 4,
+            "name": "Editing is done",
+            "isAccepted": true
+          },
+          "offer": {
+            "balance": 2500,
+            "days": 7,
+            "hours": 20
+          },
+          "workspace": [
+            {
+              "id": 1,
+              "message": "John offered — $280 for 21 hours of work with a deadline of 7 days",
+              "date": "13:30 (08 of May)"
+            },
+            {
+              "id": 2,
+              "message": "Adam accepted the offer — $280 for 21 hours of work with a deadline of 7 days. Do not begin work before the end of the reservation of funds.",
+              "date": "16:23 (08 of May)"
+            },
+            {
+              "id": 3,
+              "message": "Adam set aside $280 for the service, which will go to John when the job is done",
+              "date": "16:54 (08 of May)"
+            },
+            {
+              "id": 4,
+              "date": "15:33 (09 of May)",
+              "message": "Edits completed payment transferred to the John"
+            }
+          ],
+          "description": "Hide"
+        },
+        {
+          "name": "sdfdfssdf",
+          "tasks": [
+            {
+              "id": 1,
+              "description": "sdfdsfdsf",
+              "files": [
+                {}
+              ]
+            }
+          ],
+          "status": {
+            "id": 1,
+            "name": "Approval",
+            "key": "approval",
+            "isAccepted": false
+          },
+          "description": "",
+          "id": 5
         }
       ],
       "users": [
         {
           "id": 32,
           "name": "Adam Sainer",
-          "isOwner": true
+          "isOwner": true,
+          "role": {
+            "id": 2,
+            "name": "Artist"
+          }
         },
         {
           "id": 45,
           "name": "John Volley",
-          "isOwner": false
+          "isOwner": false,
+          "role": {
+            "id": 3,
+            "name": "Manager"
+          }
         }
       ],
       "actionsHistory": [
@@ -149,6 +237,7 @@
     "firstName": "Adam",
     "lastName": "Sainer",
     "inviteId": "8884DD",
+    "balance": 800,
     "email": "example@gmail.com",
     "role": {
       "id": 1,

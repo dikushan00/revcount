@@ -1,5 +1,5 @@
 import {InferActionsTypes, ThunkType} from "./store-redux";
-import {ProjectType, StatusType} from "../types/projectTypes";
+import {EditType, ProjectType, StatusType} from "../types/projectTypes";
 
 const initialState = {
     projects: null as ProjectType[] | null,
@@ -47,6 +47,21 @@ export const projects_reducer = (
                 projects: state.projects && state.projects?.filter(p => p.id !== action.projectId)
             };
         }
+        case "REVCOUNT/PROJECTS/ADD_EDIT_TO_PROJECT": {
+            let projects = state.projects && [...state.projects]
+            let edited = projects?.map(item => {
+                if (item.id === action.projectId) {
+                    if(item.edits)
+                        return {...item, edits: [...item.edits, {...action.edit, id: item.edits.length}]}
+                    return {...item, edits: [{...action.edit, id: 1}]}
+                }
+                return item
+            })
+            return {
+                ...state,
+                projects: edited || projects,
+            };
+        }
         case "REVCOUNT/PROJECTS/SET_INVITATIONS": {
             return {
                 ...state,
@@ -79,6 +94,8 @@ export const actionsProjects = {
         ({type: "REVCOUNT/PROJECTS/DECLINE_PROJECT", projectId} as const),
     deleteProject: (projectId: number) =>
         ({type: "REVCOUNT/PROJECTS/DELETE_PROJECT", projectId} as const),
+    addEditToProject: (projectId: number, edit: EditType) =>
+        ({type: "REVCOUNT/PROJECTS/ADD_EDIT_TO_PROJECT", edit, projectId} as const),
     setInvitations: (invitations: ProjectType[]) =>
         ({type: "REVCOUNT/PROJECTS/SET_INVITATIONS", invitations} as const),
     setStatuses: (statuses: StatusType[]) =>

@@ -208,6 +208,7 @@ img {
     -webkit-transition: all 0.5s ease 0s;
     -o-transition: all 0.5s ease 0s;
     transition: all 0.5s ease 0s;
+    cursor: pointer;
 }
 
 .btn span {
@@ -242,6 +243,7 @@ img {
     -webkit-transition: all 0.5s ease 0s;
     -o-transition: all 0.5s ease 0s;
     transition: all 0.5s ease 0s;
+    cursor: pointer;
 }
 
 .btn-2 svg {
@@ -299,6 +301,7 @@ img {
     -webkit-transition: all 0.4s ease 0s;
     -o-transition: all 0.4s ease 0s;
     transition: all 0.4s ease 0s;
+    cursor: pointer;
 }
 
 .btn-3 span {
@@ -827,6 +830,7 @@ img {
 .popup__payment .popup__link {
     width: 100%;
     height: 100%;
+    cursor: pointer;
     display: -ms-inline-flexbox;
     display: inline-flex;
     -webkit-box-align: center;
@@ -2104,6 +2108,7 @@ img {
     border-radius: calc(2px + 5 * ((100vw - 320px) / 1600));
     font-size: calc(5px + 7 * ((100vw - 320px) / 1600));
     line-height: calc(5px + 9 * ((100vw - 320px) / 1600));
+    cursor: pointer;
 }
 
 .my-corrections {
@@ -2549,13 +2554,13 @@ img {
     display: none;
 }
 
-.task-edits__item.task-open .task-edits__blosk svg {
+.task-edits__item.task-open .task-edits__block svg {
     -webkit-transform: rotate(180deg);
     -ms-transform: rotate(180deg);
     transform: rotate(180deg);
 }
 
-.task-edits__item.task-open .task-edits__blosk svg path {
+.task-edits__item.task-open .task-edits__block svg path {
     fill: #888BA0;
 }
 
@@ -2649,7 +2654,7 @@ img {
     fill: #0076ff;
 }
 
-.task-edits__blosk {
+.task-edits__block {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -2659,7 +2664,7 @@ img {
     margin-left: auto;
 }
 
-.task-edits__blosk svg {
+.task-edits__block svg {
     margin-right: calc(0px + 6 * ((100vw - 320px) / 1600));
     width: 8px;
     height: 5px;
@@ -2703,6 +2708,7 @@ img {
 }
 
 .task-edits__btn {
+    cursor: pointer;
     padding-left: calc(-5px + 43 * ((100vw - 320px) / 1600));
     padding-right: calc(-5px + 43 * ((100vw - 320px) / 1600));
 }
@@ -3017,6 +3023,7 @@ img {
     -o-transition: all 0.3s ease 0s;
     transition: all 0.3s ease 0s;
     white-space: nowrap;
+    cursor: pointer;
 }
 
 .panel-edits__btn svg {
@@ -3164,6 +3171,7 @@ img {
     font-weight: 500;
     color: #ffffff;
     margin-right: calc(0px + 10 * ((100vw - 320px) / 1600));
+    cursor: pointer;
 }
 
 .offer-edits__btn-decline {
@@ -3185,6 +3193,7 @@ img {
     font-weight: 500;
     color: #ef6868;
     background-color: transparent;
+    cursor: pointer;
 }
 
 .offer-edits__btn-reserve {
@@ -3207,6 +3216,7 @@ img {
     color: #ffffff;
     background: #229b68;
     white-space: nowrap;
+    cursor: pointer;
 }
 
 .offer-edits__btn-send {
@@ -3466,6 +3476,9 @@ img {
     flex: 0 1 75.1%;
 }
 
+.next_link_tag {
+    height: fit-content;
+}
 /*Tools*/
 .tooltip {
     position: relative;

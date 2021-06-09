@@ -1,34 +1,137 @@
 import React from 'react';
-import {EditType, OfferType, StatusesNamesType} from "../../../src/types/projectTypes";
+import {EditType, OfferType, ProjectType, StatusesNamesType} from "../../../src/types/projectTypes";
+import {MakePaymentModal} from "../modals/MakePaymentModal";
+import {ProjectAPI} from "../../../src/api/ProjectAPI";
+import {useDispatch} from "react-redux";
+import {actionsProjects} from "../../../src/redux/projects-reducer";
+import {useRouter} from "next/router";
 
-export const EditControlPanel: React.FC<{ edit: EditType | null }> = ({edit}) => {
+export const EditControlPanel: React.FC<{ edit: EditType | null, project: ProjectType | null, closePage: () => void }> = ({closePage, edit, project}) => {
+    const dispatch = useDispatch()
+    const router = useRouter()
+    const [isPaymentModalShowMode, setIsPaymentModalShowMode] = React.useState(false)
 
     const handleReserveMoney = () => {
+        let edits = project?.edits
+        let editId = edit?.id
 
-    }
-    const handleAcceptOffer = () => {
-
-    }
-    const handleDeclineOffer = () => {
-
-    }
-    return <div className="edits__control border-wrap control-edits">
-        <div className="control-edits__header">
-            <div className="control-edits__label label">
-                Control Panel
-            </div>
-        </div>
-        {
-            edit?.status.name === "Editing is done"
-                ? <CompletedEditBlock />
-                : <DefaultControlPanel handleReserveMoney = {handleReserveMoney} handleAcceptOffer={handleAcceptOffer} handleDeclineOffer={handleDeclineOffer} edit={edit} editStatusName = {edit?.status.name} />
+        if (edits && editId) {
+            edits = edits.map(item => {
+                if (item.id === editId) {
+                    return {
+                        ...item,
+                        description: "",
+                        status: {
+                            id: 3,
+                            name: "Performing",
+                            key: "performing",
+                            isAccepted: false
+                        }
+                    }
+                }
+                return item
+            })
         }
 
-    </div>
+        project && edits && ProjectAPI.reserveMoney(project?.id, {...project, edits}).then(res => {
+            if (!res?.error) {
+                dispatch(actionsProjects.setActiveProject(res))
+                router.push("/projects/" + project?.id)
+                closePage()
+            }
+        })
+    }
+    const handleAcceptOffer = () => {
+        let edits = project?.edits
+        let editId = edit?.id
+
+        if (edits && editId) {
+            edits = edits.map(item => {
+                if (item.id === editId) {
+                    return {
+                        ...item,
+                        description: "Make payment",
+                        status: {
+                            id: 2,
+                            name: "Reservation",
+                            key: "reservation",
+                            isAccepted: false
+                        }
+                    }
+                }
+                return item
+            })
+        }
+
+        project && edits && ProjectAPI.acceptOffer(project?.id, {...project, edits}).then(res => {
+            if (!res?.error) {
+                dispatch(actionsProjects.setActiveProject(res))
+                router.push("/projects/" + project?.id)
+                closePage()
+            }
+        })
+    }
+    const handleDeclineOffer = () => {
+        router.push("/projects/" + project?.id)
+        closePage()
+    }
+    const handleCompleteProject = () => {
+        let edits = project?.edits
+        let editId = edit?.id
+
+        if (edits && editId) {
+            edits = edits.map(item => {
+                if (item.id === editId) {
+                    return {
+                        ...item,
+                        description: "Hide",
+                        status: {
+                            id: 4,
+                            name: "Editing is done",
+                            key: "editing",
+                            isAccepted: false
+                        }
+                    }
+                }
+                return item
+            })
+        }
+
+        project && edits && ProjectAPI.completeProject(project?.id, {...project, edits}).then(res => {
+            if (!res?.error) {
+                dispatch(actionsProjects.setActiveProject(res))
+                router.push("/projects/" + project?.id)
+                closePage()
+            }
+        })
+    }
+
+    return <>
+        <div className="edits__control border-wrap control-edits">
+            <div className="control-edits__header">
+                <div className="control-edits__label label">
+                    Control Panel
+                </div>
+            </div>
+            {
+                edit?.status.name === "Editing is done"
+                    ? <CompletedEditBlock />
+                    : <DefaultControlPanel handleCompleteProject = {handleCompleteProject} handleReserveMoney={handleReserveMoney} handleAcceptOffer={handleAcceptOffer}
+                                           handleDeclineOffer={handleDeclineOffer} edit={edit}
+                                           editStatusName={edit?.status.name}/>
+            }
+        </div>
+        {
+            isPaymentModalShowMode &&
+            <MakePaymentModal hideBlock={() => setIsPaymentModalShowMode(false)} offer={edit?.offer}/>
+        }
+    </>
 }
 
-const DefaultControlPanel: React.FC<{editStatusName: StatusesNamesType | undefined, edit: EditType | null,
-    handleAcceptOffer: () => void,  handleDeclineOffer: () => void,  handleReserveMoney: () => void}> = ({editStatusName, handleReserveMoney, edit, handleDeclineOffer,handleAcceptOffer}) => {
+const DefaultControlPanel: React.FC<{
+    editStatusName: StatusesNamesType | undefined, edit: EditType | null,
+    handleAcceptOffer: () => void, handleDeclineOffer: () => void, handleReserveMoney: () => void, handleCompleteProject: () => void
+}> = ({editStatusName, handleReserveMoney, edit, handleDeclineOffer, handleAcceptOffer, handleCompleteProject}) => {
     return <>
         <ul className="control-edits__panel panel-edits">
             <li className="panel-edits__item">
@@ -57,21 +160,21 @@ const DefaultControlPanel: React.FC<{editStatusName: StatusesNamesType | undefin
             </li>
             {editStatusName === "Performing" &&
             <li className="panel-edits__item">
-                <CompleteButton/>
+                <CompleteButton onClick={handleCompleteProject}/>
             </li>}
         </ul>
         {
-            editStatusName ==="Approval" && edit?.status.isAccepted && <AcceptOfferBlock
-                offer={edit?.offer} handleAcceptOffer={handleAcceptOffer} handleDeclineOffer={handleDeclineOffer} />
+            editStatusName === "Approval" && edit?.status.isAccepted && <AcceptOfferBlock
+                offer={edit?.offer} handleAcceptOffer={handleAcceptOffer} handleDeclineOffer={handleDeclineOffer}/>
         }
         {
-            editStatusName ==="Reservation" && !edit?.status.isAccepted && <ReservationControlBlock
-                offer={edit?.offer} handleReserveMoney = {handleReserveMoney} />
+            editStatusName === "Reservation" && !edit?.status.isAccepted && <ReservationControlBlock
+                offer={edit?.offer} handleReserveMoney={handleReserveMoney}/>
         }
     </>
 }
 const AcceptOfferBlock: React.FC<{
-    offer: OfferType,
+    offer: OfferType | undefined,
     handleAcceptOffer: () => void,
     handleDeclineOffer: () => void
 }> = ({offer, handleAcceptOffer, handleDeclineOffer}) => {
@@ -84,16 +187,16 @@ const AcceptOfferBlock: React.FC<{
         <form className="offer-edits__form" action="#">
             <OfferConditionsBlock offer={offer}/>
             <div className="offer-edits__block">
-                <button onClick={handleAcceptOffer} type="submit" className="offer-edits__btn-accept">Accept</button>
-                <button onClick={handleDeclineOffer} type="submit" className="offer-edits__btn-decline">Decline</button>
+                <div onClick={handleAcceptOffer} className="offer-edits__btn-accept">Accept</div>
+                <div onClick={handleDeclineOffer} className="offer-edits__btn-decline">Decline</div>
             </div>
         </form>
     </div>
 }
-const ReservationControlBlock: React.FC<{ offer: OfferType, handleReserveMoney: () => void }> = ({
-                                                                                                     offer,
-                                                                                                     handleReserveMoney
-                                                                                                 }) => {
+const ReservationControlBlock: React.FC<{ offer: OfferType | undefined, handleReserveMoney: () => void }> = ({
+                                                                                                                 offer,
+                                                                                                                 handleReserveMoney
+                                                                                                             }) => {
     return <>
         <div className="control-edits__offer offer-edits">
             <div className="offer-edits__header">
@@ -104,24 +207,24 @@ const ReservationControlBlock: React.FC<{ offer: OfferType, handleReserveMoney: 
             <form className="offer-edits__form" action="#">
                 <OfferConditionsBlock offer={offer}/>
                 <div className="offer-edits__block">
-                    <button onClick={handleReserveMoney} type="submit" className="offer-edits__btn-reserve">Reserve
+                    <div onClick={handleReserveMoney} className="offer-edits__btn-reserve">Reserve
                         money
-                    </button>
+                    </div>
                 </div>
             </form>
         </div>
     </>
 }
 
-const OfferConditionsBlock: React.FC<{ offer: OfferType }> = ({offer}) => {
+const OfferConditionsBlock: React.FC<{ offer: OfferType | undefined }> = ({offer}) => {
     return <>
         <div className="offer-edits__item">
             <div className="offer-edits__signature">
                 Deadline
             </div>
             <div className="offer-edits__box offer-edits__box--days">
-                <input className="offer-edits__input" type="text" name="days" placeholder={offer.days.toString()}
-                       value={offer.days.toString()}/>
+                <input className="offer-edits__input" type="text" name="days" placeholder={offer?.days.toString()}
+                       value={offer?.days.toString()}/>
                 <div className="offer-edits__designation">days</div>
             </div>
         </div>
@@ -130,8 +233,8 @@ const OfferConditionsBlock: React.FC<{ offer: OfferType }> = ({offer}) => {
                 Time for work in hours
             </div>
             <div className="offer-edits__box offer-edits__box--time">
-                <input className="offer-edits__input" type="text" name="time" placeholder={offer.hours.toString()}
-                       value={offer.hours.toString()}/>
+                <input className="offer-edits__input" type="text" name="time" placeholder={offer?.hours.toString()}
+                       value={offer?.hours.toString()}/>
                 <div className="offer-edits__designation">hrs.</div>
             </div>
         </div>
@@ -141,8 +244,8 @@ const OfferConditionsBlock: React.FC<{ offer: OfferType }> = ({offer}) => {
             </div>
             <div className="offer-edits__box offer-edits__box--total">
                 <input className="offer-edits__input" type="text" name="total"
-                       placeholder={offer.balance.toString()}
-                       value={offer.balance.toString()}/>
+                       placeholder={offer?.balance.toString()}
+                       value={offer?.balance.toString()}/>
                 <div className="offer-edits__designation">$</div>
             </div>
         </div>
@@ -156,7 +259,7 @@ const CompletedEditBlock = () => {
             <DeleteEditHistoryButton />
             <AddNewCorrectionButton />
         </div>
-        </div>
+    </div>
 }
 
 const FreezeIcon = () => {
@@ -200,8 +303,8 @@ const RemoveIcon = () => {
             fill="#888BA0"/>
     </svg>
 }
-const CompleteButton = () => {
-    return <button className="panel-edits__btn panel-edits__btn--complete btn-green">
+const CompleteButton: React.FC<{onClick: () => void}> = ({onClick}) => {
+    return <div onClick = {onClick} className="panel-edits__btn panel-edits__btn--complete btn-green">
         Complete the project
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
              xmlns="http://www.w3.org/2000/svg">
@@ -221,7 +324,7 @@ const CompleteButton = () => {
                 d="M1.03451 4.34489C1.37731 4.34489 1.6552 4.067 1.6552 3.72421C1.6552 3.38141 1.37731 3.10352 1.03451 3.10352C0.691711 3.10352 0.413818 3.38141 0.413818 3.72421C0.413818 4.067 0.691711 4.34489 1.03451 4.34489Z"
                 fill="#95A5A5"/>
         </svg>
-    </button>
+    </div>
 }
 const AddNewCorrectionButton = () => {
     return <button className="panel-edits__btn panel-edits__btn--add btn-blue">

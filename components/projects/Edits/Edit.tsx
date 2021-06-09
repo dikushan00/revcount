@@ -4,8 +4,12 @@ import {EditProgressBar} from "./EditProgressBar";
 import {EditTasks} from "./EditTasks";
 import {EditWorkspaceWindow} from "./EditWorkspaceWindow";
 import {EditControlPanel} from "./EditControlPanel";
+import {useSelector} from "react-redux";
+import {AppStateType} from "../../../src/redux/store-redux";
 
 export const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = ({edit, closePage}) => {
+
+    const project = useSelector((state: AppStateType) => state.projects.activeProject)
     return <section className="edits">
         <div className="edits__header">
             <h2 className="edits__title title">
@@ -23,6 +27,6 @@ export const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = 
         <EditProgressBar status={edit?.status} />
         <EditTasks />
         <EditWorkspaceWindow workspace={edit?.workspace} deadline={edit?.deadline} />
-        <EditControlPanel edit={edit} />
+        <EditControlPanel closePage = {closePage} project={project} edit={edit} />
     </section>
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import {TeamProjectButton} from "../common/blocks/buttons/TeamProjectButton";
 import {AddMemberToProjectModal} from "../projects/members/AddMemberToProjectModal";
-import {TeamSettingsModal} from "../projects/TeamSettingsModal";
+import {TeamSettingsModal} from "../projects/modals/TeamSettingsModal";
 import {useSelector} from "react-redux";
 import {AppStateType} from "../../src/redux/store-redux";
 
@@ -40,7 +40,7 @@ export const SidebarRight = () => {
                                     <span/>{user.name} {user.isOwner && "(You)"}
                                 </div>
                                 <div className="team-project__role">
-                                    {user.isOwner ? "Owner" : "Artist"}
+                                    {user.role.name}
                                 </div>
                             </li>
                         })
