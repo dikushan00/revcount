@@ -2,7 +2,36 @@ import React from "react";
 import {ProjectType} from "../../src/types/projectTypes";
 
 
-export const ProjectStatsInfo:React.FC<{project: ProjectType | null}> = ({project}) => {
+export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({project}) => {
+    const addInfo = (info: string | number) => <sup>+{info} d.</sup>
+
+    const data = [
+        {
+            imgPath: "/img/projects/flame.svg",
+            title: "Deadline",
+            className: "deadline",
+            field: "deadline",
+            addInfo: addInfo,
+            addContent: null
+        },
+        {
+            imgPath: "/img/projects/free.svg",
+            title: "Free edits",
+            field: "freeEdits",
+            className: "edits",
+            addContent: null
+        },
+    ] as any[]
+
+    if (project?.role.name === "Owner")
+        data.push(
+            {
+                imgPath: "/img/projects/credit-card.svg",
+                title: "Balance",
+                field: "balance",
+                className: "balance",
+                addContent: <div className="projects-list__add">+</div>,
+            })
 
     return <ul className="projects__list projects-list">
         {
@@ -24,35 +53,10 @@ export const ProjectStatsInfo:React.FC<{project: ProjectType | null}> = ({projec
                         </div>
                     </div>
                     {
-                        item.addContent && item.addContent
+                        item?.addContent && item.addContent
                     }
                 </li>
             })
         }
     </ul>
 }
-
-const addInfo = (info: string | number) => <sup>+{info} d.</sup>
-
-const data = [
-    {
-        imgPath: "/img/projects/flame.svg",
-        title: "Deadline",
-        className: "deadline",
-        field: "deadline",
-        addInfo: addInfo,
-    },
-    {
-        imgPath: "/img/projects/free.svg",
-        title: "Free edits",
-        field: "freeEdits",
-        className: "edits",
-    },
-    {
-        imgPath: "/img/projects/credit-card.svg",
-        title: "Balance",
-        field: "balance",
-        className: "balance",
-        addContent: <div className="projects-list__add">+</div>,
-    },
-]

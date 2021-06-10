@@ -3,11 +3,14 @@ import {CustomPopup} from "../../common/blocks/CustomPopup";
 import {useOutsideAlerter} from '../../../src/utils/hooks/outsideClick';
 import {useForm} from "react-hook-form";
 import {ProjectAPI} from "../../../src/api/ProjectAPI";
+import {AcceptProjectUserType} from "../../sidebars/Sidebar";
 
 type PropsType = {
     hideBlock: () => void
+    handleAcceptProject: (n: AcceptProjectUserType) => void
+    projectId: number
 }
-export const JoinProjectModal: React.FC<PropsType> = ({hideBlock}) => {
+export const AcceptInvitationModal: React.FC<PropsType> = ({hideBlock, handleAcceptProject, projectId}) => {
 
     const {register, handleSubmit} = useForm()
     const joinProjectRef = React.useRef(null)
@@ -15,12 +18,12 @@ export const JoinProjectModal: React.FC<PropsType> = ({hideBlock}) => {
     useOutsideAlerter(joinProjectRef, hideBlock)
     const handleCloseModal = () => hideBlock()
 
-    const onSubmit = (data: any) => {
-
+    const onSubmit = (data: { name: string, hoursRate: string }) => {
+        handleAcceptProject({name: data.name, hoursRate: +data.hoursRate, projectId})
         //@ts-ignore
-        ProjectAPI.acceptInvitation(1, {}).then(res => {
-            !res?.error
-        })
+        // ProjectAPI.acceptInvitation(1, {}).then(res => {
+        //     !res?.error
+        // })
     }
     return <CustomPopup className={"popup__join"} modalBodyRef={joinProjectRef}>
         <div onClick={handleCloseModal} className="popup__close"/>

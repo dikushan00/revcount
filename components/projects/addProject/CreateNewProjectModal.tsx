@@ -1,29 +1,64 @@
 import React from 'react';
 import {CustomPopup} from "../../common/blocks/CustomPopup";
 import {useOutsideAlerter} from '../../../src/utils/hooks/outsideClick';
+import {useForm} from "react-hook-form";
+import {RemoveItemIcon} from "../members/AddMemberToProjectModal";
+import {useDispatch} from "react-redux";
+import {Simulate} from "react-dom/test-utils";
+import {ProjectAPI} from "../../../src/api/ProjectAPI";
+import {actionsProjects} from "../../../src/redux/projects-reducer";
 
 type PropsType = {
     hideBlock: () => void
 }
 export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
 
-    const [isInputDateMode, setIsInputDateMode] = React.useState(false)
+    const dispatch = useDispatch()
+    const {handleSubmit, register, watch} = useForm()
     const addProjectRef = React.useRef(null)
+
+    const [isInputDateMode, setIsInputDateMode] = React.useState(false)
+    const [addedIds, setAddedIds] = React.useState([] as string[])
+
+    const handleDeleteId = (id: string) => {
+        const edited = addedIds.filter(item => item !== id)
+        setAddedIds(edited)
+    }
 
     useOutsideAlerter(addProjectRef, hideBlock)
     const handleCloseModal = () => hideBlock()
+
+    const onSubmit = (data: { name: string, freeEdits: string, deadline: string }) => {
+        let project = {
+            name: data.name,
+            freeEdits: +data.freeEdits,
+            deadline: +data.deadline,
+            balance: 0,
+            addDeadline: 0,
+            edits: [],
+            users: [],
+            actionsHistory: []
+        }
+
+        ProjectAPI.createProject(project).then(res => {
+           if( !res?.error) {
+               dispatch(actionsProjects.addProject(res))
+               hideBlock()
+           }
+        })
+    }
 
     return <CustomPopup className={"popup__create"} modalBodyRef={addProjectRef}>
         <div className="popup__close" onClick={handleCloseModal}/>
         <h2 className="popup__title">
             Create a new project
         </h2>
-        <form action="#" className="popup__form">
+        <form className="popup__form">
             <div className="popup__item">
-                <input type="text" placeholder="Project name" className="popup__input"/>
+                <input ref={register} name = "name" type="text" placeholder="Project name" className="popup__input"/>
             </div>
             <div className="popup__item">
-                <input type="text" placeholder="Free edits in hours" className="popup__input"/>
+                <input ref={register} name="freeEdits" type="text" placeholder="Free edits in hours" className="popup__input"/>
             </div>
             <div className="popup__item">
                 <label htmlFor="inpdate" className="popup__icon">
@@ -34,56 +69,52 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
                             fill="#1078F1"/>
                     </svg>
                 </label>
-                <input id="inpdate" type={isInputDateMode ? "date" : "text"}
+                <input ref={register} name={"deadline"} id="inpdate" type={isInputDateMode ? "date" : "text"}
                        onBlur={() => setIsInputDateMode(false)} onFocus={() => setIsInputDateMode(true)}
                        placeholder="Set a deadline"
                        className="popup__input popup__input--date"/>
             </div>
             <div className="popup__item">
-                <label htmlFor="inpid" className="popup__id-block id-block">
-                    <div className="id-block__item">
-                        <div className="id-block__numer">888BA02</div>
-                        <button className="id-block__btn">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 xmlnsXlink="http://www.w3.org/1999/xlink" width={18} height={18}
-                                 viewBox="0 0 18 18">
-                                <defs>
-                                    <path id="avzva"
-                                          d="M691.485 160.07l-1.414 1.415-7.071-7.071-7.071 7.071-1.414-1.414 7.07-7.071-7.07-7.071 1.414-1.415 7.07 7.071 7.072-7.07 1.414 1.414-7.07 7.07z"/>
-                                </defs>
-                                <g>
-                                    <g transform="translate(-674 -144)">
-                                        <use fill="#fff" xlinkHref="#avzva"/>
-                                    </g>
-                                </g>
-                            </svg>
-                        </button>
-                    </div>
-                    <div className="id-block__item">
-                        <div className="id-block__numer">111742</div>
-                        <button className="id-block__btn">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 xmlnsXlink="http://www.w3.org/1999/xlink" width={18} height={18}
-                                 viewBox="0 0 18 18">
-                                <defs>
-                                    <path id="avzva"
-                                          d="M691.485 160.07l-1.414 1.415-7.071-7.071-7.071 7.071-1.414-1.414 7.07-7.071-7.07-7.071 1.414-1.415 7.07 7.071 7.072-7.07 1.414 1.414-7.07 7.07z"/>
-                                </defs>
-                                <g>
-                                    <g transform="translate(-674 -144)">
-                                        <use fill="#fff" xlinkHref="#avzva"/>
-                                    </g>
-                                </g>
-                            </svg>
-                        </button>
-                    </div>
-                </label>
-                <input id="inpid" type="text" placeholder={""} className="popup__input popup__input--id"/>
+                <div className="popup__input popup__input--id">
+                    {
+                        addedIds.map(id => {
+                            return <div key={id} className="id-block__item">
+                                <div className="id-block__number">{id}</div>
+                                <span onClick={() => handleDeleteId(id)} className="id-block__btn">
+                                <RemoveItemIcon/>
+                            </span>
+                            </div>
+                        })
+                    }
+                    <input id="inpid" onKeyPress={e => {
+                        if (e.code === "Enter") {
+                            //@ts-ignore
+                            let text = e.target.value
+                            let isExist = addedIds.some(item => item === text)
+                            if (isExist)
+                                return
+
+                            if (text.length > 0 && !isExist) {
+                                setAddedIds(state => ([...state, text]))
+                                //@ts-ignore
+                                e.target.value = ""
+                            }
+                        }
+                    }} type="text" className="input_tag"/>
+                </div>
             </div>
             <div className="popup__descr">
                 Enter a unique user ID for the invitation, comma separated
             </div>
-            <button type="submit" className="popup__btn">Create a project</button>
+
+            <div onClick={() => {
+                let data = {
+                    name: watch("name"),
+                    freeEdits: watch("freeEdits"),
+                    deadline: watch("deadline")
+                }
+                onSubmit(data)
+            }} className="popup__btn input-id-button">Create a project</div>
         </form>
     </CustomPopup>
 

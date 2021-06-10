@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppStateType} from "../../src/redux/store-redux";
 import {actionsProjects} from "../../src/redux/projects-reducer";
 import {ProjectAPI} from "../../src/api/ProjectAPI";
+import {AcceptInvitationModal} from "../projects/modals/AcceptInvitationModal";
 
 type ActionNamesType = "projects" | "invitations"
 
@@ -76,17 +77,17 @@ export const Sidebar = () => {
 }
 
 type InvitationProjectsPropsType = {}
-
+export type AcceptProjectUserType = {projectId: number, name: string, hoursRate: number}
 const InvitationProjects: React.FC<InvitationProjectsPropsType> = () => {
-
     const dispatch = useDispatch()
 
+    const [acceptProjectId, setAcceptProjectId] = React.useState<number | null>(null)
     const invitations = useSelector((state: AppStateType) => state.projects.invitations)
 
-    const handleAcceptProject = (projectId: number) => {
-        ProjectAPI.acceptProject(projectId).then(res => {
+    const handleAcceptProject = (data: AcceptProjectUserType) => {
+        ProjectAPI.acceptProject(data.projectId).then(res => {
             if (!res?.error) {
-                dispatch(actionsProjects.acceptProject(projectId))
+                dispatch(actionsProjects.acceptProject(data.projectId))
             }
         }).catch(error => {
             console.log(error)
@@ -104,36 +105,40 @@ const InvitationProjects: React.FC<InvitationProjectsPropsType> = () => {
         })
     }
 
-    return <ul className="sidebar__block block-sidebar block-sidebar__invitation">
+    return <>
+        <ul className="sidebar__block block-sidebar block-sidebar__invitation">
+            {
+                invitations?.map((item, index) => {
+                    return <li key={item.id || index} className="block-sidebar__item">
+                        <button className="block-sidebar__btn block-sidebar-open">
+                            <span/> {item.name}
+                        </button>
+                        <div className="block-sidebar__body">
+                            <button onClick={() => setAcceptProjectId(item.id)}
+                                    className="block-sidebar__button block-sidebar__button--accept">Accept
+                            </button>
+                            <button onClick={() => handleDeclineProject(item.id)}
+                                    className="block-sidebar__button block-sidebar__button--decline">Decline
+                            </button>
+                        </div>
+                    </li>
+                })
+            }
+        </ul>
         {
-            invitations?.map((item, index) => {
-                return <li key={item.id || index} className="block-sidebar__item">
-                    <button className="block-sidebar__btn block-sidebar-open">
-                        <span/> {item.name}
-                    </button>
-                    <div className="block-sidebar__body">
-                        <button onClick={() => handleAcceptProject(item.id)}
-                                className="block-sidebar__button block-sidebar__button--accept">Accept
-                        </button>
-                        <button onClick={() => handleDeclineProject(item.id)}
-                                className="block-sidebar__button block-sidebar__button--decline">Decline
-                        </button>
-                    </div>
-                </li>
-            })
+            acceptProjectId && <AcceptInvitationModal projectId = {acceptProjectId} handleAcceptProject = {handleAcceptProject} hideBlock={() => setAcceptProjectId(null)} />
         }
-    </ul>
+    </>
 }
 
 const Projects: React.FC<{ projects: ProjectType[] | null, handleAddNewProject: () => void }> = ({
                                                                                                      handleAddNewProject,
                                                                                                      projects
                                                                                                  }) => {
-
     return <ul className="sidebar__block block-sidebar">
         {
             projects?.map((item, index) => {
-                return <Link key = {item.id} href={"/projects/" + item.id}>
+                return <Link key={item.id} href={"/projects/" + item.id}>
                     <li className="block-sidebar__item">
                         <button className="block-sidebar__btn">
                             <span/> {item.name}

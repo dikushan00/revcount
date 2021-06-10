@@ -1,7 +1,10 @@
 import {instance} from "./API";
-import {ProjectType} from "../types/projectTypes";
+import {OfferType, ProjectPostType, ProjectType} from "../types/projectTypes";
 
 export const ProjectAPI = {
+    createProject(project: ProjectPostType) {
+        return instance.post("projects", project).then(res => res.data)
+    },
     getProjects() {
         return instance.get("projects").then(res => res.data)
     },
@@ -11,11 +14,17 @@ export const ProjectAPI = {
     editProject(projectId: number, project: ProjectType) {
         return instance.put("projects/" + projectId, project).then(res => res.data)
     },
+    joinToProject(projectId: number, userId: number) {
+        return instance.post("projects/" + projectId, {userId}).then(res => res.data)
+    },
     acceptOffer(projectId: number, project: ProjectType) {
         return instance.put("projects/" + projectId, project).then(res => res.data)
     },
     reserveMoney(projectId: number, project: ProjectType) {
         return instance.put("projects/" + projectId, project).then(res => res.data)
+    },
+    sendOffer(projectId: number, project: ProjectType, offer: OfferType) {
+        return instance.put("projects/" + projectId).then(res => res.data)
     },
     completeProject(projectId: number, project: ProjectType) {
         return instance.put("projects/" + projectId, project).then(res => res.data)

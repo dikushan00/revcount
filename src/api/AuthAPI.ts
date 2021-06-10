@@ -1,5 +1,5 @@
 import {instance, loginInstance} from "./API"
-import {LoginType} from "../types/userTypes";
+import {LoginType, SignUpType} from "../types/userTypes";
 
 export const AuthAPI = {
     //check client auth
@@ -8,5 +8,8 @@ export const AuthAPI = {
     },
     login(data: LoginType) {
         return loginInstance.post("auth/user/login", data).then(res => res.data)
+    },
+    signUp(data: SignUpType) {
+        return loginInstance.post("auth/sign_up", data).then(res => res.data)
     },
 }

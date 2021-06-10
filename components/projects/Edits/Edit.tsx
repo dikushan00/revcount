@@ -1,15 +1,17 @@
 import React from 'react';
-import {EditType} from "../../../src/types/projectTypes";
+import {EditType, TaskType} from "../../../src/types/projectTypes";
 import {EditProgressBar} from "./EditProgressBar";
-import {EditTasks} from "./EditTasks";
+import {EditTasksPanel} from "./EditTasksPanel";
 import {EditWorkspaceWindow} from "./EditWorkspaceWindow";
 import {EditControlPanel} from "./EditControlPanel";
 import {useSelector} from "react-redux";
 import {AppStateType} from "../../../src/redux/store-redux";
+import {ArtistsControlPanel} from "./artist/ArtistsControlPanel";
 
 export const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = ({edit, closePage}) => {
 
     const project = useSelector((state: AppStateType) => state.projects.activeProject)
+
     return <section className="edits">
         <div className="edits__header">
             <h2 className="edits__title title">
@@ -24,9 +26,13 @@ export const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = 
                 Back to project
             </button>
         </div>
-        <EditProgressBar status={edit?.status} />
-        <EditTasks />
-        <EditWorkspaceWindow workspace={edit?.workspace} deadline={edit?.deadline} />
-        <EditControlPanel closePage = {closePage} project={project} edit={edit} />
+        <EditProgressBar status={edit?.status}/>
+        <EditTasksPanel type={"changeEdit"}/>
+        <EditWorkspaceWindow isOfferExist = {!!edit?.offer} isOwner={project?.role.name === "Owner"} workspace={edit?.workspace} deadline={edit?.deadline}/>
+        {
+            project?.role.name === "Owner"
+                ? <EditControlPanel closePage={closePage} project={project} edit={edit}/>
+                : project?.role.name === "Artist" && <ArtistsControlPanel  projectId = {project.id}/>
+        }
     </section>
 };

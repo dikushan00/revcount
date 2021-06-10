@@ -7,8 +7,8 @@ type TimeLeftType = {
     seconds: string | null
 }
 
-export const EditWorkspaceWindow: React.FC<{ workspace: WorkspaceMessageType[] | undefined, deadline: string | null | undefined }> =
-    ({workspace, deadline}) => {
+export const EditWorkspaceWindow: React.FC<{ isOwner: boolean, isOfferExist: boolean, workspace: WorkspaceMessageType[] | undefined, deadline: string | null | undefined }> =
+    ({workspace, deadline, isOwner, isOfferExist}) => {
         const [timeLeft, setTimeLeft] = React.useState<TimeLeftType>({
             days: null,
             minutes: null,
@@ -29,11 +29,11 @@ export const EditWorkspaceWindow: React.FC<{ workspace: WorkspaceMessageType[] |
                 <div className="workspace-edits__label label">
                     Workspace
                 </div>
-                {!workspace && <button className="workspace-edits__btn">Waiting for an offer</button>}
+                {isOwner && !isOfferExist && <button className="workspace-edits__btn">Waiting for an offer</button>}
             </div>
-            <ul className="workspace-edits__box">
+            {workspace && workspace?.length > 0 && <ul className="workspace-edits__box">
                 {
-                    workspace?.map(item => {
+                    workspace.map(item => {
                         return <li key={item.id} className="workspace-edits__item">
                             <p className="workspace-edits__offer">
                                 {item.message}
@@ -44,7 +44,7 @@ export const EditWorkspaceWindow: React.FC<{ workspace: WorkspaceMessageType[] |
                         </li>
                     })
                 }
-            </ul>
+            </ul>}
             {deadline && <LeftTimeWorkspace timeLeft={timeLeft}/>}
         </div>
     }

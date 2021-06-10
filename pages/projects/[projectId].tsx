@@ -31,10 +31,6 @@ const Project: React.FC<{ project: ProjectType }> = () => {
 
     React.useEffect(() => {
         project && dispatch(actionsProjects.setActiveProject(project))
-
-        // return () => {
-        //     project && dispatch(actionsProjects.setActiveProject(null))
-        // }
     }, [project])
 
     const handleDisableEditMode = () => setIsEditMode(false)
@@ -50,11 +46,7 @@ const Project: React.FC<{ project: ProjectType }> = () => {
                 : <>
                     <div className="projects">
                         <div className="projects__header">
-                            <Link href={"/projects/add-new-edit/" + projectId}>
-                                <a className={"next_link_tag"}>
-                                    <ProjectsButton>Add new correction<span>+</span></ProjectsButton>
-                                </a>
-                            </Link>
+                            {project?.role.name === "Owner" && <AddCorrectionLink projectId={projectId as string}/>}
                             <ProjectStatsInfo project={project}/>
                         </div>
                     </div>
@@ -96,6 +88,12 @@ const Project: React.FC<{ project: ProjectType }> = () => {
     </MainLayOut>
 
 }
+
+const AddCorrectionLink: React.FC<{projectId: string }> = ({projectId}) => <Link href={"/projects/add-new-edit/" + projectId}>
+    <a className={"next_link_tag"}>
+        <ProjectsButton>Add new correction<span>+</span></ProjectsButton>
+    </a>
+</Link>
 
 const getStatusImg = (status: StatusesNamesType) => {
     switch (status) {

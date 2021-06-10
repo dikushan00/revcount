@@ -5,6 +5,10 @@
       "name": "Otava Chemical",
       "deadline": 14,
       "addDeadline": 3,
+      "role": {
+        "id": 2,
+        "name": "Artist"
+      },
       "freeEdits": 5,
       "balance": 1444,
       "edits": [
@@ -28,15 +32,15 @@
           "id": 10,
           "name": "buy costumes",
           "status": {
-            "id": 4,
-            "name": "Editing is done",
-            "key": "editing",
+            "id": 3,
+            "name": "Performing",
+            "key": "performing",
             "isAccepted": false
           },
           "offer": {
-            "balance": 333,
-            "days": 2,
-            "hours": 20
+            "balance": 280,
+            "days": 7,
+            "hours": 21
           },
           "workspace": [
             {
@@ -45,7 +49,7 @@
               "date": "13:30 (08 of May)"
             }
           ],
-          "description": "Hide"
+          "description": ""
         },
         {
           "id": 2,
@@ -207,6 +211,61 @@
           }
         }
       ]
+    },
+    {
+      "name": "Project 1",
+      "freeEdits": 24,
+      "deadline": null,
+      "balance": 0,
+      "addDeadline": 0,
+      "edits": [],
+      "users": [],
+      "actionsHistory": [],
+      "id": 2
+    },
+    {
+      "name": "Project 1",
+      "freeEdits": 24,
+      "deadline": null,
+      "balance": 0,
+      "addDeadline": 0,
+      "edits": [],
+      "users": [],
+      "actionsHistory": [],
+      "id": 3
+    },
+    {
+      "name": "Project 1",
+      "freeEdits": 24,
+      "deadline": null,
+      "balance": 0,
+      "addDeadline": 0,
+      "edits": [],
+      "users": [],
+      "actionsHistory": [],
+      "id": 4
+    },
+    {
+      "name": "Project 1",
+      "freeEdits": 24,
+      "deadline": null,
+      "balance": 0,
+      "addDeadline": 0,
+      "edits": [],
+      "users": [],
+      "actionsHistory": [],
+      "id": 5
+    },
+    {
+      "name": "prj",
+      "freeEdits": 36,
+      "deadline": null,
+      "balance": 0,
+      "addDeadline": 0,
+      "edits": [],
+      "users": [],
+      "actionsHistory": [],
+      "id": 6
     }
   ],
   "statuses": [

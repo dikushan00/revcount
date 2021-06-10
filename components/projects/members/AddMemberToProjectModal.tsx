@@ -98,6 +98,8 @@ const InviteMemberViaId = () => {
         setAddedIds(edited)
     }
 
+    const onSubmit = () => {}
+
     return <div className="tabs-popup__line">
         <div className="popup__item">
             <div className="popup__input popup__input--id">
@@ -128,7 +130,7 @@ const InviteMemberViaId = () => {
                 }} type="text" className="input_tag"/>
             </div>
         </div>
-        <button type="submit" className="tabs-popup__btn btn-2">Send invite</button>
+        <div onClick={onSubmit} className="tabs-popup__btn btn-2 input-id-button">Send invite</div>
     </div>
 
 }

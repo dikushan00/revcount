@@ -1,7 +1,6 @@
-import {UserType} from "./userTypes";
+import {RoleType, UserType} from "./userTypes";
 
-export type ProjectType = {
-    id: number
+export interface ProjectPostType {
     name: string
     deadline: number
     addDeadline: number
@@ -10,6 +9,10 @@ export type ProjectType = {
     edits: EditType[],
     users: UserType[],
     actionsHistory: ActionHistoryType[]
+}
+export interface ProjectType extends ProjectPostType{
+    id: number
+    role: RoleType
 }
 type ActionHistoryType = {
     id: number,

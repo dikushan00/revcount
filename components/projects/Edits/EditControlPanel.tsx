@@ -1,17 +1,28 @@
 import React from 'react';
-import {EditType, OfferType, ProjectType, StatusesNamesType} from "../../../src/types/projectTypes";
+import {
+    EditStatusType,
+    EditType,
+    OfferType,
+    ProjectType,
+    StatusesNamesType,
+    StatusType
+} from "../../../src/types/projectTypes";
 import {MakePaymentModal} from "../modals/MakePaymentModal";
 import {ProjectAPI} from "../../../src/api/ProjectAPI";
 import {useDispatch} from "react-redux";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
 import {useRouter} from "next/router";
 
-export const EditControlPanel: React.FC<{ edit: EditType | null, project: ProjectType | null, closePage: () => void }> = ({closePage, edit, project}) => {
+export const EditControlPanel: React.FC<{ edit: EditType | null, project: ProjectType | null, closePage: () => void }> = ({
+                                                                                                                              closePage,
+                                                                                                                              edit,
+                                                                                                                              project
+                                                                                                                          }) => {
     const dispatch = useDispatch()
     const router = useRouter()
     const [isPaymentModalShowMode, setIsPaymentModalShowMode] = React.useState(false)
 
-    const handleReserveMoney = () => {
+    const changeStatus = (status: EditStatusType) => {
         let edits = project?.edits
         let editId = edit?.id
 
@@ -21,49 +32,46 @@ export const EditControlPanel: React.FC<{ edit: EditType | null, project: Projec
                     return {
                         ...item,
                         description: "",
-                        status: {
-                            id: 3,
-                            name: "Performing",
-                            key: "performing",
-                            isAccepted: false
-                        }
+                        status: status
                     }
                 }
                 return item
             })
         }
 
-        project && edits && ProjectAPI.reserveMoney(project?.id, {...project, edits}).then(res => {
+        return edits || []
+    }
+    const handleReserveMoney = () => {
+        let changedStatusEdits: EditType[] = changeStatus({
+            id: 3,
+            name: "Performing",
+            key: "performing",
+            isAccepted: false
+        })
+        project && changedStatusEdits && ProjectAPI.reserveMoney(project?.id, {
+            ...project,
+            edits: changedStatusEdits
+        }).then(res => {
             if (!res?.error) {
                 dispatch(actionsProjects.setActiveProject(res))
                 router.push("/projects/" + project?.id)
                 closePage()
+                setIsPaymentModalShowMode(false)
             }
         })
     }
     const handleAcceptOffer = () => {
-        let edits = project?.edits
-        let editId = edit?.id
+        let changedStatusEdits: EditType[] = changeStatus({
+            id: 3,
+            name: "Performing",
+            key: "performing",
+            isAccepted: false
+        })
 
-        if (edits && editId) {
-            edits = edits.map(item => {
-                if (item.id === editId) {
-                    return {
-                        ...item,
-                        description: "Make payment",
-                        status: {
-                            id: 2,
-                            name: "Reservation",
-                            key: "reservation",
-                            isAccepted: false
-                        }
-                    }
-                }
-                return item
-            })
-        }
-
-        project && edits && ProjectAPI.acceptOffer(project?.id, {...project, edits}).then(res => {
+        project && changedStatusEdits && ProjectAPI.acceptOffer(project?.id, {
+            ...project,
+            edits: changedStatusEdits
+        }).then(res => {
             if (!res?.error) {
                 dispatch(actionsProjects.setActiveProject(res))
                 router.push("/projects/" + project?.id)
@@ -76,28 +84,17 @@ export const EditControlPanel: React.FC<{ edit: EditType | null, project: Projec
         closePage()
     }
     const handleCompleteProject = () => {
-        let edits = project?.edits
-        let editId = edit?.id
+        let changedStatusEdits: EditType[] = changeStatus({
+            id: 3,
+            name: "Performing",
+            key: "performing",
+            isAccepted: false
+        })
 
-        if (edits && editId) {
-            edits = edits.map(item => {
-                if (item.id === editId) {
-                    return {
-                        ...item,
-                        description: "Hide",
-                        status: {
-                            id: 4,
-                            name: "Editing is done",
-                            key: "editing",
-                            isAccepted: false
-                        }
-                    }
-                }
-                return item
-            })
-        }
-
-        project && edits && ProjectAPI.completeProject(project?.id, {...project, edits}).then(res => {
+        project && changedStatusEdits && ProjectAPI.completeProject(project?.id, {
+            ...project,
+            edits: changedStatusEdits
+        }).then(res => {
             if (!res?.error) {
                 dispatch(actionsProjects.setActiveProject(res))
                 router.push("/projects/" + project?.id)
@@ -105,6 +102,8 @@ export const EditControlPanel: React.FC<{ edit: EditType | null, project: Projec
             }
         })
     }
+
+    const enablePaymentMode = () => setIsPaymentModalShowMode(true)
 
     return <>
         <div className="edits__control border-wrap control-edits">
@@ -115,23 +114,42 @@ export const EditControlPanel: React.FC<{ edit: EditType | null, project: Projec
             </div>
             {
                 edit?.status.name === "Editing is done"
-                    ? <CompletedEditBlock />
-                    : <DefaultControlPanel handleCompleteProject = {handleCompleteProject} handleReserveMoney={handleReserveMoney} handleAcceptOffer={handleAcceptOffer}
-                                           handleDeclineOffer={handleDeclineOffer} edit={edit}
+                    ? <CompletedEditBlock/>
+                    : <DefaultControlPanel handleCompleteProject={handleCompleteProject}
+                                           handleReserveMoney={handleReserveMoney}
+                                           handleAcceptOffer={handleAcceptOffer}
+                                           handleDeclineOffer={handleDeclineOffer}
+                                           edit={edit}
+                                           enablePaymentMode={enablePaymentMode}
                                            editStatusName={edit?.status.name}/>
             }
         </div>
         {
             isPaymentModalShowMode &&
-            <MakePaymentModal hideBlock={() => setIsPaymentModalShowMode(false)} offer={edit?.offer}/>
+            <MakePaymentModal handleReserveMoney={handleReserveMoney} hideBlock={() => setIsPaymentModalShowMode(false)}
+                              offer={edit?.offer}/>
         }
     </>
 }
 
-const DefaultControlPanel: React.FC<{
-    editStatusName: StatusesNamesType | undefined, edit: EditType | null,
-    handleAcceptOffer: () => void, handleDeclineOffer: () => void, handleReserveMoney: () => void, handleCompleteProject: () => void
-}> = ({editStatusName, handleReserveMoney, edit, handleDeclineOffer, handleAcceptOffer, handleCompleteProject}) => {
+type DefaultControlPanel = {
+    editStatusName: StatusesNamesType | undefined,
+    edit: EditType | null,
+    handleAcceptOffer: () => void,
+    handleDeclineOffer: () => void,
+    enablePaymentMode: () => void,
+    handleReserveMoney: () => void,
+    handleCompleteProject: () => void
+}
+const DefaultControlPanel: React.FC<DefaultControlPanel> = ({
+                                                                editStatusName,
+                                                                handleReserveMoney,
+                                                                edit,
+                                                                handleDeclineOffer,
+                                                                handleAcceptOffer,
+                                                                enablePaymentMode,
+                                                                handleCompleteProject
+                                                            }) => {
     return <>
         <ul className="control-edits__panel panel-edits">
             <li className="panel-edits__item">
@@ -169,7 +187,7 @@ const DefaultControlPanel: React.FC<{
         }
         {
             editStatusName === "Reservation" && !edit?.status.isAccepted && <ReservationControlBlock
-                offer={edit?.offer} handleReserveMoney={handleReserveMoney}/>
+                offer={edit?.offer} handleReserveMoney={handleReserveMoney} enablePaymentMode={enablePaymentMode}/>
         }
     </>
 }
@@ -193,10 +211,10 @@ const AcceptOfferBlock: React.FC<{
         </form>
     </div>
 }
-const ReservationControlBlock: React.FC<{ offer: OfferType | undefined, handleReserveMoney: () => void }> = ({
-                                                                                                                 offer,
-                                                                                                                 handleReserveMoney
-                                                                                                             }) => {
+const ReservationControlBlock: React.FC<{ offer: OfferType | undefined, handleReserveMoney: () => void, enablePaymentMode: () => void }> = ({
+                                                                                                                                                offer,
+                                                                                                                                                enablePaymentMode
+                                                                                                                                            }) => {
     return <>
         <div className="control-edits__offer offer-edits">
             <div className="offer-edits__header">
@@ -207,7 +225,7 @@ const ReservationControlBlock: React.FC<{ offer: OfferType | undefined, handleRe
             <form className="offer-edits__form" action="#">
                 <OfferConditionsBlock offer={offer}/>
                 <div className="offer-edits__block">
-                    <div onClick={handleReserveMoney} className="offer-edits__btn-reserve">Reserve
+                    <div onClick={enablePaymentMode} className="offer-edits__btn-reserve">Reserve
                         money
                     </div>
                 </div>
@@ -216,14 +234,18 @@ const ReservationControlBlock: React.FC<{ offer: OfferType | undefined, handleRe
     </>
 }
 
-const OfferConditionsBlock: React.FC<{ offer: OfferType | undefined }> = ({offer}) => {
+export const OfferConditionsBlock: React.FC<{ offer?: OfferType | undefined, register?: any }> = ({
+                                                                                                      offer,
+                                                                                                      register
+                                                                                                  }) => {
     return <>
         <div className="offer-edits__item">
             <div className="offer-edits__signature">
                 Deadline
             </div>
             <div className="offer-edits__box offer-edits__box--days">
-                <input className="offer-edits__input" type="text" name="days" placeholder={offer?.days.toString()}
+                <input ref={register} className="offer-edits__input" type="text" name="days"
+                       placeholder={offer?.days.toString() || "0"}
                        value={offer?.days.toString()}/>
                 <div className="offer-edits__designation">days</div>
             </div>
@@ -233,7 +255,8 @@ const OfferConditionsBlock: React.FC<{ offer: OfferType | undefined }> = ({offer
                 Time for work in hours
             </div>
             <div className="offer-edits__box offer-edits__box--time">
-                <input className="offer-edits__input" type="text" name="time" placeholder={offer?.hours.toString()}
+                <input ref={register} className="offer-edits__input" type="text" name="hours"
+                       placeholder={offer?.hours.toString() || "0"}
                        value={offer?.hours.toString()}/>
                 <div className="offer-edits__designation">hrs.</div>
             </div>
@@ -243,9 +266,9 @@ const OfferConditionsBlock: React.FC<{ offer: OfferType | undefined }> = ({offer
                 Total edit cost
             </div>
             <div className="offer-edits__box offer-edits__box--total">
-                <input className="offer-edits__input" type="text" name="total"
+                <input ref={register} className="offer-edits__input" type="text" name="balance"
                        placeholder={offer?.balance.toString()}
-                       value={offer?.balance.toString()}/>
+                       value={offer?.balance.toString() || "0"}/>
                 <div className="offer-edits__designation">$</div>
             </div>
         </div>
@@ -256,8 +279,8 @@ const CompletedEditBlock = () => {
 
     return <div className="control-edits__prepare">
         <div className="control-edits__block">
-            <DeleteEditHistoryButton />
-            <AddNewCorrectionButton />
+            <DeleteEditHistoryButton/>
+            <AddNewCorrectionButton/>
         </div>
     </div>
 }
@@ -303,8 +326,8 @@ const RemoveIcon = () => {
             fill="#888BA0"/>
     </svg>
 }
-const CompleteButton: React.FC<{onClick: () => void}> = ({onClick}) => {
-    return <div onClick = {onClick} className="panel-edits__btn panel-edits__btn--complete btn-green">
+const CompleteButton: React.FC<{ onClick: () => void }> = ({onClick}) => {
+    return <div onClick={onClick} className="panel-edits__btn panel-edits__btn--complete btn-green">
         Complete the project
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
              xmlns="http://www.w3.org/2000/svg">

@@ -512,8 +512,7 @@ img {
 .popup__sec {
     top: 0;
     left: 0;
-    position: absolute;
-    /*position: relative;*/
+    position: fixed;
     width: 100%;
     min-height: 100vh;
     border-bottom: 3px solid #ebedf5;
@@ -634,6 +633,7 @@ img {
     -webkit-transition: all 0.5s ease 0s;
     -o-transition: all 0.5s ease 0s;
     transition: all 0.5s ease 0s;
+    cursor: pointer;
 }
 
 .popup__btn:hover {
@@ -825,6 +825,9 @@ img {
     height: 140px;
     background: rgba(16, 120, 241, 0.05);
     border-radius: 20px;
+}
+.popup__box.active {
+    background: rgba(97, 155, 206, 0.75);
 }
 
 .popup__payment .popup__link {
@@ -1152,6 +1155,7 @@ img {
     height: 60px !important;
     padding-left: 30px !important;
     padding-right: 30px !important;
+    cursor: pointer;
 }
 
 .popup__invite .popup__item {
@@ -1159,16 +1163,24 @@ img {
     margin: 0;
 }
 
-.popup__invite .popup__input--id {
+.input-id-button {
+    display: inline-flex;
+    align-items: center;
+}
+
+.popup__input--id {
     display: flex;
     align-items: center;
     overflow-x: auto;
+    padding: 0 20px;
+}
+
+.popup__invite .popup__input--id {
     width: 436px;
     height: 60px;
     background: #ffffff;
     border: 1px solid #0076ff;
     border-radius: 30px;
-    padding: 0 20px;
 }
 
 .popup__invite .id-block {
@@ -1197,6 +1209,7 @@ img {
     -ms-flex-pack: center;
     justify-content: center;
     margin-top: 35px;
+    cursor: pointer;
 }
 
 .popup__invite .tabs-popup__box {
@@ -2449,9 +2462,9 @@ img {
     color: #ffffff;
 }
 
-.task-edits.task-edits-open {
-    padding-right: calc(-10px + 64 * ((100vw - 320px) / 1600));
-}
+/*.task-edits.task-edits-open {*/
+/*    padding-right: calc(-10px + 64 * ((100vw - 320px) / 1600));*/
+/*}*/
 
 .task-edits.task-edits-open .task-edits__arrow {
     -webkit-transform: rotate(180deg);
@@ -2464,13 +2477,13 @@ img {
     margin-top: calc(15px + 9 * ((100vw - 320px) / 1600));
 }
 
-.task-edits.task-edits-open .task-edits__btn {
-    display: block;
-}
+/*.task-edits.task-edits-open .task-edits__btn {*/
+/*    display: block;*/
+/*}*/
 
-.task-edits.task-edits-closed .task-edits__arrow {
-    display: block;
-}
+/*.task-edits.task-edits-closed .task-edits__arrow {*/
+/*    display: block;*/
+/*}*/
 
 .task-edits.task-edits-closed .task-edits__list {
     display: none;
@@ -2511,6 +2524,7 @@ img {
     height: calc(15px + 15 * ((100vw - 320px) / 1600));
     background: #e6e8ef;
     border-radius: 50%;
+    cursor: pointer;
 }
 
 .task-edits__arrow svg {
@@ -3478,6 +3492,10 @@ img {
 
 .next_link_tag {
     height: fit-content;
+}
+.val_error{
+    padding: 5px 0;
+    color: red;
 }
 /*Tools*/
 .tooltip {

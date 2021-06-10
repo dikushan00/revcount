@@ -1,5 +1,5 @@
 //check password to valid
 export const checkPassword = (password: string) => {
-    let passw = /^[A-Za-z]\w{6,15}$/;
-    return !!password.match(passw);
+    let pass = /^[A-Za-z0-9]\w{7,15}$/;
+    return !!password.match(pass);
 }

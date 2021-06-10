@@ -1,10 +1,19 @@
 import {InferActionsTypes, ThunkType} from "./store-redux";
 import {EditType, ProjectType, StatusType} from "../types/projectTypes";
+import {TaskTypeWithFlag} from "../../components/projects/Edits/EditTasksPanel";
+
+const defaultTaskObj = [{
+    id: 1,
+    description: "",
+    isEdit: false,
+    files: []
+}] as TaskTypeWithFlag[]
 
 const initialState = {
     projects: null as ProjectType[] | null,
     invitations: null as ProjectType[] | null,
     statuses: null as StatusType[] | null,
+    tasks: defaultTaskObj,
     activeProject: null as ProjectType | null
 };
 
@@ -23,6 +32,14 @@ export const projects_reducer = (
             return {
                 ...state,
                 projects: action.projects,
+            };
+        }
+        case "REVCOUNT/PROJECTS/ADD_PROJECT": {
+            return {
+                ...state,
+                projects: state.projects
+                    ? [...state.projects, action.project]
+                    : [action.project],
             };
         }
         case "REVCOUNT/PROJECTS/ACCEPT_PROJECT": {
@@ -51,7 +68,7 @@ export const projects_reducer = (
             let projects = state.projects && [...state.projects]
             let edited = projects?.map(item => {
                 if (item.id === action.projectId) {
-                    if(item.edits)
+                    if (item.edits)
                         return {...item, edits: [...item.edits, {...action.edit, id: item.edits.length}]}
                     return {...item, edits: [{...action.edit, id: 1}]}
                 }
@@ -66,6 +83,40 @@ export const projects_reducer = (
             return {
                 ...state,
                 invitations: action.invitations,
+            };
+        }
+        case "REVCOUNT/PROJECTS/SET_TASKS": {
+            return {
+                ...state,
+                tasks: action.tasks || defaultTaskObj,
+            };
+        }
+        case "REVCOUNT/PROJECTS/ADD_TASK": {
+            let id = state.tasks.length
+            let isExist = state.tasks.find(item => item.id === id)
+            while (isExist) {
+                id++
+                isExist = state.tasks.find(item => item.id === id)
+            }
+            return {
+                ...state,
+                tasks: [...state.tasks, {id, isEdit: false, files: [], description: ""}],
+            };
+        }
+        case "REVCOUNT/PROJECTS/ENABLE_EDIT_MODE_TO_TASK": {
+            return {
+                ...state,
+                tasks: state.tasks.map(item => {
+                    if (item.id === action.taskId)
+                        return {...item, isEdit: true}
+                    return item
+                })
+            };
+        }
+        case "REVCOUNT/PROJECTS/DELETE_TASK": {
+            return {
+                ...state,
+                tasks: state.tasks.filter(item => item.id !== action.taskId),
             };
         }
         case "REVCOUNT/PROJECTS/SET_STATUSES": {
@@ -88,6 +139,8 @@ export const projects_reducer = (
 export const actionsProjects = {
     setProjects: (projects: ProjectType[]) =>
         ({type: "REVCOUNT/PROJECTS/SET_PROJECTS", projects} as const),
+    addProject: (project: ProjectType) =>
+        ({type: "REVCOUNT/PROJECTS/ADD_PROJECT", project} as const),
     acceptProject: (projectId: number) =>
         ({type: "REVCOUNT/PROJECTS/ACCEPT_PROJECT", projectId} as const),
     declineProject: (projectId: number) =>
@@ -98,6 +151,14 @@ export const actionsProjects = {
         ({type: "REVCOUNT/PROJECTS/ADD_EDIT_TO_PROJECT", edit, projectId} as const),
     setInvitations: (invitations: ProjectType[]) =>
         ({type: "REVCOUNT/PROJECTS/SET_INVITATIONS", invitations} as const),
+    setTasks: (tasks: TaskTypeWithFlag[] | null) =>
+        ({type: "REVCOUNT/PROJECTS/SET_TASKS", tasks} as const),
+    addTask: () =>
+        ({type: "REVCOUNT/PROJECTS/ADD_TASK"} as const),
+    enableEditModeToTask: (taskId: number) =>
+        ({type: "REVCOUNT/PROJECTS/ENABLE_EDIT_MODE_TO_TASK", taskId} as const),
+    deleteTask: (taskId: number) =>
+        ({type: "REVCOUNT/PROJECTS/DELETE_TASK", taskId} as const),
     setStatuses: (statuses: StatusType[]) =>
         ({type: "REVCOUNT/PROJECTS/SET_STATUSES", statuses} as const),
     setActiveProject: (project: ProjectType | null) =>
