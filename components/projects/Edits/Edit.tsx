@@ -28,11 +28,13 @@ export const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = 
         </div>
         <EditProgressBar status={edit?.status}/>
         <EditTasksPanel type={"changeEdit"}/>
-        <EditWorkspaceWindow isOfferExist = {!!edit?.offer} isOwner={project?.role.name === "Owner"} workspace={edit?.workspace} deadline={edit?.deadline}/>
+        <EditWorkspaceWindow isOfferExist={!!edit?.offer} isOwner={project?.role.name === "Owner"}
+                             workspace={edit?.workspace} deadline={edit?.deadline}/>
         {
             project?.role.name === "Owner"
                 ? <EditControlPanel closePage={closePage} project={project} edit={edit}/>
-                : project?.role.name === "Artist" && <ArtistsControlPanel  projectId = {project.id}/>
+                : project?.role.name === "Artist" && edit?.status.name === "Approval" && !edit?.status.isAccepted &&
+                <ArtistsControlPanel editId={edit?.id} projectId={project.id} role = {project.role}/>
         }
     </section>
 };

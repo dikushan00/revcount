@@ -246,7 +246,7 @@ export const OfferConditionsBlock: React.FC<{ offer?: OfferType | undefined, reg
             <div className="offer-edits__box offer-edits__box--days">
                 <input ref={register} className="offer-edits__input" type="text" name="days"
                        placeholder={offer?.days.toString() || "0"}
-                       value={offer?.days.toString()}/>
+                       defaultValue={offer?.days.toString()} />
                 <div className="offer-edits__designation">days</div>
             </div>
         </div>
@@ -257,7 +257,7 @@ export const OfferConditionsBlock: React.FC<{ offer?: OfferType | undefined, reg
             <div className="offer-edits__box offer-edits__box--time">
                 <input ref={register} className="offer-edits__input" type="text" name="hours"
                        placeholder={offer?.hours.toString() || "0"}
-                       value={offer?.hours.toString()}/>
+                       defaultValue={offer?.hours.toString()} />
                 <div className="offer-edits__designation">hrs.</div>
             </div>
         </div>
@@ -268,7 +268,7 @@ export const OfferConditionsBlock: React.FC<{ offer?: OfferType | undefined, reg
             <div className="offer-edits__box offer-edits__box--total">
                 <input ref={register} className="offer-edits__input" type="text" name="balance"
                        placeholder={offer?.balance.toString()}
-                       value={offer?.balance.toString() || "0"}/>
+                       defaultValue={offer?.balance.toString() || "0"} />
                 <div className="offer-edits__designation">$</div>
             </div>
         </div>

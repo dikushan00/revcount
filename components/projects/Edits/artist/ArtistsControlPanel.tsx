@@ -5,8 +5,9 @@ import {ProjectAPI} from "../../../../src/api/ProjectAPI";
 import {useDispatch, useSelector} from "react-redux";
 import {AppStateType} from "../../../../src/redux/store-redux";
 import {actionsProjects} from "../../../../src/redux/projects-reducer";
+import {RoleType} from "../../../../src/types/userTypes";
 
-export const ArtistsControlPanel: React.FC<{ projectId: number, editId: number }> = ({projectId, editId}) => {
+export const ArtistsControlPanel: React.FC<{ projectId: number, editId: number | undefined, role: RoleType }> = ({role, projectId, editId}) => {
 
     const project = useSelector((state: AppStateType) => state.projects.activeProject)
     const dispatch = useDispatch()
@@ -25,11 +26,11 @@ export const ArtistsControlPanel: React.FC<{ projectId: number, editId: number }
 
     return <div className="edits__control border-wrap control-edits">
         <div className="control-edits__offer offer-edits">
-            <div className="offer-edits__header">
+            {role.name !== "Artist" && <div className="offer-edits__header">
                 <div className="offer-edits__label label">
                     Offer
                 </div>
-            </div>
+            </div>}
             <form onSubmit={handleSubmit(onSubmit)} className="offer-edits__form" action="#">
                 <OfferConditionsBlock register={register}/>
                 <div className="offer-edits__block">
