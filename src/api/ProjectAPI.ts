@@ -1,12 +1,19 @@
 import {instance} from "./API";
-import {OfferType, ProjectPostType, ProjectType} from "../types/projectTypes";
+import {
+    EditType,
+    InviteProjectType,
+    InviteStatusType,
+    OfferType,
+    ProjectPostType,
+    ProjectType
+} from "../types/projectTypes";
 
 export const ProjectAPI = {
-    createProject(project: ProjectPostType) {
-        return instance.post("projects", project).then(res => res.data)
+    createProject(userId: number, project: ProjectPostType) {
+        return instance.post<{"project_id": number, name: string, deadline: string, invitations: any, "included_revisions": number, balance: number}>(`users/${userId}/projects`, project).then(res => res.data)
     },
-    getProjects() {
-        return instance.get("projects").then(res => res.data)
+    getProjects(userId: number) {
+        return instance.get<{project_id: number, name: string, deadline: string, invitations: any, included_revisions: number, balance: number}[]>(`users/${userId}/projects`).then(res => res.data)
     },
     getProject(projectId: number) {
         return instance.get("projects/" + projectId).then(res => res.data)
@@ -14,8 +21,17 @@ export const ProjectAPI = {
     editProject(projectId: number, project: ProjectType) {
         return instance.put("projects/" + projectId, project).then(res => res.data)
     },
+    getRevisions(projectId: number) {
+        return instance.get<EditType[]>(`projects/${projectId}/revisions`).then(res => res.data)
+    },
+    createRevision(projectId: number, body: EditType) {
+        return instance.post<EditType>(`projects/${projectId}/revisions`, body).then(res => res.data)
+    },
     joinToProject(projectId: number, userId: number) {
         return instance.post("projects/" + projectId, {userId}).then(res => res.data)
+    },
+    getProjectUsers(projectId: number) {
+        return instance.get<{"user_id": number, username: string, "first_name": string}>(`projects/${projectId}/users`).then(res => res.data)
     },
     acceptOffer(projectId: number, project: ProjectType) {
         return instance.put("projects/" + projectId, project).then(res => res.data)
@@ -35,13 +51,13 @@ export const ProjectAPI = {
     getStatuses() {
         return instance.get("statuses").then(res => res.data)
     },
-    getInvitations() {
-        return instance.get("invitations").then(res => res.data)
+    getInvitations(userId: number) {
+        return instance.get<InviteProjectType[]>(`users/${userId}/invitations`).then(res => res.data)
     },
-    acceptProject(projectId: number) {
-        return instance.delete("invitations/" + projectId).then(res => res.data)
+    acceptProject(userId: number, invitationId: number) {
+        return instance.patch(`users/${userId}/invitations/${invitationId}`, {status: "ACCEPTED" as InviteStatusType}).then(res => res.data)
     },
-    declineProject(projectId: number) {
-        return instance.post("invitations/" + projectId).then(res => res.data)
+    declineProject(userId: number, invitationId: number) {
+        return instance.patch(`users/${userId}/invitations/${invitationId}`, {status: "DECLINED" as InviteStatusType}).then(res => res.data)
     }
 }

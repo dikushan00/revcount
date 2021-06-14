@@ -4,7 +4,7 @@ import {RoleType} from "../types/userTypes";
 const initialState = {
     isAuth: false as boolean,
     token: null as string | null,
-    roles: null as RoleType[] | null,
+    roles: null as RoleType | null,
     userId: null as number | null
 }
 
@@ -31,7 +31,7 @@ export const auth_reducer = (state = initialState, action: ActionsType): AuthIni
 }
 
 export const actionsAuth = {
-    setNewAuth: (token: string, isAuth: boolean, roles: RoleType[] | null, userId: number) => ({
+    setNewAuth: (token: string, isAuth: boolean, roles: RoleType | null, userId: number) => ({
         type: 'REVCOUNT/AUTH/SET_NEW_AUTH',
         token,
         isAuth,

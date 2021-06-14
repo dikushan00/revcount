@@ -7,9 +7,9 @@ export const AuthAPI = {
         return instance.get(`auth/me`).then(res => res.data)
     },
     login(data: LoginType) {
-        return loginInstance.post("auth/user/login", data).then(res => res.data)
+        return loginInstance.post<{token: string}>("users/token", data).then(res => res.data)
     },
     signUp(data: SignUpType) {
-        return loginInstance.post("auth/sign_up", data).then(res => res.data)
+        return loginInstance.post<{ "user_id": number, username: string, error: any, first_name: string, token: string }>("users/register", data).then(res => res.data)
     },
 }

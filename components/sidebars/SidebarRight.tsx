@@ -2,17 +2,24 @@ import React from 'react';
 import {TeamProjectButton} from "../common/blocks/buttons/TeamProjectButton";
 import {AddMemberToProjectModal} from "../projects/members/AddMemberToProjectModal";
 import {TeamSettingsModal} from "../projects/modals/TeamSettingsModal";
-import {useSelector} from "react-redux";
-import {AppStateType} from "../../src/redux/store-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {getActiveProject} from "../../src/redux/projects-selector";
+import {actionsProjects} from "../../src/redux/projects-reducer";
 
 export const SidebarRight = () => {
 
-    const activeProject = useSelector((state: AppStateType) => state.projects.activeProject)
+    const dispatch = useDispatch()
+    const activeProject = useSelector(getActiveProject)
 
     const [isModalMode, setIsModalMode] = React.useState({
         inviteMember: false,
         teamSettings: false
     })
+
+    const onEditClick = (editId: number | null) => {
+        let activeEdit = activeProject?.revisions?.find(item => item.revision_id === editId) || null
+        dispatch(actionsProjects.setActiveEdit(activeEdit))
+    }
 
     return <>
         <div className="page__sidebar sidebar-page">
@@ -34,8 +41,8 @@ export const SidebarRight = () => {
                     member<span>+</span></TeamProjectButton>
                 <ul className="team-project__list">
                     {
-                        activeProject?.users.map(user => {
-                            return <li key={user.id} className="team-project__item">
+                        activeProject?.users?.map(user => {
+                            return <li key={user.user_id} className="team-project__item">
                                 <div className="team-project__name">
                                     <span/>{user.name} {user.isOwner && "(You)"}
                                 </div>
@@ -56,7 +63,7 @@ export const SidebarRight = () => {
                         activeProject?.actionsHistory?.map(action => {
                             return <li key={action.id} className="notices__item">
                                 <div className="notices__text">
-                                    {action.action} <span className="notices__text-span">«{action.edit.name}»</span>
+                                    {action.action} <span onClick={() => onEditClick(action?.edit?.revision_id || null)} className="notices__text-span">«{action.edit.name}»</span>
                                     {action.offer && <>
                                         <span className="notices__span notices__span--1">{action.offer.balance}$</span>
                                         <span className="notices__span notices__span--2">{action.offer.days}d.</span>

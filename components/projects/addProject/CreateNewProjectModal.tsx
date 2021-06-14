@@ -3,10 +3,11 @@ import {CustomPopup} from "../../common/blocks/CustomPopup";
 import {useOutsideAlerter} from '../../../src/utils/hooks/outsideClick';
 import {useForm} from "react-hook-form";
 import {RemoveItemIcon} from "../members/AddMemberToProjectModal";
-import {useDispatch} from "react-redux";
-import {Simulate} from "react-dom/test-utils";
+import {useDispatch, useSelector} from "react-redux";
 import {ProjectAPI} from "../../../src/api/ProjectAPI";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
+import {ProjectPostType} from "../../../src/types/projectTypes";
+import {getUserId} from "../../../src/redux/projects-selector";
 
 type PropsType = {
     hideBlock: () => void
@@ -20,6 +21,8 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
     const [isInputDateMode, setIsInputDateMode] = React.useState(false)
     const [addedIds, setAddedIds] = React.useState([] as string[])
 
+    const userId = useSelector(getUserId)
+
     const handleDeleteId = (id: string) => {
         const edited = addedIds.filter(item => item !== id)
         setAddedIds(edited)
@@ -29,22 +32,20 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
     const handleCloseModal = () => hideBlock()
 
     const onSubmit = (data: { name: string, freeEdits: string, deadline: string }) => {
+        const invitations = addedIds.map(userId => ({user_id: userId}))
         let project = {
             name: data.name,
             freeEdits: +data.freeEdits,
-            deadline: +data.deadline,
+            deadline: data.deadline,
             balance: 0,
-            addDeadline: 0,
-            edits: [],
-            users: [],
-            actionsHistory: []
-        }
+            included_revisions: 0,
+            invitations,
+            revisions: [],
+        } as ProjectPostType
 
-        ProjectAPI.createProject(project).then(res => {
-           if( !res?.error) {
-               dispatch(actionsProjects.addProject(res))
-               hideBlock()
-           }
+        userId && ProjectAPI.createProject(userId, project).then(res => {
+            dispatch(actionsProjects.addProject(res))
+            hideBlock()
         })
     }
 
@@ -55,10 +56,11 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
         </h2>
         <form className="popup__form">
             <div className="popup__item">
-                <input ref={register} name = "name" type="text" placeholder="Project name" className="popup__input"/>
+                <input ref={register} name="name" type="text" placeholder="Project name" className="popup__input"/>
             </div>
             <div className="popup__item">
-                <input ref={register} name="freeEdits" type="text" placeholder="Free edits in hours" className="popup__input"/>
+                <input ref={register} name="freeEdits" type="text" placeholder="Free edits in hours"
+                       className="popup__input"/>
             </div>
             <div className="popup__item">
                 <label htmlFor="inpdate" className="popup__icon">
@@ -114,7 +116,8 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
                     deadline: watch("deadline")
                 }
                 onSubmit(data)
-            }} className="popup__btn input-id-button">Create a project</div>
+            }} className="popup__btn input-id-button">Create a project
+            </div>
         </form>
     </CustomPopup>
 

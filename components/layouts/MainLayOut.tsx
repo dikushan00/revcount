@@ -13,22 +13,23 @@ import {actionsProfile} from "../../src/redux/profile-reducer";
 
 //main layout with sidebars, header and content
 export const MainLayOut: React.FC<{ title: string, isProjectSideBarMode?: boolean }> = ({
-                                                                                           children,
-                                                                                           title = "Revcount",
-                                                                                           isProjectSideBarMode = true
-                                                                                       }) => {
+                                                                                            children,
+                                                                                            title = "Revcount",
+                                                                                            isProjectSideBarMode = true
+                                                                                        }) => {
     const projects = useSelector((state: AppStateType) => state.projects.projects)
     const invitations = useSelector((state: AppStateType) => state.projects.invitations)
     const statuses = useSelector((state: AppStateType) => state.projects.statuses)
     const profile = useSelector((state: AppStateType) => state.profile.profile)
+    const userId = useSelector((state: AppStateType) => state.auth.userId)
 
     const dispatch = useDispatch()
 
     React.useEffect(() => {
-        !projects && ProjectAPI.getProjects().then(res => {
-            !res?.error && dispatch(actionsProjects.setProjects(res))
+        !projects && userId && ProjectAPI.getProjects(userId).then(res => {
+            dispatch(actionsProjects.setProjects(res))
         })
-    }, [projects])
+    }, [projects, userId])
 
     React.useEffect(() => {
         !statuses && ProjectAPI.getStatuses().then(res => {
@@ -43,10 +44,10 @@ export const MainLayOut: React.FC<{ title: string, isProjectSideBarMode?: boolea
     }, [profile])
 
     React.useEffect(() => {
-        !invitations && ProjectAPI.getInvitations().then(res => {
-            !res?.error && dispatch(actionsProjects.setInvitations(res))
+        !invitations && userId && ProjectAPI.getInvitations(userId).then(res => {
+            dispatch(actionsProjects.setInvitations(res))
         })
-    }, [invitations])
+    }, [invitations, userId])
 
     return <>
         <Head>

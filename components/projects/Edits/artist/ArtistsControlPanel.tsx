@@ -6,15 +6,18 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppStateType} from "../../../../src/redux/store-redux";
 import {actionsProjects} from "../../../../src/redux/projects-reducer";
 import {RoleType} from "../../../../src/types/userTypes";
+import {getActiveProject} from "../../../../src/redux/projects-selector";
 
 export const ArtistsControlPanel: React.FC<{ projectId: number, editId: number | undefined, role: RoleType }> = ({role, projectId, editId}) => {
 
-    const project = useSelector((state: AppStateType) => state.projects.activeProject)
     const dispatch = useDispatch()
     const {handleSubmit, register} = useForm()
+
+    const project = useSelector(getActiveProject)
+
     const onSubmit = (data: { days: string, hours: string, balance: string }) => {
-        let edits = project?.edits.map(item => {
-            if (item.id === editId)
+        let edits = project?.revisions?.map(item => {
+            if (item.revision_id === editId)
                 return {...item, offer: {days: +data.days, balance: +data.balance, hours: +data.hours}}
             return item
         })

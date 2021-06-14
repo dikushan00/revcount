@@ -13,12 +13,12 @@ export default function SignUp() {
 
     const [isPasswordValid, setIsPasswordValid] = React.useState(true)
 
-    const onSubmit = (data: { name: string, email: string, password: string }) => {
+    const onSubmit = (data: { first_name: string, username: string, password: string }) => {
         let isPassWordValid = checkPassword(data.password)
         if(!isPassWordValid)
             setIsPasswordValid(false)
         isPassWordValid && AuthAPI.signUp(data).then(res => {
-            !res?.error && dispatch(actionsAuth.setNewAuth(res.token, true, res.roles, res.userId))
+            !res?.error && dispatch(actionsAuth.setNewAuth(res.token, true, null, res.user_id))
         })
     }
     return <>
@@ -78,13 +78,13 @@ export default function SignUp() {
                             className="signup__link">Login</a></Link>
                         </p>
                         <div className="signup__line">
-                            <input ref = {register} required={true} name = "name" className="signup__input" placeholder="Your name" type="text"/>
+                            <input ref = {register} required={true} name = "first_name" className="signup__input" placeholder="Your name" type="text"/>
                             {
                                 errors.name && <ValidationError />
                             }
                         </div>
                         <div className="signup__line">
-                            <input ref = {register} required={true} name = "email" className="signup__input" placeholder="Your E-mail" type="email"/>
+                            <input ref = {register} required={true} name = "username" className="signup__input" placeholder="Your E-mail" type="email"/>
                             {
                                 errors.email && <ValidationError />
                             }

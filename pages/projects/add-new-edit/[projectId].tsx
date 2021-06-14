@@ -1,14 +1,13 @@
 import * as React from "react";
 import {useForm} from "react-hook-form";
-import {EditStatusType, EditType, ProjectType, TaskType} from "../../../src/types/projectTypes";
+import {EditStatusType, EditType, TaskType} from "../../../src/types/projectTypes";
 import {MainLayOut} from "../../../components/layouts/MainLayOut";
 import {useRouter} from "next/router";
 import {useDispatch, useSelector} from "react-redux";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
 import {ProjectAPI} from "../../../src/api/ProjectAPI";
-import {AppStateType} from "../../../src/redux/store-redux";
-import {EditTasksList} from "../../../components/projects/Edits/EditTasksList";
-import {EditTasksPanel, TaskTypeWithFlag} from "../../../components/projects/Edits/EditTasksPanel";
+import {EditTasksPanel} from "../../../components/projects/Edits/EditTasksPanel";
+import {getActiveProject, getTasks} from "../../../src/redux/projects-selector";
 
 
 export const defaultFirstStatus = {
@@ -25,20 +24,22 @@ export default function AddNewEdit() {
     const dispatch = useDispatch()
 
     const {register, handleSubmit, watch} = useForm()
-    const project = useSelector((state: AppStateType) => state.projects.activeProject)
-    const tasks = useSelector((state: AppStateType) => state.projects.tasks)
+    const project = useSelector(getActiveProject)
+    const tasks = useSelector(getTasks)
 
     const onSubmit = (obj: any) => {
         let editPost: EditType = {
             name: watch("name"),
             tasks: [],
-            status: defaultFirstStatus,
+            status: "Approval",
+            next_action: "",
             description: ""
         }
         tasks.forEach(item => {
             let task: TaskType = {
                 id: item.id,
                 description: "",
+                name: "",
                 files: []
             }
             for (let key in obj) {
@@ -56,7 +57,7 @@ export default function AddNewEdit() {
                         if (obj[key].length > 0) {
                             for (let i in obj[key]) {
                                 if (i !== "length")
-                                    typeof obj[key][i] !== "function" && task.files.push(obj[key][i])
+                                    typeof obj[key][i] !== "function" && task.files?.push(obj[key][i])
                             }
                         }
 
@@ -65,23 +66,14 @@ export default function AddNewEdit() {
             }
             editPost?.tasks?.push(task)
         })
-        let projectPost: ProjectType
-        if (project?.edits)
-            projectPost = {...project, edits: [...project.edits, {...editPost, id: project.edits.length}]}
-        else {
-            //@ts-ignore
-            projectPost = {...project, edits: [{...editPost, id: 1}]}
-        }
 
-        projectId && ProjectAPI.editProject(+projectId, projectPost).then(res => {
-            if (!res?.error) {
-                dispatch(actionsProjects.setActiveProject(res))
-                router.push("/projects/" + projectId)
-            }
+        projectId && ProjectAPI.createRevision(+projectId, editPost).then(res => {
+            dispatch(actionsProjects.addEditToProject(+projectId, res))
+            router.push("/projects/" + projectId)
         })
     }
 
-    if (project?.role.name !== "Owner")
+    if (project?.role?.name !== "Owner")
         return router.push("/")
 
     return <MainLayOut title={"Add edit"}>

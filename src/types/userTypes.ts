@@ -14,19 +14,21 @@ export type RoleType = {
     name: string
 }
 export type UserType = {
-    id: number,
+    user_id: number,
+    username: string,
     name: string,
     avatar: string,
     isOwner?: boolean
     role: RoleType,
-    firstName: string,
+    first_name: string,
     lastName: string
 }
 export type LoginType = {
-    email: string
+    username: string
     password: string
 }
 export type SignUpType = {
-    email: string
+    username: string
+    first_name: string
     password: string
 }

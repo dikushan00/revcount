@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-    EditStatusType,
-    EditType,
-    OfferType,
-    ProjectType,
-    StatusesNamesType,
-    StatusType
-} from "../../../src/types/projectTypes";
+import {EditType, OfferType, ProjectType, StatusesNamesType} from "../../../src/types/projectTypes";
 import {MakePaymentModal} from "../modals/MakePaymentModal";
 import {ProjectAPI} from "../../../src/api/ProjectAPI";
 import {useDispatch} from "react-redux";
@@ -22,13 +15,13 @@ export const EditControlPanel: React.FC<{ edit: EditType | null, project: Projec
     const router = useRouter()
     const [isPaymentModalShowMode, setIsPaymentModalShowMode] = React.useState(false)
 
-    const changeStatus = (status: EditStatusType) => {
-        let edits = project?.edits
-        let editId = edit?.id
+    const changeStatus = (status: StatusesNamesType) => {
+        let edits = project?.revisions
+        let editId = edit?.revision_id
 
         if (edits && editId) {
             edits = edits.map(item => {
-                if (item.id === editId) {
+                if (item.revision_id === editId) {
                     return {
                         ...item,
                         description: "",
@@ -42,62 +35,45 @@ export const EditControlPanel: React.FC<{ edit: EditType | null, project: Projec
         return edits || []
     }
     const handleReserveMoney = () => {
-        let changedStatusEdits: EditType[] = changeStatus({
-            id: 3,
-            name: "Performing",
-            key: "performing",
-            isAccepted: false
-        })
-        project && changedStatusEdits && ProjectAPI.reserveMoney(project?.id, {
-            ...project,
-            edits: changedStatusEdits
+        let changedStatusEdits: EditType[] = changeStatus("Performing")
+        project && changedStatusEdits && ProjectAPI.reserveMoney(project?.project_id, {
+            ...project, revisions: changedStatusEdits
         }).then(res => {
             if (!res?.error) {
                 dispatch(actionsProjects.setActiveProject(res))
-                router.push("/projects/" + project?.id)
+                router.push("/projects/" + project?.project_id)
                 closePage()
                 setIsPaymentModalShowMode(false)
             }
         })
     }
     const handleAcceptOffer = () => {
-        let changedStatusEdits: EditType[] = changeStatus({
-            id: 3,
-            name: "Performing",
-            key: "performing",
-            isAccepted: false
-        })
+        let changedStatusEdits: EditType[] = changeStatus("Performing")
 
-        project && changedStatusEdits && ProjectAPI.acceptOffer(project?.id, {
+        project && changedStatusEdits && ProjectAPI.acceptOffer(project?.project_id, {
             ...project,
-            edits: changedStatusEdits
+            revisions: changedStatusEdits
         }).then(res => {
             if (!res?.error) {
                 dispatch(actionsProjects.setActiveProject(res))
-                router.push("/projects/" + project?.id)
+                router.push("/projects/" + project?.project_id)
                 closePage()
             }
         })
     }
     const handleDeclineOffer = () => {
-        router.push("/projects/" + project?.id)
+        router.push("/projects/" + project?.project_id)
         closePage()
     }
     const handleCompleteProject = () => {
-        let changedStatusEdits: EditType[] = changeStatus({
-            id: 3,
-            name: "Performing",
-            key: "performing",
-            isAccepted: false
-        })
+        let changedStatusEdits: EditType[] = changeStatus("Performing")
 
-        project && changedStatusEdits && ProjectAPI.completeProject(project?.id, {
-            ...project,
-            edits: changedStatusEdits
+        project && changedStatusEdits && ProjectAPI.completeProject(project?.project_id, {
+            ...project, revisions: changedStatusEdits
         }).then(res => {
             if (!res?.error) {
                 dispatch(actionsProjects.setActiveProject(res))
-                router.push("/projects/" + project?.id)
+                router.push("/projects/" + project?.project_id)
                 closePage()
             }
         })
@@ -113,7 +89,7 @@ export const EditControlPanel: React.FC<{ edit: EditType | null, project: Projec
                 </div>
             </div>
             {
-                edit?.status.name === "Editing is done"
+                edit?.status === "Editing is done"
                     ? <CompletedEditBlock/>
                     : <DefaultControlPanel handleCompleteProject={handleCompleteProject}
                                            handleReserveMoney={handleReserveMoney}
@@ -121,7 +97,7 @@ export const EditControlPanel: React.FC<{ edit: EditType | null, project: Projec
                                            handleDeclineOffer={handleDeclineOffer}
                                            edit={edit}
                                            enablePaymentMode={enablePaymentMode}
-                                           editStatusName={edit?.status.name}/>
+                                           editStatusName={edit?.status}/>
             }
         </div>
         {
@@ -246,7 +222,7 @@ export const OfferConditionsBlock: React.FC<{ offer?: OfferType | undefined, reg
             <div className="offer-edits__box offer-edits__box--days">
                 <input ref={register} className="offer-edits__input" type="text" name="days"
                        placeholder={offer?.days.toString() || "0"}
-                       defaultValue={offer?.days.toString()} />
+                       defaultValue={offer?.days.toString()}/>
                 <div className="offer-edits__designation">days</div>
             </div>
         </div>
@@ -257,7 +233,7 @@ export const OfferConditionsBlock: React.FC<{ offer?: OfferType | undefined, reg
             <div className="offer-edits__box offer-edits__box--time">
                 <input ref={register} className="offer-edits__input" type="text" name="hours"
                        placeholder={offer?.hours.toString() || "0"}
-                       defaultValue={offer?.hours.toString()} />
+                       defaultValue={offer?.hours.toString()}/>
                 <div className="offer-edits__designation">hrs.</div>
             </div>
         </div>
@@ -268,7 +244,7 @@ export const OfferConditionsBlock: React.FC<{ offer?: OfferType | undefined, reg
             <div className="offer-edits__box offer-edits__box--total">
                 <input ref={register} className="offer-edits__input" type="text" name="balance"
                        placeholder={offer?.balance.toString()}
-                       defaultValue={offer?.balance.toString() || "0"} />
+                       defaultValue={offer?.balance.toString() || "0"}/>
                 <div className="offer-edits__designation">$</div>
             </div>
         </div>

@@ -10,21 +10,23 @@ import {actionsProjects} from "../../src/redux/projects-reducer";
 import {Edit} from "../../components/projects/Edits/Edit";
 import {useRouter} from "next/router";
 import {AppStateType} from "../../src/redux/store-redux";
+import {getActiveEdit, getActiveProject} from "../../src/redux/projects-selector";
 
 const Project: React.FC<{ project: ProjectType }> = () => {
     const dispatch = useDispatch()
     const router = useRouter()
     const {projectId} = router.query
 
-    const [isEditMode, setIsEditMode] = React.useState(false)
-    const [activeEdit, setActiveEdit] = React.useState<EditType | null>(null)
-
-    const project = useSelector((state: AppStateType) => state.projects.activeProject)
+    const project = useSelector(getActiveProject)
+    const activeEdit = useSelector(getActiveEdit)
 
     React.useEffect(() => {
         if (projectId ) {
             !project && ProjectAPI.getProject(+projectId).then(res => {
                 !res?.error && dispatch(actionsProjects.setActiveProject(res))
+            })
+           ProjectAPI.getRevisions(+projectId).then(res => {
+                dispatch(actionsProjects.addRevisionsToProject(res, +projectId))
             })
         }
     }, [projectId])
@@ -33,20 +35,19 @@ const Project: React.FC<{ project: ProjectType }> = () => {
         project && dispatch(actionsProjects.setActiveProject(project))
     }, [project])
 
-    const handleDisableEditMode = () => setIsEditMode(false)
-    const handleEditMode = (edit: EditType) => {
-        setActiveEdit(edit)
-        setIsEditMode(true)
+    const handleDisableEditMode = () => dispatch(actionsProjects.setActiveEdit(null))
+    const setEditMode = (edit: EditType | null) => {
+        dispatch(actionsProjects.setActiveEdit(edit))
     }
 
     return <MainLayOut title={"Project"}>
         {
-            isEditMode
+            activeEdit
                 ? <Edit closePage={handleDisableEditMode} edit={activeEdit}/>
                 : <>
                     <div className="projects">
                         <div className="projects__header">
-                            {project?.role.name === "Owner" && <AddCorrectionLink projectId={projectId as string}/>}
+                            {project?.role?.name === "Owner" && <AddCorrectionLink projectId={projectId as string}/>}
                             <ProjectStatsInfo project={project}/>
                         </div>
                     </div>
@@ -57,10 +58,10 @@ const Project: React.FC<{ project: ProjectType }> = () => {
                     </div>
                     <ul className="my-corrections__list">
                         {
-                            project?.edits?.map(edit => {
-                                const statusImgPath = getStatusImg(edit.status?.name)
-                                return <li key={edit.id} className="my-corrections__item">
-                                    <div className="my-corrections__edit" onClick={() => handleEditMode(edit)}>
+                            project?.revisions?.map(edit => {
+                                const statusImgPath = getStatusImg(edit.status)
+                                return <li key={edit.revision_id} className="my-corrections__item">
+                                    <div className="my-corrections__edit" onClick={() => setEditMode(edit)}>
                                         <span/>{edit.name}
                                     </div>
                                     <div className="my-corrections__box">
@@ -70,13 +71,13 @@ const Project: React.FC<{ project: ProjectType }> = () => {
                                                 <img src={statusImgPath} alt="loading"/></picture>
                                         </div>
                                         <div className="my-corrections__action">
-                                            {edit.status.name}
+                                            {edit.status}
                                         </div>
                                     </div>
                                     <div className="my-corrections__descr">
                                         {edit.description}
                                     </div>
-                                    <button className="my-corrections__btn btn-2" onClick={() => handleEditMode(edit)}>see
+                                    <button className="my-corrections__btn btn-2" onClick={() => setEditMode(edit)}>see
                                         Detail
                                     </button>
                                 </li>

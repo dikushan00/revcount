@@ -1,26 +1,27 @@
 import React from 'react';
 import {useSelector} from "react-redux";
 import {AppStateType} from "../../../src/redux/store-redux";
-import {EditStatusType} from "../../../src/types/projectTypes";
+import {EditStatusType, StatusesNamesType} from "../../../src/types/projectTypes";
+import {getStatuses} from "../../../src/redux/projects-selector";
 
 interface EditStatusProgressType extends EditStatusType {
-    touched: boolean
+    touched?: boolean
     isCurrent?: boolean
 }
 
-export const EditProgressBar: React.FC<{ status: EditStatusType | undefined }> = ({status: statusProps}) => {
+export const EditProgressBar: React.FC<{ status: StatusesNamesType | undefined }> = ({status: statusProps}) => {
 
-    const statuses = useSelector((state: AppStateType) => state.projects.statuses)
+    const statuses = useSelector(getStatuses)
     const [validStatuses, setValidStatuses] = React.useState([] as EditStatusProgressType[])
 
     React.useEffect(() => {
         if (statuses && statusProps) {
-            let currentStatusIndex = statuses.findIndex(status => status.id === statusProps?.id)
+            let currentStatusIndex = statuses.findIndex(status => status.name === statusProps)
             let edited = statuses.map((item, index) => {
                 if (index < currentStatusIndex)
                     return {...item, touched: true, isAccepted: true}
                 if (index === currentStatusIndex)
-                    return {...statusProps, touched: true, isCurrent: true}
+                    return {name: statusProps, touched: true, isCurrent: true}
                 return {...item, touched: false, isAccepted: false}
             })
             setValidStatuses(edited)

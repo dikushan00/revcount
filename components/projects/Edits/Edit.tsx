@@ -15,7 +15,7 @@ export const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = 
     return <section className="edits">
         <div className="edits__header">
             <h2 className="edits__title title">
-                Edits Pack #{edit?.id}
+                Edits Pack #{edit?.revision_id}
             </h2>
             <button onClick={closePage} className="edits__btn btn-2">
                 <svg width={14} height={14} viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -31,10 +31,10 @@ export const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = 
         <EditWorkspaceWindow isOfferExist={!!edit?.offer} isOwner={project?.role.name === "Owner"}
                              workspace={edit?.workspace} deadline={edit?.deadline}/>
         {
-            project?.role.name === "Owner"
+            project?.role?.name === "Owner"
                 ? <EditControlPanel closePage={closePage} project={project} edit={edit}/>
-                : project?.role.name === "Artist" && edit?.status.name === "Approval" && !edit?.status.isAccepted &&
-                <ArtistsControlPanel editId={edit?.id} projectId={project.id} role = {project.role}/>
+                : project?.role?.name === "Artist" && edit?.status === "Approval" && !edit?.status.isAccepted &&
+                <ArtistsControlPanel editId={edit?.revision_id} projectId={project.id} role = {project.role}/>
         }
     </section>
 };
