@@ -5,7 +5,6 @@ import {CopyTextClipboardIcon, DefaultProfileAvatar} from "../../header/Header";
 import {useDispatch, useSelector} from "react-redux";
 import {AppStateType} from "../../../src/redux/store-redux";
 import {copyTextToClipboard} from "../../../src/utils/copyToClipboard";
-import {ProjectAPI} from "../../../src/api/ProjectAPI";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
 import {Toast, useToast} from "../../common/blocks/Toast";
 import {useHttp} from "../../../src/utils/hooks/http.hook";
@@ -82,7 +81,7 @@ export const TeamSettingsModal: React.FC<PropsType> = ({hideBlock, users}) => {
                 <CopyInviteItems/>
             </form>
         </div>
-        <Toast />
+        <Toast/>
     </CustomPopup>
 }
 
