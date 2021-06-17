@@ -6,8 +6,9 @@ import {useRouter} from "next/router";
 import {useDispatch, useSelector} from "react-redux";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
 import {ProjectAPI} from "../../../src/api/ProjectAPI";
-import {EditTasksPanel} from "../../../components/projects/Edits/EditTasksPanel";
+import {EditTasksPanel} from "../../../components/projects/edits/EditTasksPanel";
 import {getActiveProject, getTasks} from "../../../src/redux/projects-selector";
+import {useHttp} from "../../../src/utils/hooks/http.hook";
 
 
 export const defaultFirstStatus = {
@@ -20,6 +21,7 @@ export const defaultFirstStatus = {
 export default function AddNewEdit() {
 
     const router = useRouter()
+    const {clearError, request, error, loading} = useHttp()
     const {projectId} = router.query
     const dispatch = useDispatch()
 
@@ -27,7 +29,7 @@ export default function AddNewEdit() {
     const project = useSelector(getActiveProject)
     const tasks = useSelector(getTasks)
 
-    const onSubmit = (obj: any) => {
+    const sortTasks = (obj: any) => {
         let editPost: EditType = {
             name: watch("name"),
             tasks: [],
@@ -66,11 +68,17 @@ export default function AddNewEdit() {
             }
             editPost?.tasks?.push(task)
         })
+        return editPost
+    }
 
-        projectId && ProjectAPI.createRevision(+projectId, editPost).then(res => {
-            dispatch(actionsProjects.addEditToProject(+projectId, res))
+    const onSubmit = async (obj: any) => {
+        let editPost = sortTasks(obj)
+
+        let response = projectId && await request(`projects/${projectId}/revisions`, "post", editPost)
+        if (response) {
+            projectId && dispatch(actionsProjects.addEditToProject(+projectId, response))
             router.push("/projects/" + projectId)
-        })
+        }
     }
 
     if (project?.role?.name !== "Owner")

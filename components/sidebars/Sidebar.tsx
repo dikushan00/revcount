@@ -1,13 +1,13 @@
 import React from "react"
 import Link from 'next/link'
 import {CreateNewProjectModal} from "../projects/addProject/CreateNewProjectModal";
-import {ProjectType} from "../../src/types/projectTypes";
+import {InviteStatusType, ProjectType} from "../../src/types/projectTypes";
 import {useDispatch, useSelector} from "react-redux";
 import {AppStateType} from "../../src/redux/store-redux";
 import {actionsProjects} from "../../src/redux/projects-reducer";
-import {ProjectAPI} from "../../src/api/ProjectAPI";
 import {AcceptInvitationModal} from "../projects/modals/AcceptInvitationModal";
 import {getInvitations, getUserId} from "../../src/redux/projects-selector";
+import {useHttp} from "../../src/utils/hooks/http.hook";
 
 type ActionNamesType = "projects" | "invitations"
 
@@ -37,7 +37,8 @@ export const Sidebar = () => {
                         <a className="sidebar__logo-link">
                             <picture>
                                 <source srcSet={"/img/icons/logo.svg"} type="image/webp"/>
-                                <img src={"/img/icons/logo.svg"} alt="logo"/></picture>
+                                <img src={"/img/icons/logo.svg"} alt="logo"/>
+                            </picture>
                         </a>
                     </Link>
                 </div>
@@ -78,32 +79,29 @@ export const Sidebar = () => {
 }
 
 type InvitationProjectsPropsType = {}
-export type AcceptProjectUserType = { projectId: number, name: string, hoursRate: number }
+
+export type AcceptProjectUserType = { invitationId: number, name: string, hoursRate: number }
+
 const InvitationProjects: React.FC<InvitationProjectsPropsType> = () => {
     const dispatch = useDispatch()
+    const {request, loading} = useHttp()
 
     const [acceptProjectId, setAcceptProjectId] = React.useState<number | null>(null)
     const invitations = useSelector(getInvitations)
     const userId = useSelector(getUserId)
 
-    const handleAcceptProject = (data: AcceptProjectUserType) => {
-        userId && ProjectAPI.acceptProject(userId, data.projectId).then(res => {
-            if (!res?.error) {
-                dispatch(actionsProjects.acceptProject(data.projectId))
-            }
-        }).catch(error => {
-            console.log(error)
-            throw error
-        })
+    const handleAcceptProject = async (data: AcceptProjectUserType) => {
+        let response = await request(`users/${userId}/invitations/${data.invitationId}`, "post", {status: "ACCEPTED" as InviteStatusType})
+        if (response) {
+            dispatch(actionsProjects.acceptProject(data.invitationId))
+        }
     }
-    const handleDeclineProject = (invitationId: number) => {
-        userId && ProjectAPI.acceptProject(userId, invitationId).then(res => {
-            if (!res?.error) {
-                dispatch(actionsProjects.declineProject(invitationId))
-            }
-        }).catch(error => {
-            throw error
-        })
+
+    const handleDeclineProject = async (invitationId: number) => {
+        let response = await request(`users/${userId}/invitations/${invitationId}`, "post", {status: "DECLINED" as InviteStatusType})
+        if (response) {
+            dispatch(actionsProjects.acceptProject(invitationId))
+        }
     }
 
     return <>
@@ -115,10 +113,10 @@ const InvitationProjects: React.FC<InvitationProjectsPropsType> = () => {
                             <span/> {item.name}
                         </button>
                         <div className="block-sidebar__body">
-                            <button onClick={() => setAcceptProjectId(item.invitation_id)}
+                            <button disabled={loading} onClick={() => setAcceptProjectId(item.invitation_id)}
                                     className="block-sidebar__button block-sidebar__button--accept">Accept
                             </button>
-                            <button onClick={() => handleDeclineProject(item.invitation_id)}
+                            <button disabled={loading} onClick={() => handleDeclineProject(item.invitation_id)}
                                     className="block-sidebar__button block-sidebar__button--decline">Decline
                             </button>
                         </div>
@@ -128,7 +126,7 @@ const InvitationProjects: React.FC<InvitationProjectsPropsType> = () => {
         </ul>
         {
             acceptProjectId &&
-            <AcceptInvitationModal projectId={acceptProjectId} handleAcceptProject={handleAcceptProject}
+            <AcceptInvitationModal invitationId={acceptProjectId} handleAcceptProject={handleAcceptProject}
                                    hideBlock={() => setAcceptProjectId(null)}/>
         }
     </>

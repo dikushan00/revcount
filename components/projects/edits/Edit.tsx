@@ -7,10 +7,32 @@ import {EditControlPanel} from "./EditControlPanel";
 import {useSelector} from "react-redux";
 import {AppStateType} from "../../../src/redux/store-redux";
 import {ArtistsControlPanel} from "./artist/ArtistsControlPanel";
+import {getActiveProject} from "../../../src/redux/projects-selector";
+import {ProjectAPI} from "../../../src/api/ProjectAPI";
+import {calculateDaysLeft} from "../../../src/utils/calculateDaysLeft";
 
 export const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = ({edit, closePage}) => {
 
-    const project = useSelector((state: AppStateType) => state.projects.activeProject)
+    const project = useSelector(getActiveProject)
+
+    const [offer, setOffer] = React.useState<ValidOfferType | null>(null)
+
+    React.useEffect(() => {
+        const getOffer = async () => {
+            if (project?.project_id && edit?.revision_id) {
+                let offer = await ProjectAPI.getOffer(project?.project_id, edit.revision_id)
+                let timeLeft = calculateDaysLeft(offer.deadline)
+                let offerObj = {
+                    days: timeLeft.days,
+                    hours: timeLeft.hours,
+                    amount: offer.amount,
+                    deadline: offer.deadline
+                }
+                setOffer(offerObj)
+            }
+        }
+        getOffer()
+    }, [project, edit])
 
     return <section className="edits">
         <div className="edits__header">
@@ -28,13 +50,15 @@ export const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = 
         </div>
         <EditProgressBar status={edit?.status}/>
         <EditTasksPanel type={"changeEdit"}/>
-        <EditWorkspaceWindow isOfferExist={!!edit?.offer} isOwner={project?.role.name === "Owner"}
-                             workspace={edit?.workspace} deadline={edit?.deadline}/>
+        <EditWorkspaceWindow isOfferExist={!!offer} isOwner={project?.role?.name === "Owner"}
+                             workspace={edit?.workspace} deadline={offer?.deadline}/>
         {
             project?.role?.name === "Owner"
-                ? <EditControlPanel closePage={closePage} project={project} edit={edit}/>
-                : project?.role?.name === "Artist" && edit?.status === "Approval" && !edit?.status.isAccepted &&
-                <ArtistsControlPanel editId={edit?.revision_id} projectId={project.id} role = {project.role}/>
+                ? <EditControlPanel offer = {offer} closePage={closePage} project={project} edit={edit}/>
+                : project?.role?.name === "Artist" && edit?.status === "Approval" && !edit?.status &&
+                <ArtistsControlPanel editId={edit?.revision_id} projectId={project.project_id} role={project.role}/>
         }
     </section>
 };
+
+export type ValidOfferType = { amount: number, days: number, hours: number, deadline: string }

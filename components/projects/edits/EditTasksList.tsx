@@ -1,5 +1,4 @@
 import React from 'react';
-import {TaskType} from "../../../src/types/projectTypes";
 import {TaskTypeWithFlag} from "./EditTasksPanel";
 
 type PropsType = {

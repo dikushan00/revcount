@@ -64,11 +64,11 @@ export const SidebarRight = () => {
                             return <li key={action.id} className="notices__item">
                                 <div className="notices__text">
                                     {action.action} <span onClick={() => onEditClick(action?.edit?.revision_id || null)} className="notices__text-span">«{action.edit.name}»</span>
-                                    {action.offer && <>
-                                        <span className="notices__span notices__span--1">{action.offer.balance}$</span>
-                                        <span className="notices__span notices__span--2">{action.offer.days}d.</span>
-                                        <span className="notices__span notices__span--3">{action.offer.hours}h.</span>
-                                    </>}
+                                    {/*{action.offer && <>*/}
+                                    {/*    <span className="notices__span notices__span--1">{action.offer.balance}$</span>*/}
+                                    {/*    <span className="notices__span notices__span--2">{action.offer.days}d.</span>*/}
+                                    {/*    <span className="notices__span notices__span--3">{action.offer.hours}h.</span>*/}
+                                    {/*</>}*/}
                                 </div>
                                 <div className="notices__time">
                                     {action.time}
@@ -81,7 +81,7 @@ export const SidebarRight = () => {
         </div>
         {
             isModalMode.inviteMember &&
-            <AddMemberToProjectModal hideBlock={() => setIsModalMode(state => ({...state, inviteMember: false}))}/>
+            <AddMemberToProjectModal projectId = {activeProject?.project_id} hideBlock={() => setIsModalMode(state => ({...state, inviteMember: false}))}/>
         }
         {
             isModalMode.teamSettings &&

@@ -1,6 +1,5 @@
 import React from 'react';
 import {useSelector} from "react-redux";
-import {AppStateType} from "../../../src/redux/store-redux";
 import {EditStatusType, StatusesNamesType} from "../../../src/types/projectTypes";
 import {getStatuses} from "../../../src/redux/projects-selector";
 

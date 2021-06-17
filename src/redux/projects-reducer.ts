@@ -1,8 +1,8 @@
 import {InferActionsTypes, ThunkType} from "./store-redux";
-import {EditStatusType, EditType, InviteProjectType, ProjectType, StatusType} from "../types/projectTypes";
-import {TaskTypeWithFlag} from "../../components/projects/Edits/EditTasksPanel";
+import {EditType, InviteProjectType, ProjectType, StatusType} from "../types/projectTypes";
+import {TaskTypeWithFlag} from "../../components/projects/edits/EditTasksPanel";
 import {UserType} from "../types/userTypes";
-import {EditTasksList} from "../../components/projects/Edits/EditTasksList";
+import {ProjectAPI} from "../api/ProjectAPI";
 
 const defaultTaskObj = [{
     id: 1,
@@ -44,6 +44,18 @@ export const projects_reducer = (
                 projects: state.projects
                     ? [...state.projects, action.project]
                     : [action.project],
+            };
+        }
+        case "REVCOUNT/PROJECTS/ADD_USERS_TO_PROJECT": {
+            return {
+                ...state,
+                //@ts-ignore
+                activeProject: {
+                    ...state.activeProject,
+                    users: state.activeProject?.users
+                        ? [...state.activeProject.users, ...action.users]
+                        : [...action.users]
+                },
             };
         }
         case "REVCOUNT/PROJECTS/ACCEPT_PROJECT": {
@@ -185,6 +197,8 @@ export const actionsProjects = {
         ({type: "REVCOUNT/PROJECTS/SET_PROJECTS", projects} as const),
     addProject: (project: ProjectType) =>
         ({type: "REVCOUNT/PROJECTS/ADD_PROJECT", project} as const),
+    addUsersToProject: (users: UserType[]) =>
+        ({type: "REVCOUNT/PROJECTS/ADD_USERS_TO_PROJECT", users} as const),
     acceptProject: (invitationId: number) =>
         ({type: "REVCOUNT/PROJECTS/ACCEPT_PROJECT", invitationId} as const),
     declineProject: (invitationId: number) =>
@@ -215,4 +229,15 @@ export const actionsProjects = {
         ({type: "REVCOUNT/PROJECTS/SET_ACTIVE_PROJECT", project} as const),
     setActiveEdit: (edit: EditType | null) =>
         ({type: "REVCOUNT/PROJECTS/SET_ACTIVE_EDIT", edit} as const),
+}
+
+export const getProjects = (userId: number): GetThunkType => async (dispatch) => {
+    userId && await ProjectAPI.getProjects(userId).then(res => {
+        dispatch(actionsProjects.setProjects(res))
+    })
+}
+export const getInvitations = (userId: number): GetThunkType => async (dispatch) => {
+    userId && await ProjectAPI.getInvitations(userId).then(res => {
+        dispatch(actionsProjects.setInvitations(res))
+    })
 }

@@ -7,9 +7,8 @@ import {EditType, ProjectType, StatusesNamesType} from "../../src/types/projectT
 import {ProjectStatsInfo} from "../../components/projects/ProjectStatsInfo";
 import {useDispatch, useSelector} from "react-redux";
 import {actionsProjects} from "../../src/redux/projects-reducer";
-import {Edit} from "../../components/projects/Edits/Edit";
+import {Edit} from "../../components/projects/edits/Edit";
 import {useRouter} from "next/router";
-import {AppStateType} from "../../src/redux/store-redux";
 import {getActiveEdit, getActiveProject} from "../../src/redux/projects-selector";
 
 const Project: React.FC<{ project: ProjectType }> = () => {

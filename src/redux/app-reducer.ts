@@ -9,7 +9,7 @@ export type AppInitialStateType = typeof initialState
 type ActionsType = InferActionsTypes<typeof actionsApp>
 type GetThunkType = ThunkType<ActionsType>
 
-export const app_reducer = (state = initialState, action: ActionsType) => {
+export const app_reducer = (state = initialState, action: ActionsType):AppInitialStateType => {
 
     switch (action.type) {
 

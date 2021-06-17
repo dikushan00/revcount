@@ -1,5 +1,6 @@
 import React from "react";
 import {ProjectType} from "../../src/types/projectTypes";
+import {calculateDaysLeft} from "../../src/utils/calculateDaysLeft";
 
 
 export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({project}) => {
@@ -23,7 +24,7 @@ export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({pro
         },
     ] as any[]
 
-    if (project?.role.name === "Owner")
+    if (project?.role?.name === "Owner")
         data.push(
             {
                 imgPath: "/img/projects/credit-card.svg",
@@ -36,6 +37,8 @@ export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({pro
     return <ul className="projects__list projects-list">
         {
             data.map((item, index) => {
+                //@ts-ignore
+                let timeLeft = calculateDaysLeft(project[item.field])
                 return <li key={index} className={"projects-list__item projects-list__item--" + item.className}>
                     <div className="projects-list__icon">
                         <picture>
@@ -49,7 +52,7 @@ export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({pro
                         </div>
                         <div className="projects-list__metrics">
                             {/*@ts-ignore*/}
-                            {project ? project[item.field] : "-"} d. {item.addInfo && item.addInfo(project?.addDeadline)}
+                            {project ? timeLeft.days : "-"} d. {item.addInfo && item.addInfo(project?.addDeadline)}
                         </div>
                     </div>
                     {

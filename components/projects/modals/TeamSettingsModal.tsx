@@ -7,6 +7,8 @@ import {AppStateType} from "../../../src/redux/store-redux";
 import {copyTextToClipboard} from "../../../src/utils/copyToClipboard";
 import {ProjectAPI} from "../../../src/api/ProjectAPI";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
+import {Toast, useToast} from "../../common/blocks/Toast";
+import {useHttp} from "../../../src/utils/hooks/http.hook";
 
 type PropsType = {
     hideBlock: () => void
@@ -14,20 +16,32 @@ type PropsType = {
 }
 export const TeamSettingsModal: React.FC<PropsType> = ({hideBlock, users}) => {
     const dispatch = useDispatch()
+    const {show} = useToast()
+    const {clearError, request, error, loading} = useHttp()
     const project = useSelector((state: AppStateType) => state.projects.activeProject)
-    const changeUsersRole = (userId: number, roleId: number) => {
+
+    const changeUsersRole = async (userId: number, roleId: number) => {
         let role = userRoleSelections.find(item => item.id === roleId)
-        let projectUsers = project?.users.map(item => {
-            if (item.id === userId)
+        let projectUsers = project?.users?.map(item => {
+            if (item.user_id === userId)
                 return {...item, role}
             return item
         })
         let projectPost = {...project, users: projectUsers}
-        //@ts-ignore
-        project && ProjectAPI.editProject(project.id, projectPost).then(res => {
-            !res?.error && dispatch(actionsProjects.setActiveProject(res))
-        })
+
+        let response = project?.project_id && await request(`projects/${project?.project_id}`, "post", projectPost)
+        if (response) {
+            !response?.error && dispatch(actionsProjects.setActiveProject(response))
+            hideBlock()
+        }
     }
+
+    React.useEffect(() => {
+        error && show(error)
+        return () => clearError()
+
+    }, [error])
+
     return <CustomPopup className={"popup__team"}>
         <div>
             <div className="popup__close" onClick={hideBlock}/>
@@ -37,7 +51,7 @@ export const TeamSettingsModal: React.FC<PropsType> = ({hideBlock, users}) => {
             <form action="#" className="popup__form">
                 {
                     users?.map(user => {
-                        return <div key={user.id} className="popup__line">
+                        return <div key={user.user_id} className="popup__line">
                             <label className="popup__user">
                                 <div className="popup__user-icon">
                                     {user?.avatar
@@ -54,7 +68,7 @@ export const TeamSettingsModal: React.FC<PropsType> = ({hideBlock, users}) => {
                                 <div className="popup__profession">
                                     <select onChange={(e) => {
                                         let roleId = e.currentTarget.value
-                                        changeUsersRole(user.id, +roleId)
+                                        changeUsersRole(user.user_id, +roleId)
                                     }} defaultValue={user.role.id} id="popup-select-1" className="popup__select">
                                         {userRoleSelections.map((item, index) => {
                                             return <option key={index} value={item.id}>{item.name}</option>
@@ -68,6 +82,7 @@ export const TeamSettingsModal: React.FC<PropsType> = ({hideBlock, users}) => {
                 <CopyInviteItems/>
             </form>
         </div>
+        <Toast />
     </CustomPopup>
 }
 

@@ -1,20 +1,17 @@
 import React from 'react';
-import {OfferType} from "../../../src/types/projectTypes";
 import {useDispatch, useSelector} from "react-redux";
 import {AppStateType} from "../../../src/redux/store-redux";
 import {CustomPopup} from "../../common/blocks/CustomPopup";
 import {useForm} from "react-hook-form";
 import {useOutsideAlerter} from "../../../src/utils/hooks/outsideClick";
-import {ProjectAPI} from "../../../src/api/ProjectAPI";
-import {actionsProjects} from "../../../src/redux/projects-reducer";
+import {ValidOfferType} from "../edits/Edit";
 
-export const MakePaymentModal: React.FC<{ hideBlock: () => void, handleReserveMoney: () => void, offer: OfferType | undefined }>
+export const MakePaymentModal: React.FC<{ hideBlock: () => void, handleReserveMoney: () => void, offer: ValidOfferType | null }>
     = ({handleReserveMoney, offer, hideBlock}) => {
 
     const balance = useSelector((state: AppStateType) => state.profile.profile?.balance)
 
-    const dispatch = useDispatch()
-    const {register, errors} = useForm()
+    const {register} = useForm()
     const modalRef = React.useRef(null)
 
     const [paymentMethod, setPaymentMethod] = React.useState<{ id: number, name: PaymentMethodsNames } | null>(null)
@@ -24,7 +21,7 @@ export const MakePaymentModal: React.FC<{ hideBlock: () => void, handleReserveMo
     return <CustomPopup className={"popup__payment"} modalBodyRef={modalRef}>
         <div className="popup__close" onClick={hideBlock}/>
         <h2 className="popup__title">
-            Total cost - <span>{offer?.balance}$</span>
+            Total cost - <span>{offer?.amount}$</span>
         </h2>
         <form className="popup__form">
             <div className="popup__info">

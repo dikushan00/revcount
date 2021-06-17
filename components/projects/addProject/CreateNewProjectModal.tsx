@@ -35,12 +35,10 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
         const invitations = addedIds.map(userId => ({user_id: userId}))
         let project = {
             name: data.name,
-            freeEdits: +data.freeEdits,
             deadline: data.deadline,
             balance: 0,
             included_revisions: 0,
             invitations,
-            revisions: [],
         } as ProjectPostType
 
         userId && ProjectAPI.createProject(userId, project).then(res => {
@@ -59,8 +57,7 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
                 <input ref={register} name="name" type="text" placeholder="Project name" className="popup__input"/>
             </div>
             <div className="popup__item">
-                <input ref={register} name="freeEdits" type="text" placeholder="Free edits in hours"
-                       className="popup__input"/>
+                <input ref={register} name="freeEdits" type="text" placeholder="Free edits in hours" className="popup__input"/>
             </div>
             <div className="popup__item">
                 <label htmlFor="inpdate" className="popup__icon">

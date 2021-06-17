@@ -5,12 +5,16 @@ import {ProjectAPI} from "../../../src/api/ProjectAPI";
 import {useDispatch} from "react-redux";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
 import {useRouter} from "next/router";
+import {ValidOfferType} from "./Edit";
 
-export const EditControlPanel: React.FC<{ edit: EditType | null, project: ProjectType | null, closePage: () => void }> = ({
-                                                                                                                              closePage,
-                                                                                                                              edit,
-                                                                                                                              project
-                                                                                                                          }) => {
+type PropsType = { offer: ValidOfferType | null, edit: EditType | null, project: ProjectType | null, closePage: () => void }
+
+export const EditControlPanel: React.FC<PropsType> = ({
+                                                          offer,
+                                                          closePage,
+                                                          edit,
+                                                          project
+                                                      }) => {
     const dispatch = useDispatch()
     const router = useRouter()
     const [isPaymentModalShowMode, setIsPaymentModalShowMode] = React.useState(false)
@@ -91,7 +95,7 @@ export const EditControlPanel: React.FC<{ edit: EditType | null, project: Projec
             {
                 edit?.status === "Editing is done"
                     ? <CompletedEditBlock/>
-                    : <DefaultControlPanel handleCompleteProject={handleCompleteProject}
+                    : <DefaultControlPanel offer={offer} handleCompleteProject={handleCompleteProject}
                                            handleReserveMoney={handleReserveMoney}
                                            handleAcceptOffer={handleAcceptOffer}
                                            handleDeclineOffer={handleDeclineOffer}
@@ -103,7 +107,7 @@ export const EditControlPanel: React.FC<{ edit: EditType | null, project: Projec
         {
             isPaymentModalShowMode &&
             <MakePaymentModal handleReserveMoney={handleReserveMoney} hideBlock={() => setIsPaymentModalShowMode(false)}
-                              offer={edit?.offer}/>
+                              offer={offer}/>
         }
     </>
 }
@@ -111,6 +115,7 @@ export const EditControlPanel: React.FC<{ edit: EditType | null, project: Projec
 type DefaultControlPanel = {
     editStatusName: StatusesNamesType | undefined,
     edit: EditType | null,
+    offer: ValidOfferType | null,
     handleAcceptOffer: () => void,
     handleDeclineOffer: () => void,
     enablePaymentMode: () => void,
@@ -124,6 +129,7 @@ const DefaultControlPanel: React.FC<DefaultControlPanel> = ({
                                                                 handleDeclineOffer,
                                                                 handleAcceptOffer,
                                                                 enablePaymentMode,
+                                                                offer,
                                                                 handleCompleteProject
                                                             }) => {
     return <>
@@ -158,17 +164,17 @@ const DefaultControlPanel: React.FC<DefaultControlPanel> = ({
             </li>}
         </ul>
         {
-            editStatusName === "Approval" && edit?.status.isAccepted && <AcceptOfferBlock
-                offer={edit?.offer} handleAcceptOffer={handleAcceptOffer} handleDeclineOffer={handleDeclineOffer}/>
+            editStatusName === "Approval" && edit?.status && <AcceptOfferBlock
+                offer={offer} handleAcceptOffer={handleAcceptOffer} handleDeclineOffer={handleDeclineOffer}/>
         }
         {
-            editStatusName === "Reservation" && !edit?.status.isAccepted && <ReservationControlBlock
-                offer={edit?.offer} handleReserveMoney={handleReserveMoney} enablePaymentMode={enablePaymentMode}/>
+            editStatusName === "Reservation" && !edit?.status && <ReservationControlBlock
+                offer={offer} handleReserveMoney={handleReserveMoney} enablePaymentMode={enablePaymentMode}/>
         }
     </>
 }
 const AcceptOfferBlock: React.FC<{
-    offer: OfferType | undefined,
+    offer: ValidOfferType | null,
     handleAcceptOffer: () => void,
     handleDeclineOffer: () => void
 }> = ({offer, handleAcceptOffer, handleDeclineOffer}) => {
@@ -187,7 +193,7 @@ const AcceptOfferBlock: React.FC<{
         </form>
     </div>
 }
-const ReservationControlBlock: React.FC<{ offer: OfferType | undefined, handleReserveMoney: () => void, enablePaymentMode: () => void }> = ({
+const ReservationControlBlock: React.FC<{ offer: ValidOfferType | null, handleReserveMoney: () => void, enablePaymentMode: () => void }> = ({
                                                                                                                                                 offer,
                                                                                                                                                 enablePaymentMode
                                                                                                                                             }) => {
@@ -210,7 +216,7 @@ const ReservationControlBlock: React.FC<{ offer: OfferType | undefined, handleRe
     </>
 }
 
-export const OfferConditionsBlock: React.FC<{ offer?: OfferType | undefined, register?: any }> = ({
+export const OfferConditionsBlock: React.FC<{ offer?: ValidOfferType | null, register?: any }> = ({
                                                                                                       offer,
                                                                                                       register
                                                                                                   }) => {
@@ -243,8 +249,8 @@ export const OfferConditionsBlock: React.FC<{ offer?: OfferType | undefined, reg
             </div>
             <div className="offer-edits__box offer-edits__box--total">
                 <input ref={register} className="offer-edits__input" type="text" name="balance"
-                       placeholder={offer?.balance.toString()}
-                       defaultValue={offer?.balance.toString() || "0"}/>
+                       placeholder={offer?.amount.toString()}
+                       defaultValue={offer?.amount.toString() || "0"}/>
                 <div className="offer-edits__designation">$</div>
             </div>
         </div>

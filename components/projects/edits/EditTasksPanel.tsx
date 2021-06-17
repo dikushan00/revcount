@@ -5,12 +5,13 @@ import {useForm} from "react-hook-form";
 import {useDispatch, useSelector} from "react-redux";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
 import {AppStateType} from "../../../src/redux/store-redux";
+import {ValidOfferType} from "./Edit";
 
 export interface TaskTypeWithFlag extends TaskType {
     isEdit: boolean
 }
 
-export const EditTasksPanel: React.FC<{ type: "addNewEdit" | "changeEdit", projectTasks?: TaskType[] }> = ({
+export const EditTasksPanel: React.FC<{ type: "addNewEdit" | "changeEdit", projectTasks?: TaskType[]}> = ({
                                                                                                                type,
                                                                                                                projectTasks
                                                                                                            }) => {
@@ -27,6 +28,7 @@ export const EditTasksPanel: React.FC<{ type: "addNewEdit" | "changeEdit", proje
             dispatch(actionsProjects.setTasks(null))
         }
     }, [])
+
     React.useEffect(() => {
         if (projectTasks) {
             let tasks = projectTasks.map(item => ({...item, isEdit: false}))

@@ -2,31 +2,26 @@ import React from 'react';
 import {CustomPopup} from "../../common/blocks/CustomPopup";
 import {useOutsideAlerter} from '../../../src/utils/hooks/outsideClick';
 import {useForm} from "react-hook-form";
-import {ProjectAPI} from "../../../src/api/ProjectAPI";
 import {AcceptProjectUserType} from "../../sidebars/Sidebar";
 
 type PropsType = {
     hideBlock: () => void
     handleAcceptProject: (n: AcceptProjectUserType) => void
-    projectId: number
+    invitationId: number
 }
-export const AcceptInvitationModal: React.FC<PropsType> = ({hideBlock, handleAcceptProject, projectId}) => {
+
+export const AcceptInvitationModal: React.FC<PropsType> = ({hideBlock, handleAcceptProject, invitationId}) => {
 
     const {register, handleSubmit} = useForm()
     const joinProjectRef = React.useRef(null)
 
     useOutsideAlerter(joinProjectRef, hideBlock)
-    const handleCloseModal = () => hideBlock()
 
     const onSubmit = (data: { name: string, hoursRate: string }) => {
-        handleAcceptProject({name: data.name, hoursRate: +data.hoursRate, projectId})
-        //@ts-ignore
-        // ProjectAPI.acceptInvitation(1, {}).then(res => {
-        //     !res?.error
-        // })
+        handleAcceptProject({name: data.name, hoursRate: +data.hoursRate, invitationId})
     }
     return <CustomPopup className={"popup__join"} modalBodyRef={joinProjectRef}>
-        <div onClick={handleCloseModal} className="popup__close"/>
+        <div onClick={hideBlock} className="popup__close"/>
         <h2 className="popup__title">
             Otava Chemical
         </h2>

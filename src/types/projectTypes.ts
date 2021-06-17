@@ -34,10 +34,10 @@ type ActionHistoryType = {
 }
 
 export type OfferType = {
-    "balance": number,
-    "days": number,
-    "hours": number
+    amount: number
+    deadline: string
 }
+
 export type InviteStatusType = "PENDING" | "ACCEPTED" | "DECLINED"
 
 export type WorkspaceMessageType = {
@@ -51,9 +51,7 @@ export type EditType = {
     description: string
     name: string
     next_action: string
-    // offer?: OfferType,
-    // deadline?: string
-    // workspace?: WorkspaceMessageType[]
+    workspace?: WorkspaceMessageType[]
     tasks?: TaskType[]
 }
 
