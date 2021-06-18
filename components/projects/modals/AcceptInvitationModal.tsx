@@ -3,6 +3,15 @@ import {CustomPopup} from "../../common/blocks/CustomPopup";
 import {useOutsideAlerter} from '../../../src/utils/hooks/outsideClick';
 import {useForm} from "react-hook-form";
 import {AcceptProjectUserType} from "../../sidebars/Sidebar";
+import {
+    PopupClose,
+    PopupDesc,
+    PopupForm,
+    PopupIcon,
+    PopupInput,
+    PopupItem,
+    PopupTitle
+} from "../../styled/modals/components";
 
 type PropsType = {
     hideBlock: () => void
@@ -21,25 +30,25 @@ export const AcceptInvitationModal: React.FC<PropsType> = ({hideBlock, handleAcc
         handleAcceptProject({name: data.name, hoursRate: +data.hoursRate, invitationId})
     }
     return <CustomPopup className={"popup__join"} modalBodyRef={joinProjectRef}>
-        <div onClick={hideBlock} className="popup__close"/>
-        <h2 className="popup__title">
+        <PopupClose onClick={hideBlock}/>
+        <PopupTitle className="popup__title">
             Otava Chemical
-        </h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="popup__form">
-            <div className="popup__item">
-                <input name = "name" ref={register} type="text" placeholder="Your name" className="popup__input"/>
-            </div>
-            <div className="popup__item">
-                <label htmlFor="inprate" className="popup__icon">
+        </PopupTitle>
+        <PopupForm onSubmit={handleSubmit(onSubmit)} className="popup__form">
+            <PopupItem className="popup__item">
+                <PopupInput name = "name" ref={register} type="text" placeholder="Your name" className="popup__input"/>
+            </PopupItem>
+            <PopupItem className="popup__item">
+                <PopupIcon htmlFor="inprate" className="popup__icon">
                     $
-                </label>
-                <input name = "rate" ref={register} id="inprate" type="text" placeholder="Hours Rate"
+                </PopupIcon>
+                <PopupInput name = "rate" ref={register} id="inprate" type="text" placeholder="Hours Rate"
                        className="popup__input popup__input--rate"/>
-            </div>
-            <div className="popup__descr">
+            </PopupItem>
+            <PopupDesc className="popup__descr">
                 Set the cost of one hour of your work in dollars
-            </div>
+            </PopupDesc>
             <button type="submit" className="popup__btn">Accept Invitation</button>
-        </form>
+        </PopupForm>
     </CustomPopup>
 }

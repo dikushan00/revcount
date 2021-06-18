@@ -1,11 +1,13 @@
 
 export type ProfileType = {
-    id: number;
-    inviteId: number;
+    id?: number;
+    user_id: number;
+    inviteId?: number;
     balance?: number;
-    firstName: string;
-    lastName: string;
-    email: string;
+    first_name: string;
+    last_name?: string;
+    username?: string;
+    email?: string;
     role?: RoleType[]
     avatar?: string | null
 };

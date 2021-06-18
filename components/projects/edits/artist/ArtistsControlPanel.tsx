@@ -1,47 +1,54 @@
 import React from 'react';
 import {OfferConditionsBlock} from "../EditControlPanel";
 import {useForm} from "react-hook-form";
-import {ProjectAPI} from "../../../../src/api/ProjectAPI";
-import {useDispatch, useSelector} from "react-redux";
-import {AppStateType} from "../../../../src/redux/store-redux";
+import {useDispatch} from "react-redux";
 import {actionsProjects} from "../../../../src/redux/projects-reducer";
 import {RoleType} from "../../../../src/types/userTypes";
-import {getActiveProject} from "../../../../src/redux/projects-selector";
+import {useHttp} from "../../../../src/utils/hooks/http.hook";
+import {OfferType} from "../../../../src/types/projectTypes";
+import {OfferEditsAcceptButton} from "../../../styled/buttons/revisionButtons/RevisionsButtons";
+import {ControlEdits, EditsLabel, OfferEdits, OfferEditsForm, OfferEditsHeader} from "../../../styled/edit/components";
 
-export const ArtistsControlPanel: React.FC<{ projectId: number, editId: number | undefined, role: RoleType }> = ({role, projectId, editId}) => {
+export const ArtistsControlPanel: React.FC<{ projectId: number, revisionId: number | undefined, role: RoleType }> = ({
+                                                                                                                                         role,
+                                                                                                                                         projectId,
+                                                                                                                                         revisionId,
+                                                                                                                                     }) => {
 
     const dispatch = useDispatch()
     const {handleSubmit, register} = useForm()
+    const {request, error} = useHttp()
 
-    const project = useSelector(getActiveProject)
+    const onSubmit = async (data: { days: string, hours: string, balance: string }) => {
+        const {days, hours} = data
+        let dateNow = new Date().getTime()
+        let oneDay = 86400000
+        let oneHour = 3600000
+        let deadline = dateNow + (oneDay * +days) + (oneHour * +hours)
+        let deadlineDate = new Date(deadline).toLocaleString()
 
-    const onSubmit = (data: { days: string, hours: string, balance: string }) => {
-        let edits = project?.revisions?.map(item => {
-            if (item.revision_id === editId)
-                return {...item, offer: {days: +data.days, balance: +data.balance, hours: +data.hours}}
-            return item
-        })
-        //@ts-ignore
-        edits && ProjectAPI.sendOffer(projectId, {...project, edits}, data).then(res => {
-            !res?.error && dispatch(actionsProjects.setActiveProject(res))
-        })
+        let response = await request<OfferType>(`revisions/${revisionId}/offer/${projectId}`, "post", {deadline: deadlineDate, amount: data.balance})
+        if(response) {
+            revisionId && dispatch(actionsProjects.setActiveProjectOffer(revisionId, response))
+        }
     }
 
-    return <div className="edits__control border-wrap control-edits">
-        <div className="control-edits__offer offer-edits">
-            {role.name !== "Artist" && <div className="offer-edits__header">
-                <div className="offer-edits__label label">
+    return <ControlEdits>
+        <OfferEdits>
+            {role.name !== "Artist" &&
+            <OfferEditsHeader>
+                <EditsLabel>
                     Offer
-                </div>
-            </div>}
-            <form onSubmit={handleSubmit(onSubmit)} className="offer-edits__form" action="#">
+                </EditsLabel>
+            </OfferEditsHeader>}
+            <OfferEditsForm onSubmit={handleSubmit(onSubmit)}>
                 <OfferConditionsBlock register={register}/>
                 <div className="offer-edits__block">
-                    <div onClick={() => {
-                    }} className="offer-edits__btn-accept">Send an offer
-                    </div>
+                    <OfferEditsAcceptButton onClick={() => {
+                    }}>Send an offer
+                    </OfferEditsAcceptButton>
                 </div>
-            </form>
-        </div>
-    </div>
+            </OfferEditsForm>
+        </OfferEdits>
+    </ControlEdits>
 };

@@ -1,10 +1,23 @@
 import React from 'react';
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {AppStateType} from "../../../src/redux/store-redux";
 import {CustomPopup} from "../../common/blocks/CustomPopup";
 import {useForm} from "react-hook-form";
 import {useOutsideAlerter} from "../../../src/utils/hooks/outsideClick";
 import {ValidOfferType} from "../edits/Edit";
+import {
+    PopupBlock,
+    PopupBox,
+    PopupClose,
+    PopupDesc,
+    PopupForm,
+    PopupInfo,
+    PopupInput,
+    PopupItem,
+    PopupLink,
+    PopupTitle
+} from "../../styled/modals/components";
+import {ImgWrapper} from "../../common/blocks/ImgWrapper";
 
 export const MakePaymentModal: React.FC<{ hideBlock: () => void, handleReserveMoney: () => void, offer: ValidOfferType | null }>
     = ({handleReserveMoney, offer, hideBlock}) => {
@@ -19,42 +32,39 @@ export const MakePaymentModal: React.FC<{ hideBlock: () => void, handleReserveMo
     useOutsideAlerter(modalRef, hideBlock)
 
     return <CustomPopup className={"popup__payment"} modalBodyRef={modalRef}>
-        <div className="popup__close" onClick={hideBlock}/>
-        <h2 className="popup__title">
+        <PopupClose onClick={hideBlock}/>
+        <PopupTitle className="popup__title">
             Total cost - <span>{offer?.amount}$</span>
-        </h2>
-        <form className="popup__form">
-            <div className="popup__info">
+        </PopupTitle>
+        <PopupForm className="popup__form">
+            <PopupInfo className="popup__info">
                 Pay from my balance
-            </div>
-            <div className="popup__item">
+            </PopupInfo>
+            <PopupItem className="popup__item">
                 <label onClick={handleReserveMoney} htmlFor="inprate" className="popup__method">
                     pay
                 </label>
-                <input ref={register} name={"pay"} id="inprate" type="text"
+                <PopupInput ref={register} name={"pay"} id="inprate" type="text"
                        placeholder={balance?.toString() + "$" || "0"} className="popup__input popup__input--method"/>
-            </div>
-            <div className="popup__descr">
+            </PopupItem>
+            <PopupDesc className="popup__descr">
                 Choose a payment method
-            </div>
-            <ul className="popup__block">
+            </PopupDesc>
+            <PopupBlock className="popup__block">
                 {
                     paymentMethods?.map((item, index) => {
-                        return <li key={index} onClick={() => setPaymentMethod({
+                        return <PopupBox key={index} onClick={() => setPaymentMethod({
                             id: item.id,
                             name: item.name
                         })} className={"popup__box " + (paymentMethod?.id === item.id ? "active" : "")}>
-                            <span className="popup__link">
-                                <picture>
-                                    <source srcSet={item.imgPath} type="image/webp"/>
-                                    <img src={item.imgPath} alt={item.name}/>
-                                </picture>
-                            </span>
-                        </li>
+                            <PopupLink className="popup__link">
+                                <ImgWrapper path={item.imgPath} />
+                            </PopupLink>
+                        </PopupBox>
                     })
                 }
-            </ul>
-        </form>
+            </PopupBlock>
+        </PopupForm>
     </CustomPopup>
 }
 

@@ -7,6 +7,16 @@ import {useDispatch} from "react-redux";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
 import {Toast, useToast} from "../../common/blocks/Toast";
 import {useHttp} from "../../../src/utils/hooks/http.hook";
+import {ProjectType} from "../../../src/types/projectTypes";
+import {
+    PopupButton,
+    PopupClose,
+    PopupDesc,
+    PopupForm,
+    PopupIcon, PopupInput, PopupInputDate,
+    PopupItem,
+    PopupTitle
+} from "../../styled/modals/components";
 
 type PropsType = {
     hideBlock: () => void
@@ -22,12 +32,12 @@ export const JoinProjectModal: React.FC<PropsType> = ({hideBlock}) => {
     useOutsideAlerter(joinProjectRef, hideBlock)
 
     const onSubmit = async (data: { projectId: number, username: string, hoursRate: number }) => {
-        let response = data.projectId && await request(`projects/${data.projectId}/users`, "post", {
+        let response = data.projectId && await request<ProjectType>(`projects/${data.projectId}/users`, "post", {
             username: data.username,
             hoursRate: data.hoursRate
         })
         if (response) {
-            !response?.error && dispatch(actionsProjects.addProject(response))
+            dispatch(actionsProjects.addProject(response))
             hideBlock()
         }
     }
@@ -38,39 +48,39 @@ export const JoinProjectModal: React.FC<PropsType> = ({hideBlock}) => {
     }, [error])
 
     return <CustomPopup className={"popup__join"} modalBodyRef={joinProjectRef}>
-        <div onClick={hideBlock} className="popup__close"/>
-        <h2 className="popup__title">
+        <PopupClose onClick={hideBlock} className="popup__close"/>
+        <PopupTitle className="popup__title">
             Join the project
-        </h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="popup__form">
-            <div className="popup__item">
-                <input ref={register} name="projectId" type="text" placeholder="Unique project ID"
+        </PopupTitle>
+        <PopupForm onSubmit={handleSubmit(onSubmit)} className="popup__form">
+            <PopupItem className="popup__item">
+                <PopupInput ref={register} name="projectId" type="text" placeholder="Unique project ID"
                        className="popup__input"/>
                 {
                     errors.id && <ValidationError/>
                 }
-            </div>
-            <div className="popup__item">
-                <input ref={register} name="username" type="text" placeholder="Your name" className="popup__input"/>
+            </PopupItem>
+            <PopupItem className="popup__item">
+                <PopupInput ref={register} name="username" type="text" placeholder="Your name" className="popup__input"/>
                 {
                     errors.name && <ValidationError/>
                 }
-            </div>
-            <div className="popup__item">
-                <label htmlFor="inprate" className="popup__icon">
+            </PopupItem>
+            <PopupItem className="popup__item">
+                <PopupIcon htmlFor="inprate" className="popup__icon">
                     $
-                </label>
-                <input id="inprate" name="hoursRate" type="number" placeholder="Hours Rate"
+                </PopupIcon>
+                <PopupInputDate id="inprate" name="hoursRate" type="number" placeholder="Hours Rate"
                        className="popup__input popup__input--date"/>
                 {
                     errors.hoursRate && <ValidationError/>
                 }
-            </div>
-            <div className="popup__descr">
+            </PopupItem>
+            <PopupDesc className="popup__descr">
                 Set the cost of one hour of your work in dollars
-            </div>
-            <button disabled={loading} type="submit" className="popup__btn">Join the project</button>
-        </form>
-        <Toast />
+            </PopupDesc>
+            <PopupButton disabled={loading} type="submit">Join the project</PopupButton>
+        </PopupForm>
+        <Toast/>
     </CustomPopup>
 }

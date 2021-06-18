@@ -8,6 +8,16 @@ import {copyTextToClipboard} from "../../../src/utils/copyToClipboard";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
 import {Toast, useToast} from "../../common/blocks/Toast";
 import {useHttp} from "../../../src/utils/hooks/http.hook";
+import {ProjectType} from "../../../src/types/projectTypes";
+import {
+    PopupActions, PopupActionsItem, PopupActionsLink,
+    PopupClose,
+    PopupForm,
+    PopupProfession,
+    PopupSelect,
+    PopupTabsLine,
+    PopupTitle
+} from "../../styled/modals/components";
 
 type PropsType = {
     hideBlock: () => void
@@ -28,9 +38,9 @@ export const TeamSettingsModal: React.FC<PropsType> = ({hideBlock, users}) => {
         })
         let projectPost = {...project, users: projectUsers}
 
-        let response = project?.project_id && await request(`projects/${project?.project_id}`, "post", projectPost)
+        let response = project?.project_id && await request<ProjectType>(`projects/${project?.project_id}`, "post", projectPost)
         if (response) {
-            !response?.error && dispatch(actionsProjects.setActiveProject(response))
+            dispatch(actionsProjects.setActiveProject(response))
             hideBlock()
         }
     }
@@ -43,14 +53,14 @@ export const TeamSettingsModal: React.FC<PropsType> = ({hideBlock, users}) => {
 
     return <CustomPopup className={"popup__team"}>
         <div>
-            <div className="popup__close" onClick={hideBlock}/>
-            <h2 className="popup__title">
+            <PopupClose onClick={hideBlock}/>
+            <PopupTitle className="popup__title">
                 Team setting
-            </h2>
-            <form action="#" className="popup__form">
+            </PopupTitle>
+            <PopupForm className="popup__form">
                 {
                     users?.map(user => {
-                        return <div key={user.user_id} className="popup__line">
+                        return <PopupTabsLine key={user.user_id} className="popup__line">
                             <label className="popup__user">
                                 <div className="popup__user-icon">
                                     {user?.avatar
@@ -62,24 +72,24 @@ export const TeamSettingsModal: React.FC<PropsType> = ({hideBlock, users}) => {
                                     {user.name} {user.isOwner && "(You)"}
                                 </div>
                             </label>
-                            <div className="popup__profession">
+                            <PopupProfession className="popup__profession">
                                 {/*{user.isOwner ? "Owner" : "Artist"}*/}
-                                <div className="popup__profession">
-                                    <select onChange={(e) => {
+                                <PopupProfession className="popup__profession">
+                                    <PopupSelect onChange={(e) => {
                                         let roleId = e.currentTarget.value
                                         changeUsersRole(user.user_id, +roleId)
                                     }} defaultValue={user.role.id} id="popup-select-1" className="popup__select">
                                         {userRoleSelections.map((item, index) => {
                                             return <option key={index} value={item.id}>{item.name}</option>
                                         })}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+                                    </PopupSelect>
+                                </PopupProfession>
+                            </PopupProfession>
+                        </PopupTabsLine>
                     })
                 }
                 <CopyInviteItems/>
-            </form>
+            </PopupForm>
         </div>
         <Toast/>
     </CustomPopup>
@@ -106,29 +116,30 @@ export const CopyInviteItems = () => {
     const setIsIdCopied = (n: boolean) => {
         setIsCopied(state => ({...state, id: n}))
     }
-    return <ul className="popup__actions actions-popup">
-        <li onMouseLeave={() => setIsInviteLinkCopied(false)} className="actions-popup__item tooltip"
+    return <PopupActions>
+        <PopupActionsItem onMouseLeave={() => setIsInviteLinkCopied(false)}
+            className="tooltip"
             onClick={() => copyInviteLinkText("http://localhost:3000/")}>
-                        <span className="actions-popup__link">
-                            Copy invite link
-                            <CopyTextClipboardIcon/>
-                        </span>
-            <span className={"tooltiptext"}>
+                <PopupActionsLink className="actions-popup__link">
+                    Copy invite link
+                    <CopyTextClipboardIcon/>
+                </PopupActionsLink>
+                <span className={"tooltiptext"}>
                             {isCopied.inviteLink ? "Copied!" : "Copy"}
-                        </span>
-        </li>
-        <li onMouseLeave={() => setIsIdCopied(false)}
-            className="actions-popup__item tooltip"
+                </span>
+        </PopupActionsItem>
+        <PopupActionsItem onMouseLeave={() => setIsIdCopied(false)}
+            className="tooltip"
             onClick={() => profile?.inviteId && copyIdText(profile?.inviteId)}>
-                        <span className="actions-popup__link">
-                            Unique ID - {profile?.inviteId}
-                            <CopyTextClipboardIcon/>
-                        </span>
-            <span className={"tooltiptext"}>
-                            {isCopied.id ? "Copied!" : "Copy"}
-                        </span>
-        </li>
-    </ul>
+                <PopupActionsLink className="actions-popup__link">
+                    Unique ID - {profile?.inviteId}
+                    <CopyTextClipboardIcon/>
+                </PopupActionsLink>
+                <span className={"tooltiptext"}>
+                    {isCopied.id ? "Copied!" : "Copy"}
+                </span>
+        </PopupActionsItem>
+    </PopupActions>
 }
 
 const userRoleSelections = [

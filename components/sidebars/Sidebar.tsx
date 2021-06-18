@@ -8,6 +8,21 @@ import {actionsProjects} from "../../src/redux/projects-reducer";
 import {AcceptInvitationModal} from "../projects/modals/AcceptInvitationModal";
 import {getInvitations, getUserId} from "../../src/redux/projects-selector";
 import {useHttp} from "../../src/utils/hooks/http.hook";
+import {
+    SideBarAcceptButton, SideBarBlockAddButton,
+    SideBarBlockButton,
+    SideBarButton,
+    SideBarDeclineButton,
+    SideBarFooterButton
+} from "../styled/buttons/Buttons";
+import {
+    SidebarActions,
+    SidebarAside, SidebarBlockInvitation, SidebarBlockItem,
+    SidebarContent, SidebarFooter,
+    SidebarHeader,
+    SidebarLogo,
+    SidebarLogoLink
+} from "../styled/sidebar/components";
 
 type ActionNamesType = "projects" | "invitations"
 
@@ -30,31 +45,31 @@ export const Sidebar = () => {
     }
 
     return <>
-        <aside className="sidebar">
-            <div className="sidebar__header">
-                <div className="sidebar__logo">
+        <SidebarAside>
+            <SidebarHeader>
+                <SidebarLogo>
                     <Link href="/">
-                        <a className="sidebar__logo-link">
+                        <SidebarLogoLink>
                             <picture>
                                 <source srcSet={"/img/icons/logo.svg"} type="image/webp"/>
                                 <img src={"/img/icons/logo.svg"} alt="logo"/>
                             </picture>
-                        </a>
+                        </SidebarLogoLink>
                     </Link>
-                </div>
-            </div>
-            <div className="sidebar__content">
-                <div className="sidebar__actions">
-                    <button onClick={() => handleChangeAction("projects")}
-                            className={"sidebar__btn sidebar__btn--1 btn-3 " + (activeAction === "projects" ? "active" : "")}>Projects
-                    </button>
-                    <button onClick={() => handleChangeAction("invitations")}
-                            className={"sidebar__btn sidebar__btn--2 btn-3 " + (activeAction === "invitations" ? "active" : "")}>
+                </SidebarLogo>
+            </SidebarHeader>
+            <SidebarContent>
+                <SidebarActions>
+                    <SideBarButton onClick={() => handleChangeAction("projects")}
+                            className={" " + (activeAction === "projects" ? "active" : "")}>Projects
+                    </SideBarButton>
+                    <SideBarButton onClick={() => handleChangeAction("invitations")}
+                            className={" " + (activeAction === "invitations" ? "active" : "")}>
                         Invitations
                         {invitations && invitations?.length > 0 &&
                         <span className="sidebar__span">{invitations?.length}</span>}
-                    </button>
-                </div>
+                    </SideBarButton>
+                </SidebarActions>
                 {
                     activeAction === "projects" &&
                     <Projects projects={projects} handleAddNewProject={handleAddNewProject}/>
@@ -62,16 +77,16 @@ export const Sidebar = () => {
                 {
                     activeAction === "invitations" && <InvitationProjects/>
                 }
-            </div>
-            <div className="sidebar__footer">
-                <button className="sidebar__footer-btn ">
+            </SidebarContent>
+            <SidebarFooter>
+                <SideBarFooterButton>
                     Upgrade to premium
                     <svg width={12} height={11} viewBox="0 0 12 11" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M6 11V2M6 2L1 7M6 2L11 7" stroke="#868594" strokeWidth="1.6"/>
                     </svg>
-                </button>
-            </div>
-        </aside>
+                </SideBarFooterButton>
+            </SidebarFooter>
+        </SidebarAside>
         {
             isAddNewProjectModalMode && <CreateNewProjectModal hideBlock={handleCloseModal}/>
         }
@@ -105,25 +120,23 @@ const InvitationProjects: React.FC<InvitationProjectsPropsType> = () => {
     }
 
     return <>
-        <ul className="sidebar__block block-sidebar block-sidebar__invitation">
+        <SidebarBlockInvitation className="sidebar__block block-sidebar block-sidebar__invitation">
             {
                 invitations?.map((item, index) => {
-                    return <li key={item.invitation_id || index} className="block-sidebar__item">
-                        <button className="block-sidebar__btn block-sidebar-open">
+                    return <SidebarBlockItem key={item.invitation_id || index} className="block-sidebar__item">
+                        <SideBarBlockButton className="block-sidebar-open">
                             <span/> {item.name}
-                        </button>
+                        </SideBarBlockButton>
                         <div className="block-sidebar__body">
-                            <button disabled={loading} onClick={() => setAcceptProjectId(item.invitation_id)}
-                                    className="block-sidebar__button block-sidebar__button--accept">Accept
-                            </button>
-                            <button disabled={loading} onClick={() => handleDeclineProject(item.invitation_id)}
-                                    className="block-sidebar__button block-sidebar__button--decline">Decline
-                            </button>
+                            <SideBarAcceptButton disabled={loading} onClick={() => setAcceptProjectId(item.invitation_id)}>Accept
+                            </SideBarAcceptButton>
+                            <SideBarDeclineButton disabled={loading} onClick={() => handleDeclineProject(item.invitation_id)}>Decline
+                            </SideBarDeclineButton>
                         </div>
-                    </li>
+                    </SidebarBlockItem>
                 })
             }
-        </ul>
+        </SidebarBlockInvitation>
         {
             acceptProjectId &&
             <AcceptInvitationModal invitationId={acceptProjectId} handleAcceptProject={handleAcceptProject}
@@ -140,18 +153,18 @@ const Projects: React.FC<{ projects: ProjectType[] | null, handleAddNewProject: 
         {
             projects?.map((item, index) => {
                 return <Link key={item.project_id} href={"/projects/" + item.project_id}>
-                    <li className="block-sidebar__item">
-                        <button className="block-sidebar__btn">
+                    <SidebarBlockItem className="block-sidebar__item">
+                        <SideBarBlockButton>
                             <span/> {item.name}
-                        </button>
-                    </li>
+                        </SideBarBlockButton>
+                    </SidebarBlockItem>
                 </Link>
             })
         }
-        <li className="block-sidebar__item">
-            <button onClick={handleAddNewProject} className="block-sidebar__btn-add">
+        <SidebarBlockItem className="block-sidebar__item">
+            <SideBarBlockAddButton onClick={handleAddNewProject} className="block-sidebar__btn-add">
                 <span>+</span>Add new project
-            </button>
-        </li>
+            </SideBarBlockAddButton>
+        </SidebarBlockItem>
     </ul>
 }

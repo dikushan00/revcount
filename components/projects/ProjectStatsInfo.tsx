@@ -1,6 +1,13 @@
 import React from "react";
 import {ProjectType} from "../../src/types/projectTypes";
 import {calculateDaysLeft} from "../../src/utils/calculateDaysLeft";
+import {
+    ProjectsList,
+    ProjectsListBody, ProjectsListIcon,
+    ProjectsListItem,
+    ProjectsListLabel,
+    ProjectsListMetrics
+} from "../styled/projects/components";
 
 
 export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({project}) => {
@@ -34,32 +41,32 @@ export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({pro
                 addContent: <div className="projects-list__add">+</div>,
             })
 
-    return <ul className="projects__list projects-list">
+    return <ProjectsList>
         {
             data.map((item, index) => {
                 //@ts-ignore
                 let timeLeft = calculateDaysLeft(project[item.field])
-                return <li key={index} className={"projects-list__item projects-list__item--" + item.className}>
-                    <div className="projects-list__icon">
+                return <ProjectsListItem key={index} className={item.className}>
+                    <ProjectsListIcon>
                         <picture>
                             <source srcSet={item.imgPath} type="image/webp"/>
                             <img src={item.imgPath} alt="flame"/>
                         </picture>
-                    </div>
-                    <div className="projects-list__body">
-                        <div className="projects-list__label">
+                    </ProjectsListIcon>
+                    <ProjectsListBody>
+                        <ProjectsListLabel>
                             {item.title}
-                        </div>
-                        <div className="projects-list__metrics">
+                        </ProjectsListLabel>
+                        <ProjectsListMetrics>
                             {/*@ts-ignore*/}
                             {project ? timeLeft.days : "-"} d. {item.addInfo && item.addInfo(project?.addDeadline)}
-                        </div>
-                    </div>
+                        </ProjectsListMetrics>
+                    </ProjectsListBody>
                     {
                         item?.addContent && item.addContent
                     }
-                </li>
+                </ProjectsListItem>
             })
         }
-    </ul>
+    </ProjectsList>
 }

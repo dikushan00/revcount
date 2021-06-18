@@ -10,6 +10,18 @@ import {actionsProjects} from "../../../src/redux/projects-reducer";
 import {useForm} from "react-hook-form";
 import {Toast, useToast} from "../../common/blocks/Toast";
 import {useHttp} from "../../../src/utils/hooks/http.hook";
+import {UserType} from "../../../src/types/userTypes";
+import {Btn2, Btn2Div} from "../../styled/buttons/Buttons";
+import {IdBlockButton} from "../../styled/buttons/popup/PopupButtons";
+import {
+    IdBlockItem, IdBlockNumber, InputTag,
+    PopupClose,
+    PopupForm, PopupInputId, PopupItem,
+    PopupTabs, PopupTabsBlock, PopupTabsBody, PopupTabsColumn,
+    PopupTabsItem, PopupTabsLine,
+    PopupTabsNav,
+    PopupTitle
+} from "../../styled/modals/components";
 
 type PropsType = {
     hideBlock: () => void
@@ -49,6 +61,13 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
         })
     }, [contacts])
 
+    const sendRequestUsers = async (data: any) => {
+        let response = projectId && await request<UserType[]>(`projects/${projectId}/invitations`, "post", data)
+        if (response) {
+            response && dispatch(actionsProjects.addUsersToProject(response))
+            hideBlock()
+        }
+    }
     const onSubmit = async (data: { email?: string }) => {
         let contactId = 0
         for (let key in data) {
@@ -57,48 +76,37 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
             contactId = splitId && splitId[1]
         }
         if (data?.email) {
-            let response = projectId && await request(`projects/${projectId}/invitations`, "post", data)
-            if (response) {
-                response && dispatch(actionsProjects.addUsersToProject(response))
-                hideBlock()
-            }
+            await sendRequestUsers(data)
         } else if (contactId) {
-            let response = projectId && await request(`projects/${projectId}/invitations`, "post", {user_id: contactId.toString()})
-            if (response) {
-                response && dispatch(actionsProjects.addUsersToProject(response))
-                hideBlock()
-            }
+            await sendRequestUsers({user_id: contactId.toString()})
         }
     }
 
     React.useEffect(() => {
         error && show(error)
-
-        return () => {
-            clearError()
-        }
+        return () => clearError()
     }, [error])
 
     useOutsideAlerter(modalRef, hideBlock)
 
     return <CustomPopup className={"popup__invite"} modalBodyRef={modalRef}>
-        <div onClick={hideBlock} className="popup__close"/>
-        <h2 className="popup__title">
+        <PopupClose onClick={hideBlock} />
+        <PopupTitle className="popup__title">
             Invite with:
-        </h2>
+        </PopupTitle>
 
-        <form onSubmit={hookForm.handleSubmit(onSubmit)} className="popup__form">
-            <div className="popup__tabs tabs-popup">
-                <nav className="tabs-popup__nav">
+        <PopupForm onSubmit={hookForm.handleSubmit(onSubmit)} className="popup__form">
+            <PopupTabs className="popup__tabs tabs-popup">
+                <PopupTabsNav className="tabs-popup__nav">
                     {
                         tabs.map((tab, index) => {
-                            return <div key={index} onClick={() => setActiveTabId(index)}
-                                        className={"tabs-popup__item" + (index === activeTabId ? " tabs-open" : "")}>{tab.title}</div>
+                            return <PopupTabsItem key={index} onClick={() => setActiveTabId(index)}
+                                        className={"tabs-popup__item" + (index === activeTabId ? " tabs-open" : "")}>{tab.title}</PopupTabsItem>
                         })
                     }
-                </nav>
-                <div className="tabs-popup__body">
-                    <div className="tabs-popup__block">
+                </PopupTabsNav>
+                <PopupTabsBody>
+                    <PopupTabsBlock className="tabs-popup__block">
                         {
                             projectId && tabs.map((tab, index) => {
                                 return <React.Fragment key={index}>
@@ -108,27 +116,27 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
                                 </React.Fragment>
                             })
                         }
-                    </div>
-                </div>
-            </div>
+                    </PopupTabsBlock>
+                </PopupTabsBody>
+            </PopupTabs>
             <CopyInviteItems/>
-        </form>
+        </PopupForm>
         <Toast/>
     </CustomPopup>
 }
 
 const InviteMemberViaEmail: React.FC<ModalItemPropsType> = ({hookForm}) => {
-    return <div className="tabs-popup__line">
+    return <PopupTabsLine className="tabs-popup__line">
         <input required={true} ref={hookForm?.register} className="tabs-popup__input"
                placeholder="E-mail, comma separated" type="email"
                name="email"/>
-        <button type={"submit"} className={"tabs-popup__btn btn-2"}>Send invite</button>
-    </div>
+        <Btn2 type={"submit"} className={"tabs-popup__btn"}>Send invite</Btn2>
+    </PopupTabsLine>
 }
 const InviteMemberFromContacts: React.FC<ModalItemPropsType> = ({hookForm}) => {
     const contacts = useSelector((state: AppStateType) => state.profile.contacts)
 
-    return <div className="tabs-popup__column">
+    return <PopupTabsColumn className="tabs-popup__column">
         <ul className="tabs-popup__inner">
             {
                 contacts?.map(c => {
@@ -144,8 +152,8 @@ const InviteMemberFromContacts: React.FC<ModalItemPropsType> = ({hookForm}) => {
                 })
             }
         </ul>
-        <button disabled={!!contacts} type={"submit"} className={"tabs-popup__btn btn-2"}>Send invite</button>
-    </div>
+        <Btn2 disabled={!!contacts} type={"submit"} className={"tabs-popup__btn"}>Send invite</Btn2>
+    </PopupTabsColumn>
 
 }
 
@@ -163,7 +171,7 @@ const InviteMemberViaId: React.FC<InviteViaIdType> = ({hideBlock, projectId}) =>
     const onSubmit = async () => {
         const invitations = addedIds.map(userId => ({user_id: userId}))
 
-        let response = projectId && await request(`projects/${projectId}/invitations`, "post", invitations)
+        let response = projectId && await request<UserType[]>(`projects/${projectId}/invitations`, "post", invitations)
         if (response) {
             response && dispatch(actionsProjects.addUsersToProject(response))
             hideBlock()
@@ -189,10 +197,7 @@ const InviteMemberViaId: React.FC<InviteViaIdType> = ({hideBlock, projectId}) =>
 
     React.useEffect(() => {
         error && show(error)
-
-        return () => {
-            clearError()
-        }
+        return () => clearError()
     }, [error])
 
     const onClick = () => {
@@ -200,27 +205,25 @@ const InviteMemberViaId: React.FC<InviteViaIdType> = ({hideBlock, projectId}) =>
             addedIds && onSubmit()
     }
 
-    return <div className="tabs-popup__line">
-        <div className="popup__item">
-            <div className="popup__input popup__input--id">
+    return <PopupTabsLine className="tabs-popup__line">
+        <PopupItem className="popup__item">
+            <PopupInputId className="popup__input popup__input--id">
                 {
                     addedIds.map((id, index) => {
-                        return <div key={index} className="id-block__item">
-                            <div className="id-block__number">{id}</div>
-                            <span onClick={() => handleDeleteId(id)} className="id-block__btn">
+                        return <IdBlockItem key={index}>
+                            <IdBlockNumber>{id}</IdBlockNumber>
+                            <IdBlockButton onClick={() => handleDeleteId(id)}>
                                 <RemoveItemIcon/>
-                            </span>
-                        </div>
+                            </IdBlockButton>
+                        </IdBlockItem>
                     })
                 }
-                <input name="ids" id="inpid" onKeyPress={onPressEnter} type="text" className="input_tag"/>
-            </div>
-        </div>
-        <div onClick={onClick} className={"tabs-popup__btn btn-2"}>Send
-            invite
-        </div>
-        <Toast />
-    </div>
+                <InputTag name="ids" id="inpid" onKeyPress={onPressEnter} type="text"/>
+            </PopupInputId>
+        </PopupItem>
+        <Btn2Div onClick={onClick} className={"tabs-popup__btn"}>Send invite</Btn2Div>
+        <Toast/>
+    </PopupTabsLine>
 
 }
 

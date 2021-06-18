@@ -4,6 +4,15 @@ import {AppStateType} from "../../src/redux/store-redux";
 import React from "react";
 import {copyTextToClipboard} from "../../src/utils/copyToClipboard";
 import {ImgWrapper} from "../common/blocks/ImgWrapper";
+import {
+    HeaderComponent, HeaderIndexer,
+    HeaderMenu,
+    HeaderRegistration, HeaderRegistrationIcon, HeaderUser,
+    MenuBody,
+    MenuItem,
+    MenuLink,
+    MenuList, Tooltip
+} from "../styled/header/components";
 
 export const Header = () => {
 
@@ -14,63 +23,64 @@ export const Header = () => {
         copyTextToClipboard(text.toString(), setIsCopied)
     }
 
-    return <header className="header">
-        <div className="header__menu menu">
+    return <HeaderComponent>
+        <HeaderMenu>
             <div className="menu__icon icon-menu">
                 <span/>
                 <span/>
                 <span/>
             </div>
-            <nav className="menu__body">
-                <ul className="menu__list">
-                    <li className="menu__item">
+            <MenuBody>
+                <MenuList>
+                    <MenuItem>
                         <Link href="/">
-                            <a className="menu__link">Owerview</a>
+                            <MenuLink>Owerview</MenuLink>
                         </Link>
-                    </li>
-                    <li className="menu__item">
+                    </MenuItem>
+                    <MenuItem>
                         <Link href="/">
-                            <a className="menu__link">Milestone</a>
+                            <MenuLink>Milestone</MenuLink>
                         </Link>
-                    </li>
-                    <li className="menu__item">
+                    </MenuItem>
+                    <MenuItem>
                         <Link href="/">
-                            <a className="menu__link">Payment</a>
+                            <MenuLink>Payment</MenuLink>
                         </Link>
-                    </li>
-                    <li className="menu__item">
+                    </MenuItem>
+                    <MenuItem>
                         <Link href="/">
-                            <a className="menu__link">
+                            <MenuLink>
                                 Contacts <span className="menu__link-span">3</span>
-                            </a>
+                            </MenuLink>
                         </Link>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-        <div className="header__registration">
-            <div className="header__indexer">
+                    </MenuItem>
+                </MenuList>
+            </MenuBody>
+        </HeaderMenu>
+
+        <HeaderRegistration>
+            <HeaderIndexer>
                 your invite id - {profile?.inviteId}
-            </div>
-            <span onMouseLeave={() => isCopied && setIsCopied(false)}
-                  onClick={() => profile?.inviteId && copyText(profile?.inviteId)}
-                  className="header__registration-icon">
-                <span className="tooltip">
+            </HeaderIndexer>
+
+            <HeaderRegistrationIcon onMouseLeave={() => isCopied && setIsCopied(false)}
+                  onClick={() => profile?.inviteId && copyText(profile?.inviteId)}>
+                <Tooltip>
                     <ImgWrapper path={"/img/icons/copyTextIcon.svg"}/>
                     <span className={"tooltiptext"}>
                         {isCopied ? "Copied!" : "Copy"}
                     </span>
-                </span>
-            </span>
+                </Tooltip>
+            </HeaderRegistrationIcon>
             <Link href="/">
-                <a className="header__user">
+                <HeaderUser>
                     {profile?.avatar
-                        ? <img src={profile?.avatar} alt="profile ava"/>
+                        ? <ImgWrapper path={profile?.avatar} />
                         : <DefaultProfileAvatar/>}
-                </a>
+                </HeaderUser>
             </Link>
-        </div>
-    </header>
+        </HeaderRegistration>
+    </HeaderComponent>
 }
 
 export const DefaultProfileAvatar = () => {

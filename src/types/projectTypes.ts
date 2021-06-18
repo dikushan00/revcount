@@ -51,6 +51,7 @@ export type EditType = {
     description: string
     name: string
     next_action: string
+    offer?: OfferType
     workspace?: WorkspaceMessageType[]
     tasks?: TaskType[]
 }

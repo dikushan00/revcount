@@ -2,6 +2,14 @@ import React from 'react';
 import {useSelector} from "react-redux";
 import {EditStatusType, StatusesNamesType} from "../../../src/types/projectTypes";
 import {getStatuses} from "../../../src/redux/projects-selector";
+import {ProgressEditButton} from "../../styled/buttons/revisionButtons/RevisionsButtons";
+import {
+    ProgressEdits,
+    ProgressEditsItem,
+    ProgressEditsLabel,
+    ProgressEditsList,
+    ProgressEditsWrapper
+} from "../../styled/edit/components";
 
 interface EditStatusProgressType extends EditStatusType {
     touched?: boolean
@@ -27,12 +35,12 @@ export const EditProgressBar: React.FC<{ status: StatusesNamesType | undefined }
         }
     }, [statuses, statusProps])
 
-    return <div className="edits__progress border-wrap progress-edits">
-        <div className="progress-edits__wrapper">
-            <div className="progress-edits__label label">
+    return <ProgressEdits>
+        <ProgressEditsWrapper>
+            <ProgressEditsLabel>
                 Progress:
-            </div>
-            <ul className="progress-edits__list">
+            </ProgressEditsLabel>
+            <ProgressEditsList>
                 {
                     validStatuses?.map((item, index) => {
                         let className: "btn-border" | "btn-blue" | "btn-green" | "" = ""
@@ -44,14 +52,14 @@ export const EditProgressBar: React.FC<{ status: StatusesNamesType | undefined }
                         if (item.name === "Editing is done" && item?.isCurrent) {
                             className = "btn-green"
                         }
-                        return <li key={index} className="progress-edits__item">
-                            <button
-                                className={"progress-edits__btn progress-edits__btn--" + item.key + "btn-4 " + className}>{item.name}
-                            </button>
-                        </li>
+                        return <ProgressEditsItem key={index}>
+                            <ProgressEditButton className={"progress-edits__btn progress-edits__btn--" + item.key + " " + className}>
+                                {item.name}
+                            </ProgressEditButton>
+                        </ProgressEditsItem>
                     })
                 }
-            </ul>
-        </div>
-    </div>
+            </ProgressEditsList>
+        </ProgressEditsWrapper>
+    </ProgressEdits>
 }

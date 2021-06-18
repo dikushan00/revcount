@@ -2,84 +2,109 @@ import React from 'react';
 import Link from 'next/link'
 import {useForm} from "react-hook-form";
 import {ValidationError} from "../components/common/form/ValidationError";
-import {checkPassword} from "../src/utils/checkPassword";
 import {useHttp} from "../src/utils/hooks/http.hook";
 import {Toast, useToast} from "../components/common/blocks/Toast";
 import {AuthHeader} from "../components/auth/AuthHeader";
 import {AuthImg} from "../components/auth/AuthImg";
-import {ImgWrapper} from "../components/common/blocks/ImgWrapper";
 import {SocialNetworksSignUp} from "../components/auth/SocialNetworksSignUp";
+import {actionsAuth, checkAuthMe} from "../src/redux/auth-reducer";
+import {useRouter} from "next/router";
+import {useDispatch, useSelector} from "react-redux";
+import {SignUpButton} from "../components/styled/buttons/Buttons";
+import {
+    BreadCrumbs,
+    BreadCrumbsItem,
+    BreadCrumbsLink,
+    BreadCrumbsList,
+    Container,
+    SignUpBlock,
+    SignUpContent,
+    SignUpDesc,
+    SignUpForm,
+    SignUpInput,
+    SignUpLine,
+    SignUpSection,
+    SignUpTitle
+} from "../components/styled/signUp/components";
+import {getIsAuth} from "../src/redux/auth-selector";
 
 export default function Login() {
     const {register, errors, handleSubmit} = useForm()
     const {show} = useToast()
+    const router = useRouter()
+    const dispatch = useDispatch()
+    const {authRequest, error, loading, clearError} = useHttp()
+
+    const isAuth = useSelector(getIsAuth)
     const [isPasswordValid, setIsPasswordValid] = React.useState(true)
 
-    const {request, error, loading, clearError} = useHttp()
-    const onSubmit = (data: { first_name: string, username: string, password: string }) => {
-        let isPassWordValid = checkPassword(data.password)
-        if (!isPassWordValid)
-            setIsPasswordValid(false)
+    React.useEffect(() => {
+        dispatch(checkAuthMe())
+    }, [])
 
-        let response = request("users/register", "post", data)
+    const onSubmit = async (data: { first_name: string, username: string, password: string }) => {
+
+        let response = await authRequest<{token: string}>("users/token", "post", data)
+        if(response) {
+            router.push("/")
+            dispatch(actionsAuth.setNewAuth(response.token, null))
+            localStorage.setItem("token", response.token)
+        }
     }
 
     React.useEffect(() => {
         error && show(error)
 
-        return () => {
-            clearError()
-        }
+        return () => clearError()
     }, [error])
+
+    if(isAuth) {
+        router.push("/")
+    }
 
     return <>
         <AuthHeader />
-        <section className="signup">
-            <div className="_container">
-                <nav className="breadcrumbs">
-                    <ul className="breadcrumbs__list">
+        <SignUpSection>
+            <Container >
+                <BreadCrumbs>
+                    <BreadCrumbsList>
                         <li>
-                            <Link href="/"><a className="breadcrumbs__link">Home</a></Link>
+                            <Link href="/"><BreadCrumbsLink>Home</BreadCrumbsLink></Link>
                         </li>
                         <li>
-                            <span className="breadcrumbs__item">Login</span>
+                            <BreadCrumbsItem>Login</BreadCrumbsItem>
                         </li>
-                    </ul>
-                </nav>
-                <div className="signup__content">
-                    <form onSubmit={handleSubmit(onSubmit)} action="/" className="signup__form">
-                        <h1 className="signup__title">
+                    </BreadCrumbsList>
+                </BreadCrumbs>
+                <SignUpContent>
+                    <SignUpForm onSubmit={handleSubmit(onSubmit)}>
+                        <SignUpTitle className="signup__title">
                             Login
-                        </h1>
-                        <p className="signup__descr">
+                        </SignUpTitle>
+                        <SignUpDesc>
                             Don't&nbsp; have an&nbsp; account yet?&nbsp; —  <Link href="/"><a className="signup__link">Sign Up</a></Link>
-                        </p>
-                        <div className="signup__line">
-                            <input ref={register} required={true} name="username" className="signup__input"
+                        </SignUpDesc>
+                        <SignUpLine>
+                            <SignUpInput ref={register} required={true} name="username"
                                    placeholder="Your name" type="text"/>
                             {
                                 errors.name && <ValidationError/>
                             }
-                        </div>
-                        <div className="signup__line">
-                            <input ref={register} required={true} onFocus={() => setIsPasswordValid(true)}
-                                   name="password" className="signup__input" placeholder="Password" type="password"/>
-                            {
-                                errors.password && <ValidationError/>
-                            }
-                            {
-                                !isPasswordValid && <ValidationError>This password is not valid!</ValidationError>
-                            }
-                        </div>
-                        <div className="signup__block">
-                            <button disabled={loading} type="submit" className="signup__btn btn">Login</button>
+                        </SignUpLine>
+                        <SignUpLine>
+                            <SignUpInput ref={register} required={true}
+                                         onFocus={() => setIsPasswordValid(true)}
+                                   name="password" placeholder="Password" type="password"/>
+                        </SignUpLine>
+                        <SignUpBlock>
+                            <SignUpButton disabled={loading} type="submit" className="signup__btn btn">Login</SignUpButton>
                             <SocialNetworksSignUp />
-                        </div>
-                    </form>
+                        </SignUpBlock>
+                    </SignUpForm>
                     <AuthImg />
-                </div>
-            </div>
-        </section>
+                </SignUpContent>
+            </Container>
+        </SignUpSection>
         <Toast/>
     </>
 }

@@ -1,9 +1,16 @@
+import {BorderedButton, Btn} from "../components/styled/buttons/Buttons";
 import {MainLayOut} from "../components/layouts/MainLayOut";
-import {FilledButton} from "../components/common/blocks/buttons/FilledButton";
-import {BorderedButton} from "../components/common/blocks/buttons/BorderedButton";
 import React from "react";
 import {CreateNewProjectModal} from "../components/projects/addProject/CreateNewProjectModal";
 import {JoinProjectModal} from "../components/projects/modals/JoinProjectModal";
+import {
+    MainBlock,
+    MainButtons,
+    MainImages,
+    MainSection,
+    MainText,
+    MainTitle
+} from "../components/styled/mainPage/components";
 
 export default function Home() {
 
@@ -13,31 +20,29 @@ export default function Home() {
     })
 
     return <MainLayOut title={"Revcount"} isProjectSideBarMode={false}>
-        <section className="main">
-            <div className="main__block">
-                <h1 className="main__title">
+        <MainSection>
+            <MainBlock>
+                <MainTitle>
                     Hello! You don't have any projects
-                </h1>
-                <p className="main__text">
+                </MainTitle>
+                <MainText>
                     To get started, you need to create a project or join an existing one
-                </p>
-                <div className="main__buttons">
-                    <FilledButton
-                        onClick={() => setIsModalMode(state => ({...state, createProject: true}))}
-                    > Create a
-                        new project</FilledButton>
-                    <BorderedButton
-                        onClick={() => setIsModalMode(state => ({...state, joinProject: true}))}
-                    >Join project</BorderedButton>
-                </div>
-            </div>
-            <div className="main__images">
+                </MainText>
+                <MainButtons>
+                    <Btn onClick={() => setIsModalMode(state => ({...state, createProject: true}))}> Create a new
+                        project
+                    </Btn>
+                    <BorderedButton onClick={() => setIsModalMode(state => ({...state, joinProject: true}))}>Join
+                        project</BorderedButton>
+                </MainButtons>
+            </MainBlock>
+            <MainImages>
                 <picture>
                     <source srcSet={"/img/main/illustration.svg"} type="image/webp"/>
                     <img src={"/img/main/illustration.svg"} alt="illustration"/>
                 </picture>
-            </div>
-        </section>
+            </MainImages>
+        </MainSection>
 
         {
             isModalMode.createProject &&
@@ -49,3 +54,4 @@ export default function Home() {
         }
     </MainLayOut>
 }
+

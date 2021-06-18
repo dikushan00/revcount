@@ -1,11 +1,28 @@
 import React from 'react';
-import {EditType, OfferType, ProjectType, StatusesNamesType} from "../../../src/types/projectTypes";
+import {EditType, ProjectType, StatusesNamesType} from "../../../src/types/projectTypes";
 import {MakePaymentModal} from "../modals/MakePaymentModal";
-import {ProjectAPI} from "../../../src/api/ProjectAPI";
 import {useDispatch} from "react-redux";
-import {actionsProjects} from "../../../src/redux/projects-reducer";
 import {useRouter} from "next/router";
 import {ValidOfferType} from "./Edit";
+import {useHttp} from "../../../src/utils/hooks/http.hook";
+import {Toast, useToast} from "../../common/blocks/Toast";
+import {
+    BlueEditButton,
+    CompleteButton,
+    OfferEditsAcceptButton, OfferEditsDeclineButton,
+    PanelEditsButton
+} from "../../styled/buttons/revisionButtons/RevisionsButtons";
+import {
+    ControlEdits,
+    ControlEditsHeader,
+    ControlEditsLabel,
+    EditsLabel,
+    OfferEdits, OfferEditsBlock,
+    OfferEditsForm,
+    OfferEditsHeader, OfferEditsReserveBtn,
+    PanelEdits,
+    PanelEditsItem
+} from "../../styled/edit/components";
 
 type PropsType = { offer: ValidOfferType | null, edit: EditType | null, project: ProjectType | null, closePage: () => void }
 
@@ -17,6 +34,8 @@ export const EditControlPanel: React.FC<PropsType> = ({
                                                       }) => {
     const dispatch = useDispatch()
     const router = useRouter()
+    const {show} = useToast()
+    const {request, error, clearError} = useHttp()
     const [isPaymentModalShowMode, setIsPaymentModalShowMode] = React.useState(false)
 
     const changeStatus = (status: StatusesNamesType) => {
@@ -38,60 +57,57 @@ export const EditControlPanel: React.FC<PropsType> = ({
 
         return edits || []
     }
-    const handleReserveMoney = () => {
-        let changedStatusEdits: EditType[] = changeStatus("Performing")
-        project && changedStatusEdits && ProjectAPI.reserveMoney(project?.project_id, {
-            ...project, revisions: changedStatusEdits
-        }).then(res => {
-            if (!res?.error) {
-                dispatch(actionsProjects.setActiveProject(res))
-                router.push("/projects/" + project?.project_id)
-                closePage()
-                setIsPaymentModalShowMode(false)
-            }
-        })
-    }
-    const handleAcceptOffer = () => {
-        let changedStatusEdits: EditType[] = changeStatus("Performing")
 
-        project && changedStatusEdits && ProjectAPI.acceptOffer(project?.project_id, {
-            ...project,
-            revisions: changedStatusEdits
-        }).then(res => {
-            if (!res?.error) {
-                dispatch(actionsProjects.setActiveProject(res))
-                router.push("/projects/" + project?.project_id)
-                closePage()
-            }
-        })
+    const handleReserveMoney = async () => {
+        // let changedStatusEdits: EditType[] = changeStatus("Performing")
+
+        let response = await request(`projects/${project?.project_id}/reserve`, "post")
+        if(response) {
+            router.push("/projects/" + project?.project_id)
+            closePage()
+            setIsPaymentModalShowMode(false)
+        }
+    }
+    const handleAcceptOffer = async () => {
+        // let changedStatusEdits: EditType[] = changeStatus("Performing")
+
+        let response = await request(`projects/${project?.project_id}/accept_offer`, "post")
+        if(response) {
+            router.push("/projects/" + project?.project_id)
+            closePage()
+            setIsPaymentModalShowMode(false)
+        }
     }
     const handleDeclineOffer = () => {
         router.push("/projects/" + project?.project_id)
         closePage()
     }
-    const handleCompleteProject = () => {
-        let changedStatusEdits: EditType[] = changeStatus("Performing")
+    const handleCompleteProject = async () => {
+        // let changedStatusEdits: EditType[] = changeStatus("Performing")
 
-        project && changedStatusEdits && ProjectAPI.completeProject(project?.project_id, {
-            ...project, revisions: changedStatusEdits
-        }).then(res => {
-            if (!res?.error) {
-                dispatch(actionsProjects.setActiveProject(res))
-                router.push("/projects/" + project?.project_id)
-                closePage()
-            }
-        })
+        let response = await request(`projects/${project?.project_id}/complete_project`, "post")
+        if(response) {
+            router.push("/projects/" + project?.project_id)
+            closePage()
+            setIsPaymentModalShowMode(false)
+        }
     }
 
     const enablePaymentMode = () => setIsPaymentModalShowMode(true)
 
+    React.useEffect(() => {
+        error && show(error)
+        return () => clearError()
+    }, [error])
+
     return <>
-        <div className="edits__control border-wrap control-edits">
-            <div className="control-edits__header">
-                <div className="control-edits__label label">
+        <Toast />
+        <ControlEdits>
+            <ControlEditsHeader>
+                <ControlEditsLabel>
                     Control Panel
-                </div>
-            </div>
+                </ControlEditsLabel>
+            </ControlEditsHeader>
             {
                 edit?.status === "Editing is done"
                     ? <CompletedEditBlock/>
@@ -103,7 +119,7 @@ export const EditControlPanel: React.FC<PropsType> = ({
                                            enablePaymentMode={enablePaymentMode}
                                            editStatusName={edit?.status}/>
             }
-        </div>
+        </ControlEdits>
         {
             isPaymentModalShowMode &&
             <MakePaymentModal handleReserveMoney={handleReserveMoney} hideBlock={() => setIsPaymentModalShowMode(false)}
@@ -133,36 +149,36 @@ const DefaultControlPanel: React.FC<DefaultControlPanel> = ({
                                                                 handleCompleteProject
                                                             }) => {
     return <>
-        <ul className="control-edits__panel panel-edits">
-            <li className="panel-edits__item">
-                <button className="panel-edits__btn panel-edits__btn--freeze">
+        <PanelEdits>
+            <PanelEditsItem>
+                <PanelEditsButton className="panel-edits__btn panel-edits__btn--freeze">
                     Freeze
                     <FreezeIcon/>
-                </button>
-            </li>
-            <li className="panel-edits__item">
-                <button className="panel-edits__btn panel-edits__btn--resume">
+                </PanelEditsButton>
+            </PanelEditsItem>
+            <PanelEditsItem>
+                <PanelEditsButton className="panel-edits__btn panel-edits__btn--resume">
                     Resume
                     <ResumeIcon/>
-                </button>
-            </li>
-            <li className="panel-edits__item">
-                <button className="panel-edits__btn panel-edits__btn--replace">
+                </PanelEditsButton>
+            </PanelEditsItem>
+            <PanelEditsItem>
+                <PanelEditsButton className="panel-edits__btn panel-edits__btn--replace">
                     Replace the artist
                     <ReplaceIcon/>
-                </button>
-            </li>
-            <li className="panel-edits__item">
-                <button className="panel-edits__btn panel-edits__btn--remove">
+                </PanelEditsButton>
+            </PanelEditsItem>
+            <PanelEditsItem>
+                <PanelEditsButton className="panel-edits__btn panel-edits__btn--remove">
                     Remove edit
                     <RemoveIcon/>
-                </button>
-            </li>
+                </PanelEditsButton>
+            </PanelEditsItem>
             {editStatusName === "Performing" &&
-            <li className="panel-edits__item">
-                <CompleteButton onClick={handleCompleteProject}/>
-            </li>}
-        </ul>
+            <PanelEditsItem>
+                <CompleteButtonComponent onClick={handleCompleteProject}/>
+            </PanelEditsItem>}
+        </PanelEdits>
         {
             editStatusName === "Approval" && edit?.status && <AcceptOfferBlock
                 offer={offer} handleAcceptOffer={handleAcceptOffer} handleDeclineOffer={handleDeclineOffer}/>
@@ -178,41 +194,39 @@ const AcceptOfferBlock: React.FC<{
     handleAcceptOffer: () => void,
     handleDeclineOffer: () => void
 }> = ({offer, handleAcceptOffer, handleDeclineOffer}) => {
-    return <div className="control-edits__offer offer-edits">
-        <div className="offer-edits__header">
-            <div className="offer-edits__label label">
-                Offer
-            </div>
-        </div>
-        <form className="offer-edits__form" action="#">
+    return <OfferEdits>
+        <OfferEditsHeader>
+            <EditsLabel>Offer</EditsLabel>
+        </OfferEditsHeader>
+        <OfferEditsForm>
             <OfferConditionsBlock offer={offer}/>
-            <div className="offer-edits__block">
-                <div onClick={handleAcceptOffer} className="offer-edits__btn-accept">Accept</div>
-                <div onClick={handleDeclineOffer} className="offer-edits__btn-decline">Decline</div>
-            </div>
-        </form>
-    </div>
+            <OfferEditsBlock>
+                <OfferEditsAcceptButton onClick={handleAcceptOffer} >Accept</OfferEditsAcceptButton>
+                <OfferEditsDeclineButton onClick={handleDeclineOffer}>Decline</OfferEditsDeclineButton>
+            </OfferEditsBlock>
+        </OfferEditsForm>
+    </OfferEdits>
 }
 const ReservationControlBlock: React.FC<{ offer: ValidOfferType | null, handleReserveMoney: () => void, enablePaymentMode: () => void }> = ({
                                                                                                                                                 offer,
                                                                                                                                                 enablePaymentMode
                                                                                                                                             }) => {
     return <>
-        <div className="control-edits__offer offer-edits">
-            <div className="offer-edits__header">
-                <div className="offer-edits__label label">
+        <OfferEdits>
+            <OfferEditsHeader>
+                <EditsLabel>
                     Reservation
-                </div>
-            </div>
-            <form className="offer-edits__form" action="#">
+                </EditsLabel>
+            </OfferEditsHeader>
+            <OfferEditsForm>
                 <OfferConditionsBlock offer={offer}/>
-                <div className="offer-edits__block">
-                    <div onClick={enablePaymentMode} className="offer-edits__btn-reserve">Reserve
-                        money
-                    </div>
-                </div>
-            </form>
-        </div>
+                <OfferEditsBlock>
+                    <OfferEditsReserveBtn onClick={enablePaymentMode}>
+                        Reserve money
+                    </OfferEditsReserveBtn>
+                </OfferEditsBlock>
+            </OfferEditsForm>
+        </OfferEdits>
     </>
 }
 
@@ -248,8 +262,9 @@ export const OfferConditionsBlock: React.FC<{ offer?: ValidOfferType | null, reg
                 Total edit cost
             </div>
             <div className="offer-edits__box offer-edits__box--total">
-                <input ref={register} className="offer-edits__input" type="text" name="balance"
+                <input ref={register} className="offer-edits__input" type="number" name="balance"
                        placeholder={offer?.amount.toString()}
+                       max={24}
                        defaultValue={offer?.amount.toString() || "0"}/>
                 <div className="offer-edits__designation">$</div>
             </div>
@@ -308,9 +323,11 @@ const RemoveIcon = () => {
             fill="#888BA0"/>
     </svg>
 }
-const CompleteButton: React.FC<{ onClick: () => void }> = ({onClick}) => {
-    return <div onClick={onClick} className="panel-edits__btn panel-edits__btn--complete btn-green">
-        Complete the project
+
+const CompleteButtonComponent: React.FC<{ onClick: () => void }> = ({onClick}) => {
+    return <CompleteButton onClick={onClick} className="panel-edits__btn">
+
+            Complete the project
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
              xmlns="http://www.w3.org/2000/svg">
             <path
@@ -329,15 +346,15 @@ const CompleteButton: React.FC<{ onClick: () => void }> = ({onClick}) => {
                 d="M1.03451 4.34489C1.37731 4.34489 1.6552 4.067 1.6552 3.72421C1.6552 3.38141 1.37731 3.10352 1.03451 3.10352C0.691711 3.10352 0.413818 3.38141 0.413818 3.72421C0.413818 4.067 0.691711 4.34489 1.03451 4.34489Z"
                 fill="#95A5A5"/>
         </svg>
-    </div>
+    </CompleteButton>
 }
 const AddNewCorrectionButton = () => {
-    return <button className="panel-edits__btn panel-edits__btn--add btn-blue">
+    return <BlueEditButton className="panel-edits__btn btn-blue">
         Add new correction <span>+</span>
-    </button>
+    </BlueEditButton>
 }
 const DeleteEditHistoryButton = () => {
-    return <button className="panel-edits__btn panel-edits__btn--delete">
+    return <PanelEditsButton className="panel-edits__btn">
         Delete the history of this edit
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"
              xmlns="http://www.w3.org/2000/svg">
@@ -345,6 +362,6 @@ const DeleteEditHistoryButton = () => {
                 d="M13.4167 2.33332H12.25H10.3717L10.1797 1.56565C9.94993 0.644 9.12507 0 8.17482 0H5.82515C4.8749 0 4.05007 0.644 3.82022 1.56568L3.6283 2.33335H1.75H0.583324C0.26075 2.33332 0 2.59468 0 2.91668C0 3.23868 0.26075 3.5 0.583324 3.5H1.19815L1.68932 12.3468C1.74125 13.2737 2.5095 14 3.43757 14H10.5624C11.4905 14 12.2587 13.2737 12.3106 12.3468L12.8018 3.5H13.4166C13.7392 3.5 14 3.23868 14 2.91668C14 2.59468 13.7393 2.33332 13.4167 2.33332ZM4.95132 1.84857C5.05225 1.44725 5.411 1.16665 5.82515 1.16665H8.17482C8.589 1.16665 8.94775 1.44722 9.04865 1.84857L9.1694 2.33332H4.83057L4.95132 1.84857ZM5.25 11.0833C5.25 11.4053 4.98925 11.6666 4.66668 11.6666C4.3441 11.6666 4.08335 11.4053 4.08335 11.0833V5.25C4.08335 4.928 4.3441 4.66668 4.66668 4.66668C4.98925 4.66668 5.25 4.928 5.25 5.25V11.0833ZM7.58332 11.0833C7.58332 11.4053 7.32257 11.6666 7 11.6666C6.67743 11.6666 6.41668 11.4053 6.41668 11.0833V5.25C6.41668 4.928 6.67743 4.66668 7 4.66668C7.32257 4.66668 7.58332 4.928 7.58332 5.25V11.0833ZM9.91668 11.0833C9.91668 11.4053 9.65593 11.6666 9.33335 11.6666C9.01078 11.6666 8.75003 11.4053 8.75003 11.0833V5.25C8.75003 4.928 9.01078 4.66668 9.33335 4.66668C9.65593 4.66668 9.91668 4.928 9.91668 5.25V11.0833Z"
                 fill="#888BA0"/>
         </svg>
-    </button>
+    </PanelEditsButton>
 }
 

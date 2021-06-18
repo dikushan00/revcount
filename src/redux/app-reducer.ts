@@ -1,4 +1,5 @@
 import {InferActionsTypes, ThunkType} from "./store-redux"
+import {checkAuthMe} from "./auth-reducer";
 
 let initialState = {
     initialized: false, //initialize app
@@ -44,6 +45,7 @@ export const actionsApp = {
  *  Passes through all promises and initializes app
  */
 export const init = (): GetThunkType => async (dispatch) => {
+    // let checkAuth = dispatch(checkAuthMe())
     Promise.all([])
         .then(() => {
             dispatch(actionsApp.initialize())

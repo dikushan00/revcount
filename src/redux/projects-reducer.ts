@@ -1,5 +1,5 @@
 import {InferActionsTypes, ThunkType} from "./store-redux";
-import {EditType, InviteProjectType, ProjectType, StatusType} from "../types/projectTypes";
+import {EditType, InviteProjectType, OfferType, ProjectType, StatusType} from "../types/projectTypes";
 import {TaskTypeWithFlag} from "../../components/projects/edits/EditTasksPanel";
 import {UserType} from "../types/userTypes";
 import {ProjectAPI} from "../api/ProjectAPI";
@@ -15,7 +15,28 @@ const defaultTaskObj = [{
 const initialState = {
     projects: null as ProjectType[] | null,
     invitations: null as InviteProjectType[] | null,
-    statuses: null as StatusType[] | null,
+    statuses: [
+        {
+            "id": 1,
+            "name": "Approval",
+            "key": "approval"
+        },
+        {
+            "id": 2,
+            "name": "Reservation",
+            "key": "reservation"
+        },
+        {
+            "id": 3,
+            "name": "Performing",
+            "key": "performing"
+        },
+        {
+            "id": 4,
+            "name": "Editing is done",
+            "key": "editing"
+        }
+    ] as StatusType[] | null, //you can make an endpoint to get statuses
     tasks: defaultTaskObj,
     activeEdit: null as EditType | null,
     activeProject: null as ProjectType | null
@@ -187,6 +208,18 @@ export const projects_reducer = (
                 activeProject: action.project,
             };
         }
+        case "REVCOUNT/PROJECTS/SET_ACTIVE_PROJECT_OFFER": {
+            return {
+                ...state,
+                activeProject: state.activeProject && {
+                    ...state.activeProject, revisions: state.activeProject?.revisions?.map(item => {
+                        if (item.revision_id === action.revisionId)
+                            return {...item, offer: action.offer}
+                        return item
+                    })
+                },
+            };
+        }
         default:
             return {...state}
     }
@@ -227,6 +260,8 @@ export const actionsProjects = {
         ({type: "REVCOUNT/PROJECTS/SET_STATUSES", statuses} as const),
     setActiveProject: (project: ProjectType | null) =>
         ({type: "REVCOUNT/PROJECTS/SET_ACTIVE_PROJECT", project} as const),
+    setActiveProjectOffer: (revisionId: number, offer: OfferType) =>
+        ({type: "REVCOUNT/PROJECTS/SET_ACTIVE_PROJECT_OFFER", offer, revisionId} as const),
     setActiveEdit: (edit: EditType | null) =>
         ({type: "REVCOUNT/PROJECTS/SET_ACTIVE_EDIT", edit} as const),
 }
@@ -234,10 +269,14 @@ export const actionsProjects = {
 export const getProjects = (userId: number): GetThunkType => async (dispatch) => {
     userId && await ProjectAPI.getProjects(userId).then(res => {
         dispatch(actionsProjects.setProjects(res))
+    }).catch(e => {
+        console.log(e)
     })
 }
 export const getInvitations = (userId: number): GetThunkType => async (dispatch) => {
     userId && await ProjectAPI.getInvitations(userId).then(res => {
         dispatch(actionsProjects.setInvitations(res))
+    }).catch(e => {
+        console.log(e)
     })
 }

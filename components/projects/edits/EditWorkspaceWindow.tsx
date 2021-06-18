@@ -1,5 +1,12 @@
 import React from 'react';
 import {WorkspaceMessageType} from "../../../src/types/projectTypes";
+import {
+    LeftWorkspace, LeftWorkspaceDesc,
+    LeftWorkspaceInput,
+    LeftWorkspaceItem,
+    LeftWorkspaceLabel,
+    LeftWorkspaceList
+} from "../../styled/edit/components";
 
 type TimeLeftType = {
     days: string | null,
@@ -50,21 +57,21 @@ export const EditWorkspaceWindow: React.FC<{ isOwner: boolean, isOfferExist: boo
     }
 
 const LeftTimeWorkspace: React.FC<{ timeLeft: TimeLeftType }> = ({timeLeft}) => {
-    return <form className="workspace-edits__left left-workspace">
-        <div className="left-workspace__label">Left:</div>
-        <ul className="left-workspace__list">
-            <li className="left-workspace__item">
-                <input type="text" className="left-workspace__input" placeholder={timeLeft.days || "0"}/>
-                <div className="left-workspace__designation">d.</div>
-            </li>
-            <li className="left-workspace__item">
-                <input type="text" className="left-workspace__input" placeholder={timeLeft.minutes || "0"}/>
-                <div className="left-workspace__designation">m.</div>
-            </li>
-            <li className="left-workspace__item">
-                <input type="text" className="left-workspace__input" placeholder={timeLeft.seconds || "0"}/>
-                <div className="left-workspace__designation">s.</div>
-            </li>
-        </ul>
-    </form>
+    return <LeftWorkspace>
+        <LeftWorkspaceLabel>Left:</LeftWorkspaceLabel>
+        <LeftWorkspaceList>
+            <LeftWorkspaceItem>
+                <LeftWorkspaceInput type="text" placeholder={timeLeft.days || "0"}/>
+                <LeftWorkspaceDesc>d.</LeftWorkspaceDesc>
+            </LeftWorkspaceItem>
+            <LeftWorkspaceItem>
+                <LeftWorkspaceInput type="text" placeholder={timeLeft.minutes || "0"}/>
+                <LeftWorkspaceDesc>m.</LeftWorkspaceDesc>
+            </LeftWorkspaceItem>
+            <LeftWorkspaceItem>
+                <LeftWorkspaceInput type="text" placeholder={timeLeft.seconds || "0"}/>
+                <LeftWorkspaceDesc>s.</LeftWorkspaceDesc>
+            </LeftWorkspaceItem>
+        </LeftWorkspaceList>
+    </LeftWorkspace>
 }

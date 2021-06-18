@@ -1,8 +1,8 @@
-
 import React from "react";
+import {PageContent} from "../styled/mainPage/components";
 
 export const Content:React.FC = ({children}) => {
-    return <div className={"page__content"}>
+    return <PageContent>
         {children}
-    </div>
+    </PageContent>
 };

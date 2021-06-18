@@ -1,19 +1,24 @@
 import React from 'react';
 import Link from "next/link";
+import {
+    SignUpContentContainer,
+    SignUpHeader,
+    SignUpHeaderButton, SignUpHeaderItem, SignUpHeaderLink, SignUpHeaderList,
+    SignUpHeaderLogo,
+    SignUpHeaderLogoLink
+} from "../styled/signUp/components";
+import {ImgWrapper} from "../common/blocks/ImgWrapper";
 
 export const AuthHeader = () => {
-    return <header className="header-signup">
-        <div className="header-signup__content _container">
-            <div className="header-signup__logo">
+    return <SignUpHeader className="header-signup">
+        <SignUpContentContainer>
+            <SignUpHeaderLogo>
                 <Link href="/">
-                    <a className="header-signup__logo-link">
-                        <picture>
-                            <source srcSet={"/img/icons/logo.svg"} type="image/webp"/>
-                            <img src={"/img/icons/logo.svg"} alt="logo"/>
-                        </picture>
-                    </a>
+                    <SignUpHeaderLogoLink>
+                        <ImgWrapper path={"/img/icons/logo.svg"}/>
+                    </SignUpHeaderLogoLink>
                 </Link>
-            </div>
+            </SignUpHeaderLogo>
             <div className="header-signup__menu menu">
                 <div className="header-signup__icon icon-menu">
                     <span/>
@@ -21,26 +26,26 @@ export const AuthHeader = () => {
                     <span/>
                 </div>
                 <nav className="header-signup__body">
-                    <ul className="header-signup__list">
+                    <SignUpHeaderList>
                         {
                             headerNavItems.map((item, index) => {
-                                return <li key={index} className="header-signup__item">
+                                return <SignUpHeaderItem key={index}>
                                     <Link href={item.link}>
-                                        <a className="header-signup__link">{item.title}</a>
+                                        <SignUpHeaderLink>{item.title}</SignUpHeaderLink>
                                     </Link>
-                                </li>
+                                </SignUpHeaderItem>
                             })
                         }
-                    </ul>
+                    </SignUpHeaderList>
                 </nav>
             </div>
             <Link href={"/sign-up"}>
                 <a>
-                    <button className="header-signup__btn">Sign up</button>
+                    <SignUpHeaderButton>Sign up</SignUpHeaderButton>
                 </a>
             </Link>
-        </div>
-    </header>
+        </SignUpContentContainer>
+    </SignUpHeader>
 }
 
 const headerNavItems = [
