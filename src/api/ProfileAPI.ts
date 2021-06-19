@@ -5,12 +5,20 @@ import {ProfileType} from "../types/userTypes";
 export const ProfileAPI = {
 
     getProfile() {
-        return instance.get(`profile`).then((response) => {
+        return instance.get(`profile`, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            }
+        }).then((response) => {
             return response.data;
         });
     },
     getContacts() {
-        return instance.get(`contacts`).then((response) => {
+        return instance.get(`contacts`, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            }
+        }).then((response) => {
             return response.data;
         });
     },
@@ -19,11 +27,5 @@ export const ProfileAPI = {
         return instance.put(`users/${id}`, body).then((response) => {
             return response.data;
         });
-    },
-
-    getCurrentSeason() {
-        return instance.get("currentSeason").then(res => {
-            return res.data
-        })
     },
 };

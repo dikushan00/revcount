@@ -66,8 +66,8 @@ export const Sidebar = () => {
                     <SideBarButton onClick={() => handleChangeAction("invitations")}
                             className={" " + (activeAction === "invitations" ? "active" : "")}>
                         Invitations
-                        {invitations && invitations?.length > 0 &&
-                        <span className="sidebar__span">{invitations?.length}</span>}
+                        {invitations && invitations?.filter(item => item.status === "PENDING").length > 0 &&
+                        <span className="sidebar__span">{invitations?.filter(item => item.status === "PENDING").length || ""}</span>}
                     </SideBarButton>
                 </SidebarActions>
                 {
@@ -106,15 +106,17 @@ const InvitationProjects: React.FC<InvitationProjectsPropsType> = () => {
     const userId = useSelector(getUserId)
 
     const handleAcceptProject = async (data: AcceptProjectUserType) => {
-        let response = await request(`users/${userId}/invitations/${data.invitationId}`, "post", {status: "ACCEPTED" as InviteStatusType})
+        let response = await request(`users/${userId}/invitations/${data.invitationId}`, "patch", {status: "ACCEPTED" as InviteStatusType})
         if (response) {
+            setAcceptProjectId(null)
             dispatch(actionsProjects.acceptProject(data.invitationId))
         }
     }
 
     const handleDeclineProject = async (invitationId: number) => {
-        let response = await request(`users/${userId}/invitations/${invitationId}`, "post", {status: "DECLINED" as InviteStatusType})
+        let response = await request(`users/${userId}/invitations/${invitationId}`, "patch", {status: "DECLINED" as InviteStatusType})
         if (response) {
+            setAcceptProjectId(null)
             dispatch(actionsProjects.acceptProject(invitationId))
         }
     }
@@ -123,9 +125,9 @@ const InvitationProjects: React.FC<InvitationProjectsPropsType> = () => {
         <SidebarBlockInvitation className="sidebar__block block-sidebar block-sidebar__invitation">
             {
                 invitations?.map((item, index) => {
-                    return <SidebarBlockItem key={item.invitation_id || index} className="block-sidebar__item">
+                    return item.status === "PENDING" && <SidebarBlockItem key={item.invitation_id || index} className="block-sidebar__item">
                         <SideBarBlockButton className="block-sidebar-open">
-                            <span/> {item.name}
+                            <span/> {item.project_name}
                         </SideBarBlockButton>
                         <div className="block-sidebar__body">
                             <SideBarAcceptButton disabled={loading} onClick={() => setAcceptProjectId(item.invitation_id)}>Accept

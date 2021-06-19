@@ -45,7 +45,7 @@ export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({pro
         {
             data.map((item, index) => {
                 //@ts-ignore
-                let timeLeft = calculateDaysLeft(project[item.field])
+                let timeLeft = project && project[item.field] && calculateDaysLeft(project[item.field] || 0)
                 return <ProjectsListItem key={index} className={item.className}>
                     <ProjectsListIcon>
                         <picture>
@@ -59,7 +59,7 @@ export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({pro
                         </ProjectsListLabel>
                         <ProjectsListMetrics>
                             {/*@ts-ignore*/}
-                            {project ? timeLeft.days : "-"} d. {item.addInfo && item.addInfo(project?.addDeadline)}
+                            {project ? timeLeft?.days : "-"} d. {item.addInfo && project?.addDeadline && item.addInfo(project?.addDeadline)}
                         </ProjectsListMetrics>
                     </ProjectsListBody>
                     {

@@ -7,7 +7,8 @@ const initialState = {
     isAuth: false as boolean,
     token: null as string | null,
     roles: null as RoleType | null,
-    userId: 1 as number | null
+    userId: 1 as number | null,
+    isFetching: false
 }
 
 type AuthInitialStateType = typeof initialState
@@ -25,6 +26,12 @@ export const auth_reducer = (state = initialState, action: ActionsType): AuthIni
                 roles: action.roles,
                 token: action.token,
                 userId: action.userId
+            }
+        }
+        case 'REVCOUNT/AUTH/TOGGLE_IS_FETCHING': {
+            return {
+                ...state,
+                isFetching: action.isFetching,
             }
         }
         default:
@@ -45,19 +52,26 @@ export const actionsAuth = {
         isAuth: false,
         roles: null,
         userId: null
+    } as const),
+    setIsFetching: (isFetching: boolean) => ({
+        type: 'REVCOUNT/AUTH/TOGGLE_IS_FETCHING',
+        isFetching
     } as const)
 }
 
 export const checkAuthMe = (): GetThunkType => async (dispatch) => {
     try {
+        dispatch(actionsAuth.setIsFetching(true))
         let response = await AuthAPI.checkAuth()
         if (response && response.user_id) {
+            dispatch(actionsAuth.setIsFetching(false))
             let token = localStorage.getItem("token")
             token && dispatch(actionsAuth.setNewAuth(token, null, response.user_id))
             //@ts-ignore
             dispatch(actionsProfile.setProfile(response))
         }
     } catch (e) {
+        dispatch(actionsAuth.setIsFetching(false))
         console.log(e)
     }
 }

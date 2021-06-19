@@ -45,8 +45,8 @@ export const actionsApp = {
  *  Passes through all promises and initializes app
  */
 export const init = (): GetThunkType => async (dispatch) => {
-    // let checkAuth = dispatch(checkAuthMe())
-    Promise.all([])
+    let checkAuth = dispatch(checkAuthMe())
+    Promise.all([checkAuth])
         .then(() => {
             dispatch(actionsApp.initialize())
         })

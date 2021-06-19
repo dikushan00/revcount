@@ -18,12 +18,11 @@ export type RoleType = {
 export type UserType = {
     user_id: number,
     username: string,
-    name: string,
-    avatar: string,
     isOwner?: boolean
     role: RoleType,
     first_name: string,
-    lastName: string
+    avatar?: string,
+    last_name?: string
 }
 export type LoginType = {
     username: string

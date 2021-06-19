@@ -1,8 +1,9 @@
 import {InferActionsTypes, ThunkType} from "./store-redux";
 import {EditType, InviteProjectType, OfferType, ProjectType, StatusType} from "../types/projectTypes";
 import {TaskTypeWithFlag} from "../../components/projects/edits/EditTasksPanel";
-import {UserType} from "../types/userTypes";
+import {RoleType, UserType} from "../types/userTypes";
 import {ProjectAPI} from "../api/ProjectAPI";
+import {act} from "react-dom/test-utils";
 
 const defaultTaskObj = [{
     id: 1,
@@ -65,6 +66,12 @@ export const projects_reducer = (
                 projects: state.projects
                     ? [...state.projects, action.project]
                     : [action.project],
+            };
+        }
+        case "REVCOUNT/PROJECTS/ADD_ROLE_TO_PROJECT": {
+            return {
+                ...state,
+                activeProject: state.activeProject && {...state.activeProject, role: action.role},
             };
         }
         case "REVCOUNT/PROJECTS/ADD_USERS_TO_PROJECT": {
@@ -230,6 +237,8 @@ export const actionsProjects = {
         ({type: "REVCOUNT/PROJECTS/SET_PROJECTS", projects} as const),
     addProject: (project: ProjectType) =>
         ({type: "REVCOUNT/PROJECTS/ADD_PROJECT", project} as const),
+    addRoleToProject: (role: RoleType) =>
+        ({type: "REVCOUNT/PROJECTS/ADD_ROLE_TO_PROJECT", role} as const),
     addUsersToProject: (users: UserType[]) =>
         ({type: "REVCOUNT/PROJECTS/ADD_USERS_TO_PROJECT", users} as const),
     acceptProject: (invitationId: number) =>
@@ -269,6 +278,13 @@ export const actionsProjects = {
 export const getProjects = (userId: number): GetThunkType => async (dispatch) => {
     userId && await ProjectAPI.getProjects(userId).then(res => {
         dispatch(actionsProjects.setProjects(res))
+    }).catch(e => {
+        console.log(e)
+    })
+}
+export const getProjectUsers = (projectId: number): GetThunkType => async (dispatch) => {
+    projectId && await ProjectAPI.getProjectUsers(projectId).then(res => {
+        res && dispatch(actionsProjects.setProjectUsers(res))
     }).catch(e => {
         console.log(e)
     })

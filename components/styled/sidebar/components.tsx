@@ -79,6 +79,7 @@ export const SidebarBlockInvitation = styled.div`
 export const SidebarBlockItem = styled.div`
 `
 export const SidebarLogoLink = styled.a`
+    cursor: pointer;
 `
 export const TeamProject = styled.div`
   padding: calc(-10px + 50 * ((100vw - 320px) / 1600));

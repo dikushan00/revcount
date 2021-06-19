@@ -199,6 +199,7 @@ export const SignUpHeaderLogo = styled.div`
   -webkit-box-flex: 1;
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
+  cursor: pointer;
 `
 export const SignUpHeaderLogoLink = styled.a`
   display: inline-block;

@@ -7,7 +7,7 @@ import {Toast, useToast} from "../components/common/blocks/Toast";
 import {AuthHeader} from "../components/auth/AuthHeader";
 import {AuthImg} from "../components/auth/AuthImg";
 import {SocialNetworksSignUp} from "../components/auth/SocialNetworksSignUp";
-import {actionsAuth, checkAuthMe} from "../src/redux/auth-reducer";
+import {actionsAuth} from "../src/redux/auth-reducer";
 import {useRouter} from "next/router";
 import {useDispatch, useSelector} from "react-redux";
 import {SignUpButton} from "../components/styled/buttons/Buttons";
@@ -27,24 +27,20 @@ import {
     SignUpTitle
 } from "../components/styled/signUp/components";
 import {getIsAuth} from "../src/redux/auth-selector";
+import {Layout} from "../components/layouts/Layout";
 
 export default function Login() {
     const {register, errors, handleSubmit} = useForm()
     const {show} = useToast()
     const router = useRouter()
     const dispatch = useDispatch()
-    const {authRequest, error, loading, clearError} = useHttp()
+    const {request, error, loading, clearError} = useHttp()
 
     const isAuth = useSelector(getIsAuth)
-    const [isPasswordValid, setIsPasswordValid] = React.useState(true)
-
-    React.useEffect(() => {
-        dispatch(checkAuthMe())
-    }, [])
 
     const onSubmit = async (data: { first_name: string, username: string, password: string }) => {
 
-        let response = await authRequest<{token: string}>("users/token", "post", data)
+        let response = await request<{token: string}>("users/token", "post", data)
         if(response) {
             router.push("/")
             dispatch(actionsAuth.setNewAuth(response.token, null))
@@ -58,11 +54,9 @@ export default function Login() {
         return () => clearError()
     }, [error])
 
-    if(isAuth) {
-        router.push("/")
-    }
+    if(isAuth) router.push("/")
 
-    return <>
+    return <Layout layoutId={2} title={"Login"}>
         <AuthHeader />
         <SignUpSection>
             <Container >
@@ -92,9 +86,7 @@ export default function Login() {
                             }
                         </SignUpLine>
                         <SignUpLine>
-                            <SignUpInput ref={register} required={true}
-                                         onFocus={() => setIsPasswordValid(true)}
-                                   name="password" placeholder="Password" type="password"/>
+                            <SignUpInput ref={register} required={true} name="password" placeholder="Password" type="password"/>
                         </SignUpLine>
                         <SignUpBlock>
                             <SignUpButton disabled={loading} type="submit" className="signup__btn btn">Login</SignUpButton>
@@ -106,5 +98,5 @@ export default function Login() {
             </Container>
         </SignUpSection>
         <Toast/>
-    </>
+    </Layout>
 }

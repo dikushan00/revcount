@@ -1,5 +1,5 @@
 import React from 'react';
-import {EditType, OfferType} from "../../../src/types/projectTypes";
+import {EditType, InviteStatusType, OfferType} from "../../../src/types/projectTypes";
 import {EditProgressBar} from "./EditProgressBar";
 import {EditTasksPanel} from "./EditTasksPanel";
 import {EditWorkspaceWindow} from "./EditWorkspaceWindow";
@@ -21,12 +21,13 @@ export const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = 
     React.useEffect(() => {
         const getOffer = async () => {
             if (project?.project_id && edit?.revision_id) {
-                let offer = await request<OfferType>(`revisions/${edit.revision_id}/offer/${project.project_id}`)
+                let offer = await request<OfferType>(`revisions/${edit.revision_id}/offer`)
                 if (offer) {
                     let timeLeft = calculateDaysLeft(offer.deadline)
                     let offerObj = {
                         days: timeLeft.days,
                         hours: timeLeft.hours,
+                        status: offer.status,
                         amount: offer.amount,
                         deadline: offer.deadline
                     }
@@ -53,15 +54,15 @@ export const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = 
         </EditsHeader>
         <EditProgressBar status={edit?.status}/>
         <EditTasksPanel type={"changeEdit"}/>
-        <EditWorkspaceWindow isOfferExist={!!offer} isOwner={project?.role?.name === "Owner"}
+        <EditWorkspaceWindow isOfferExist = {!!offer} offer = {offer} isOwner={project?.role?.name === "Owner"}
                              workspace={edit?.workspace} deadline={offer?.deadline}/>
         {
             project?.role?.name === "Owner"
                 ? <EditControlPanel offer={offer} closePage={closePage} project={project} edit={edit}/>
-                : project?.role?.name === "Artist" && edit?.status === "Approval" && !edit?.status &&
+                : project?.role?.name === "Artist" && edit?.status === "Approval" && !offer &&
                 <ArtistsControlPanel revisionId={edit?.revision_id} projectId={project.project_id} role={project.role}/>
         }
     </Edits>
 };
 
-export type ValidOfferType = { amount: number, days: number, hours: number, deadline: string }
+export type ValidOfferType = { amount: number, days: number, hours: number, deadline: string, status: InviteStatusType }

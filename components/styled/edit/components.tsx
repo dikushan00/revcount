@@ -278,29 +278,29 @@ export const TaskEditsItem = styled.li`
     margin: 0 0 0 0;
   }
 
-  .task-open .task-edits__box {
+  .task-open.task-edits__box {
     display: block;
   }
 
-  .task-open .task-edits__body {
+  .task-open.task-edits__body {
     display: block;
   }
 
-  .task-open .task-edits__edit {
+  .task-open.task-edits__edit {
     display: none;
   }
 
-  .task-open .task-edits__delete {
+  .task-open.task-edits__delete {
     display: none;
   }
 
-  .task-open .task-edits__block svg {
+  .task-open.task-edits__block svg {
     -webkit-transform: rotate(180deg);
     -ms-transform: rotate(180deg);
     transform: rotate(180deg);
   }
 
-  .task-open .task-edits__block svg path {
+  .task-open.task-edits__block svg path {
     fill: #888BA0;
   }
 

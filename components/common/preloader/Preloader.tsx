@@ -5,17 +5,17 @@ type PropsType = {
     theme?: string | boolean //if true dark theme, default: white
 }
 
-//preloader component
-const Preloader = ({ theme }:PropsType) => {
-
-  const PreloaderWrap = styled.div`
+const PreloaderWrap = styled.div`
     width: 100%;
     height: 100%;
+    position: fixed;
     display: flex;
     justify-content: center;
     align-items: center;
   `;
-  const LdsDualRing = styled.div`
+const LdsDualRing = styled.div.attrs(props => ({
+    theme: props.theme || true,
+}))`
     width: 100%;
     height: 100%;
     display: flex;
@@ -30,7 +30,7 @@ const Preloader = ({ theme }:PropsType) => {
       margin: 8px;
       border-radius: 50%;
       border: 6px solid;
-      border-color: ${theme ? "#1e2723" : "#fff"} transparent ${theme ? "#1e2723" : "#fff"} transparent;
+      border-color: ${(props) => props.theme ? "#1e2723" : "#fff"} transparent ${(props) => props.theme ? "#1e2723" : "#fff"} transparent;
       animation: ldsDualRing 1.2s linear infinite;
     }
     @keyframes ldsDualRing {
@@ -43,10 +43,12 @@ const Preloader = ({ theme }:PropsType) => {
     }
   `;
 
+//preloader component
+const Preloader = ({ theme }:PropsType) => {
   return (
     <>
-      <PreloaderWrap>
-        <LdsDualRing/>
+      <PreloaderWrap theme = {theme}>
+        <LdsDualRing theme = {theme}/>
       </PreloaderWrap>
     </>
   );

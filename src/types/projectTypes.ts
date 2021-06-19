@@ -20,7 +20,7 @@ export interface ProjectType extends ProjectPostType {
 
 export interface InviteProjectType {
     invitation_id: number,
-    name: string,
+    project_name: string,
     project_id: number,
     status: InviteStatusType
 }
@@ -35,6 +35,7 @@ type ActionHistoryType = {
 
 export type OfferType = {
     amount: number
+    status: InviteStatusType
     deadline: string
 }
 

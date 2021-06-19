@@ -10,7 +10,7 @@ export const PopupClose = styled.div`
   cursor: pointer;
   z-index: 30;
   background-color: #e6e8ef;
-  background-image: url("/public/img/icons/x.svg");
+  background-image: url("/img/icons/x.svg");
   background-repeat: no-repeat;
   background-position: center center;
   background-size: 13px 13px;
@@ -63,7 +63,6 @@ export const PopupTabsLine = styled.div``
 export const PopupTabsInput = styled.input``
 export const PopupTabsColumn = styled.div``
 export const PopupInput = styled.input`
-
   font-size: 22px;
   line-height: 33px;
   width: 100%;
@@ -126,13 +125,45 @@ export const PopupInputDate = styled(PopupInput)`
     color: rgba(17, 23, 66, 0.3);
   }
 `
-export const PopupInputId = styled(PopupInput)`
+const PopupInputDiv = styled.div`
+  font-size: 22px;
+  line-height: 33px;
+  width: 100%;
+  min-height: 68px;
+  height: auto;
+  border-bottom: 1px solid #ebedf5;
+
+  &::-webkit-input-placeholder {
+    color: rgba(17, 23, 66, 0.3);
+  }
+
+  &::-moz-placeholder {
+    color: rgba(17, 23, 66, 0.3);
+  }
+
+  &:-ms-input-placeholder {
+    color: rgba(17, 23, 66, 0.3);
+  }
+
+  &::-ms-input-placeholder {
+    color: rgba(17, 23, 66, 0.3);
+  }
+
+  &::placeholder {
+    color: rgba(17, 23, 66, 0.3);
+  }
+
+  &:focus {
+    border-bottom: 1px solid #0e0b2a;
+  }
+`
+export const PopupInputId = styled(PopupInputDiv)`
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   /*overflow-x: auto;*/
   padding: 10px 20px;
-
+  
 `
 export const IdBlockItem = styled.div`
 
@@ -215,7 +246,7 @@ export const PopupActions = styled.ul`
   margin-top: 50px;
   
 `
-export const PopupActionsItem = styled.ul`
+export const PopupActionsItem = styled.li`
   padding: 15px 25px;
   background: #f3f5f7;
   border-radius: 100px;
@@ -262,7 +293,9 @@ export const PopupActionsLink = styled.span`
   -o-transition: all 0.3s ease 0s;
   transition: all 0.3s ease 0s;
 
-  svg {
+  svg, img {
+    width: auto;
+    height: auto;
     -webkit-transition: all 0.3s ease 0s;
     -o-transition: all 0.3s ease 0s;
     transition: all 0.3s ease 0s;

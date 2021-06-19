@@ -4,6 +4,7 @@ import {useOutsideAlerter} from '../../../src/utils/hooks/outsideClick';
 import {useForm} from "react-hook-form";
 import {AcceptProjectUserType} from "../../sidebars/Sidebar";
 import {
+    PopupButton,
     PopupClose,
     PopupDesc,
     PopupForm,
@@ -48,7 +49,7 @@ export const AcceptInvitationModal: React.FC<PropsType> = ({hideBlock, handleAcc
             <PopupDesc className="popup__descr">
                 Set the cost of one hour of your work in dollars
             </PopupDesc>
-            <button type="submit" className="popup__btn">Accept Invitation</button>
+            <PopupButton type="submit">Accept Invitation</PopupButton>
         </PopupForm>
     </CustomPopup>
 }

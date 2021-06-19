@@ -21,8 +21,8 @@ export const EditTasksList: React.FC<PropsType> = ({register, tasks, enableEditM
         {
             tasks?.map(task => {
                 return <TaskEditsItem key={task.id}
-                                      className={task.isEdit ? "task-open" : ""}>
-                    <TaskEditsTop>
+                                      className={"task-edits__item " + (task.isEdit ? "task-open" : "")}>
+                    <TaskEditsTop className={"task-edits__top"}>
                         <TaskEditsNumber className="task-edits__number"/>
                         {task.isEdit && <EditBox registerRef={register} taskId={task.id}/>}
                         <TaskEditsBlock className="task-edits__block">

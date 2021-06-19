@@ -35,8 +35,10 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
     const modalRef = React.useRef(null)
     const {show} = useToast()
     const {clearError, request, error, loading} = useHttp()
+
     const contacts = useSelector((state: AppStateType) => state.profile.contacts)
     const [activeTabId, setActiveTabId] = React.useState<number>(1)
+
     const [tabs,] = React.useState<{ className?: string, title: string, Component: () => JSX.Element }[]>(
         [
             {
@@ -58,6 +60,8 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
     React.useEffect(() => {
         !contacts && ProfileAPI.getContacts().then(res => {
             !res?.error && dispatch(actionsProfile.setContacts(res))
+        }).catch(e => {
+            console.log(e)
         })
     }, [contacts])
 
@@ -142,7 +146,7 @@ const InviteMemberFromContacts: React.FC<ModalItemPropsType> = ({hookForm}) => {
                 contacts?.map(c => {
                     return <li key={c.user_id} className="tabs-popup__box">
                         <label htmlFor={"radio-" + c.user_id} className="tabs-popup__label">
-                            {c.name}
+                            {c.first_name}
                             <input ref={hookForm?.register} required={true} type="radio" id={"radio-" + c.user_id}
                                    defaultChecked
                                    className="tabs-popup__radio" name={"contact_" + c.user_id}/>
@@ -169,11 +173,11 @@ const InviteMemberViaId: React.FC<InviteViaIdType> = ({hideBlock, projectId}) =>
         setAddedIds(edited)
     }
     const onSubmit = async () => {
-        const invitations = addedIds.map(userId => ({user_id: userId}))
+        const invitations = projectId && addedIds.map(userId => ({user_id: +userId, project_id: +projectId}))
 
-        let response = projectId && await request<UserType[]>(`projects/${projectId}/invitations`, "post", invitations)
+        let response = invitations && await request<UserType[]>(`invitations`, "post", invitations)
         if (response) {
-            response && dispatch(actionsProjects.addUsersToProject(response))
+            // response && dispatch(actionsProjects.addUsersToProject(response))
             hideBlock()
         }
     }

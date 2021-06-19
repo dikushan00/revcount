@@ -1,12 +1,11 @@
 import * as React from "react";
 import {useForm} from "react-hook-form";
 import {EditStatusType, EditType, TaskType} from "../../../src/types/projectTypes";
-import {MainLayOut} from "../../../components/layouts/MainLayOut";
 import {useRouter} from "next/router";
 import {useDispatch, useSelector} from "react-redux";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
 import {EditTasksPanel} from "../../../components/projects/edits/EditTasksPanel";
-import {getActiveProject, getTasks} from "../../../src/redux/projects-selector";
+import {getTasks} from "../../../src/redux/projects-selector";
 import {useHttp} from "../../../src/utils/hooks/http.hook";
 import {Toast, useToast} from "../../../components/common/blocks/Toast";
 import {EditButton} from "../../../components/styled/buttons/Buttons";
@@ -14,10 +13,13 @@ import {
     EditForm,
     EditHeader,
     EditTitle,
-    EditWrapper, FormEditBox,
-    FormEditHeader, FormEditInput,
+    EditWrapper,
+    FormEditBox,
+    FormEditHeader,
+    FormEditInput,
     FormEditLabel
 } from "../../../components/styled/edit/components";
+import {Layout} from "../../../components/layouts/Layout";
 
 
 export const defaultFirstStatus = {
@@ -36,7 +38,6 @@ export default function AddNewEdit() {
     const dispatch = useDispatch()
 
     const {register, handleSubmit, watch} = useForm()
-    const project = useSelector(getActiveProject)
     const tasks = useSelector(getTasks)
 
     const sortTasks = (obj: any) => {
@@ -80,10 +81,8 @@ export default function AddNewEdit() {
         })
         return editPost
     }
-
     const onSubmit = async (obj: any) => {
         let editPost = sortTasks(obj)
-
         let response = projectId && await request<EditType>(`projects/${projectId}/revisions`, "post", editPost)
         if (response) {
             projectId && dispatch(actionsProjects.addEditToProject(+projectId, response))
@@ -96,10 +95,10 @@ export default function AddNewEdit() {
         return () => clearError()
     }, [error])
 
-    if (project?.role?.name !== "Owner")
-        return router.push("/")
+    // if (project?.role?.name !== "Owner")
+    //     return router.push("/")
 
-    return <MainLayOut title={"Add edit"}>
+    return <Layout title={"Add edit"}>
         <EditWrapper className="edit">
             <EditHeader>
                 <EditTitle>
@@ -123,9 +122,9 @@ export default function AddNewEdit() {
                         <FormEditInput ref={register} type="text" name="name" placeholder="Write name here"/>
                     </FormEditBox>
                 </FormEditHeader>
-                <EditTasksPanel type={"addNewEdit"}/>
+                <EditTasksPanel register={register} type={"addNewEdit"}/>
             </EditForm>
         </EditWrapper>
         <Toast />
-    </MainLayOut>
+    </Layout>
 }

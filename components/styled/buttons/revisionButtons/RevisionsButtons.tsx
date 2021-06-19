@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import {Btn2} from "../Buttons";
+import {Btn2, Btn2Div} from "../Buttons";
 
 const ProgressEditButtonStyled = styled.button`
   display: -ms-inline-flexbox;
@@ -86,31 +86,28 @@ const PanelEditsButtonStyled = styled.button`
   cursor: pointer;
 `
 
-export const OfferEditsAcceptButton: React.FC<React.ButtonHTMLAttributes<any>> = (props) => {
-    const OfferEditsAcceptButton = styled.div`
-      padding-left: calc(-5px + 76 * ((100vw - 320px) / 1600));
-      padding-right: calc(-5px + 76 * ((100vw - 320px) / 1600));
-      height: calc(15px + 45 * ((100vw - 320px) / 1600));
-      font-size: calc(7px + 9 * ((100vw - 320px) / 1600));
-      line-height: calc(7px + 17 * ((100vw - 320px) / 1600));
-      display: -ms-inline-flexbox;
-      display: inline-flex;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-      -webkit-box-pack: center;
-      -ms-flex-pack: center;
-      justify-content: center;
-      background: #229b68;
-      border: 1px solid #229b68;
-      border-radius: 100px;
-      font-weight: 500;
-      color: #ffffff;
-      margin-right: calc(0px + 10 * ((100vw - 320px) / 1600));
-      cursor: pointer;
-    `
-    return <OfferEditsAcceptButton {...props}> {props.children}</OfferEditsAcceptButton>
-}
+export const OfferEditsAcceptButton = styled.button`
+  padding-left: calc(-5px + 76 * ((100vw - 320px) / 1600));
+  padding-right: calc(-5px + 76 * ((100vw - 320px) / 1600));
+  height: calc(15px + 45 * ((100vw - 320px) / 1600));
+  font-size: calc(7px + 9 * ((100vw - 320px) / 1600));
+  line-height: calc(7px + 17 * ((100vw - 320px) / 1600));
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  background: #229b68;
+  border: 1px solid #229b68;
+  border-radius: 100px;
+  font-weight: 500;
+  color: #ffffff;
+  margin-right: calc(0px + 10 * ((100vw - 320px) / 1600));
+  cursor: pointer;
+`
 export const OfferEditsDeclineButton: React.FC<React.ButtonHTMLAttributes<any>> = (props) => {
     const OfferEditsDeclineButton = styled.div`
       padding-left: calc(-5px + 35 * ((100vw - 320px) / 1600));
@@ -140,30 +137,25 @@ export const PanelEditsButton: React.FC<React.ButtonHTMLAttributes<any>> = (prop
     return <PanelEditsButtonStyled {...props}> {props.children}</PanelEditsButtonStyled>
 }
 export const CompleteButton = styled(PanelEditsButtonStyled)`
-      color: #ffffff;
-      background: #229B68;
+  color: #ffffff;
+  background: #229B68;
 
-      svg path {
-        fill: #ffffff;
-      }
-    `
+  svg path {
+    fill: #ffffff;
+  }
+`
 
 export const BlueEditButton = styled(PanelEditsButton)`
-      background: #1078f1;
-      color: #ffffff;
-    `
+  background: #1078f1;
+  color: #ffffff;
+`
 export const ProgressEditButton: React.FC<React.ButtonHTMLAttributes<any>> = (props) => {
     return <ProgressEditButtonStyled {...props}>{props.children}</ProgressEditButtonStyled>
 }
 
-const TaskEditsBtnStyled = styled(Btn2)`
-      cursor: pointer;
-      padding-left: calc(-5px + 43 * ((100vw - 320px) / 1600));
-      padding-right: calc(-5px + 43 * ((100vw - 320px) / 1600));
-
-    `
-export const TaskEditsButton: React.FC<React.ButtonHTMLAttributes<any>> = (props) => {
-
-    return <TaskEditsBtnStyled {...props}>{props.children}</TaskEditsBtnStyled>
-}
+export const TaskEditsButton = styled(Btn2Div)`
+  cursor: pointer;
+  padding-left: calc(-5px + 43 * ((100vw - 320px) / 1600));
+  padding-right: calc(-5px + 43 * ((100vw - 320px) / 1600));
+`
 

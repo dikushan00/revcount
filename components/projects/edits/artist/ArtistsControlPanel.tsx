@@ -25,9 +25,10 @@ export const ArtistsControlPanel: React.FC<{ projectId: number, revisionId: numb
         let oneDay = 86400000
         let oneHour = 3600000
         let deadline = dateNow + (oneDay * +days) + (oneHour * +hours)
-        let deadlineDate = new Date(deadline).toLocaleString()
 
-        let response = await request<OfferType>(`revisions/${revisionId}/offer/${projectId}`, "post", {deadline: deadlineDate, amount: data.balance})
+        let deadlineDate = new Date(deadline).toISOString()
+
+        let response = await request<OfferType>(`revisions/${revisionId}/offer`, "post", {deadline: deadlineDate, amount: data.balance})
         if(response) {
             revisionId && dispatch(actionsProjects.setActiveProjectOffer(revisionId, response))
         }
@@ -44,9 +45,7 @@ export const ArtistsControlPanel: React.FC<{ projectId: number, revisionId: numb
             <OfferEditsForm onSubmit={handleSubmit(onSubmit)}>
                 <OfferConditionsBlock register={register}/>
                 <div className="offer-edits__block">
-                    <OfferEditsAcceptButton onClick={() => {
-                    }}>Send an offer
-                    </OfferEditsAcceptButton>
+                    <OfferEditsAcceptButton type={"submit"} >Send an offer</OfferEditsAcceptButton>
                 </div>
             </OfferEditsForm>
         </OfferEdits>

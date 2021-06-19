@@ -2,7 +2,7 @@ import React from 'react';
 import {AddMemberToProjectModal} from "../projects/members/AddMemberToProjectModal";
 import {TeamSettingsModal} from "../projects/modals/TeamSettingsModal";
 import {useDispatch, useSelector} from "react-redux";
-import {getActiveProject} from "../../src/redux/projects-selector";
+import {getActiveProject, getUserId} from "../../src/redux/projects-selector";
 import {actionsProjects} from "../../src/redux/projects-reducer";
 import {TeamProjectButton, TeamProjectSettingsButton} from "../styled/buttons/Buttons";
 import {
@@ -18,6 +18,8 @@ export const SidebarRight = () => {
 
     const dispatch = useDispatch()
     const activeProject = useSelector(getActiveProject)
+
+    const userId = useSelector(getUserId)
 
     const [isModalMode, setIsModalMode] = React.useState({
         inviteMember: false,
@@ -45,17 +47,19 @@ export const SidebarRight = () => {
                         </svg>
                     </TeamProjectSettingsButton>
                 </TeamProjectHeader>
-                <TeamProjectButton onClick={() => setIsModalMode(state => ({...state, inviteMember: true}))}>Add
-                    member<span>+</span></TeamProjectButton>
+                {activeProject?.role?.name === "Owner" &&
+                <TeamProjectButton onClick={() => setIsModalMode(state => ({...state, inviteMember: true}))}>
+                    Add member<span>+</span>
+                </TeamProjectButton>}
                 <TeamProjectsList>
                     {
                         activeProject?.users?.map(user => {
                             return <TeamProjectsItem key={user.user_id} className="team-project__item">
                                 <TeamProjectsName>
-                                    <span/>{user.name} {user.isOwner && "(You)"}
+                                    <span/>{user.first_name} {user.user_id === userId &&  "(You)"}
                                 </TeamProjectsName>
                                 <TeamProjectsRole>
-                                    {user.role.name}
+                                    {user?.role?.name || "Artist"}
                                 </TeamProjectsRole>
                             </TeamProjectsItem>
                         })

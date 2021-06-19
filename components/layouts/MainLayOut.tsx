@@ -5,14 +5,11 @@ import {Content} from "../content/Content";
 import {SidebarRight} from "../sidebars/SidebarRight";
 import {Sidebar} from "../sidebars/Sidebar";
 import {useDispatch, useSelector} from "react-redux";
-import {AppStateType} from "../../src/redux/store-redux";
 import {getInvitations, getProjects} from "../../src/redux/projects-reducer";
-import {actionsProfile} from "../../src/redux/profile-reducer";
 import {Redirect} from "../common/tools/Router";
-import {useHttp} from "../../src/utils/hooks/http.hook";
-import {ProfileType} from "../../src/types/userTypes";
 import {Page, PageWrapper, Wrapper} from "../styled/mainPage/components";
-import {checkAuthMe} from "../../src/redux/auth-reducer";
+import {getIsAuth} from "../../src/redux/auth-selector";
+import {getUserId} from "../../src/redux/projects-selector";
 
 //main layout with sidebars, header and content
 export const MainLayOut: React.FC<{ title: string, isProjectSideBarMode?: boolean }> = ({
@@ -20,10 +17,8 @@ export const MainLayOut: React.FC<{ title: string, isProjectSideBarMode?: boolea
                                                                                             title = "Revcount",
                                                                                             isProjectSideBarMode = true
                                                                                         }) => {
-    const userId = useSelector((state: AppStateType) => state.auth.userId)
-    const isAuth = useSelector((state: AppStateType) => state.auth.isAuth)
-
-    const {request, error} = useHttp()
+    const userId = useSelector(getUserId)
+    const isAuth = useSelector(getIsAuth)
 
     const dispatch = useDispatch()
 
@@ -31,8 +26,6 @@ export const MainLayOut: React.FC<{ title: string, isProjectSideBarMode?: boolea
         if (userId) {
             dispatch(getProjects(userId))
             dispatch(getInvitations(userId))
-        } else {
-             dispatch(checkAuthMe())
         }
     }, [userId])
 

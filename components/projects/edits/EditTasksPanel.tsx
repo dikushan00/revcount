@@ -20,13 +20,13 @@ export interface TaskTypeWithFlag extends TaskType {
     isEdit: boolean
 }
 
-export const EditTasksPanel: React.FC<{ type: "addNewEdit" | "changeEdit", projectTasks?: TaskType[] }> = ({
+export const EditTasksPanel: React.FC<{ type: "addNewEdit" | "changeEdit", projectTasks?: TaskType[], register?: any }> = ({
                                                                                                                type,
+                                                                                                                              register,
                                                                                                                projectTasks
                                                                                                            }) => {
 
     const dispatch = useDispatch()
-    const {register, errors, handleSubmit} = useForm()
     const stateTasks = useSelector((state: AppStateType) => state.projects.tasks)
     const [tasks, setTasks] = React.useState<TaskTypeWithFlag[] | null>(null)
 
@@ -71,13 +71,13 @@ export const EditTasksPanel: React.FC<{ type: "addNewEdit" | "changeEdit", proje
                                        register={register}/>
                     </FormEditWrapper>
                     <TaskEditsInner className="task-edits__inner">
-                        <TaskEditsButton onClick={addTask}/>
+                        <TaskEditsButton onClick={addTask}>Add new task <span>+</span></TaskEditsButton>
                         <TaskEditsCorrectionButton type={"submit"}>Add correction to project
                         </TaskEditsCorrectionButton>
                     </TaskEditsInner>
                 </>
                 : type === "changeEdit" &&
-                <TaskEdits className={isTasksShow ? "task-edits-open" : "task-edits-closed"}>
+                <TaskEdits className={"task-edits " + (isTasksShow ? "task-edits-open" : "task-edits-closed")}>
                 <TaskEditsHeader>
                     <EditsLabel>
                         Edit Task’s
@@ -95,9 +95,6 @@ export const EditTasksPanel: React.FC<{ type: "addNewEdit" | "changeEdit", proje
                 </TaskEditsInner>
             </TaskEdits>
         }
-
     </>
-
-
 };
 

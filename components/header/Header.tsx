@@ -59,23 +59,25 @@ export const Header = () => {
         </HeaderMenu>
 
         <HeaderRegistration>
-            <HeaderIndexer>
-                your invite id - {profile?.inviteId}
-            </HeaderIndexer>
+            {profile?.inviteId && <>
+                <HeaderIndexer>
+                    your invite id - {profile?.inviteId}
+                </HeaderIndexer>
 
-            <HeaderRegistrationIcon onMouseLeave={() => isCopied && setIsCopied(false)}
-                  onClick={() => profile?.inviteId && copyText(profile?.inviteId)}>
-                <Tooltip>
-                    <ImgWrapper path={"/img/icons/copyTextIcon.svg"}/>
-                    <span className={"tooltiptext"}>
+                <HeaderRegistrationIcon onMouseLeave={() => isCopied && setIsCopied(false)}
+                                        onClick={() => profile?.inviteId && copyText(profile?.inviteId)}>
+                    <Tooltip>
+                        <ImgWrapper path={"/img/icons/copyTextIcon.svg"}/>
+                        <span className={"tooltiptext"}>
                         {isCopied ? "Copied!" : "Copy"}
                     </span>
-                </Tooltip>
-            </HeaderRegistrationIcon>
+                    </Tooltip>
+                </HeaderRegistrationIcon>
+            </>}
             <Link href="/">
                 <HeaderUser>
                     {profile?.avatar
-                        ? <ImgWrapper path={profile?.avatar} />
+                        ? <ImgWrapper path={profile?.avatar}/>
                         : <DefaultProfileAvatar/>}
                 </HeaderUser>
             </Link>

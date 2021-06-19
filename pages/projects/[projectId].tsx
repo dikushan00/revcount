@@ -1,22 +1,26 @@
 import React from 'react';
 import Link from "next/link"
-import {MainLayOut} from "../../components/layouts/MainLayOut";
 import {EditType, ProjectType, StatusesNamesType} from "../../src/types/projectTypes"
 import {ProjectStatsInfo} from "../../components/projects/ProjectStatsInfo";
 import {useDispatch, useSelector} from "react-redux";
-import {actionsProjects} from "../../src/redux/projects-reducer";
+import {actionsProjects, getProjectUsers} from "../../src/redux/projects-reducer";
 import {Edit} from "../../components/projects/edits/Edit";
 import {useRouter} from "next/router";
 import {getActiveEdit, getActiveProject} from "../../src/redux/projects-selector";
 import {useHttp} from "../../src/utils/hooks/http.hook";
 import {MyCorrectionsButton, ProjectsButton} from "../../components/styled/buttons/Buttons";
 import {
-    MyCorrections, MyCorrectionsBox, MyCorrectionsDesc, MyCorrectionsEdit, MyCorrectionsIcon, MyCorrectionsItem,
+    MyCorrections, MyCorrectionsAction,
+    MyCorrectionsBox,
+    MyCorrectionsDesc,
+    MyCorrectionsEdit,
+    MyCorrectionsIcon,
+    MyCorrectionsItem,
     MyCorrectionsList,
     MyCorrectionsTitle,
     ProjectsHeader
 } from "../../components/styled/projects/components";
-import {MyCorrectionsAction} from "../../components/styled/edit/components";
+import {Layout} from "../../components/layouts/Layout";
 
 const Project: React.FC<{ project: ProjectType }> = () => {
     const dispatch = useDispatch()
@@ -27,16 +31,19 @@ const Project: React.FC<{ project: ProjectType }> = () => {
     const project = useSelector(getActiveProject)
     const activeEdit = useSelector(getActiveEdit)
 
+    const [revisions, setRevisions] = React.useState<EditType[] | null>(null)
+
     React.useEffect(() => {
         if (projectId) {
             const getData = async () => {
                 let project = await request<ProjectType>(`projects/${+projectId}`)
                 if (project) {
-                    dispatch(actionsProjects.setActiveProject(project))
+                    dispatch(actionsProjects.setActiveProject({...project, role: {id: 1, name: "Owner"}}))
                 }
                 let revisions = await request<EditType[]>(`projects/${projectId}/revisions`)
                 if (revisions) {
-                    dispatch(actionsProjects.addRevisionsToProject(revisions, +projectId))
+                    setRevisions(revisions)
+                    // dispatch(actionsProjects.addRevisionsToProject(revisions, +projectId))
                 }
             }
             getData()
@@ -44,7 +51,15 @@ const Project: React.FC<{ project: ProjectType }> = () => {
     }, [projectId])
 
     React.useEffect(() => {
+        project && !project.users && dispatch(getProjectUsers(+project.project_id))
+    }, [project])
+
+    React.useEffect(() => {
         project && dispatch(actionsProjects.setActiveProject(project))
+
+        return () => {
+            dispatch(actionsProjects.setActiveProject(null))
+        }
     }, [project])
 
     const handleDisableEditMode = () => dispatch(actionsProjects.setActiveEdit(null))
@@ -52,7 +67,7 @@ const Project: React.FC<{ project: ProjectType }> = () => {
         dispatch(actionsProjects.setActiveEdit(edit))
     }
 
-    return <MainLayOut title={"Project"}>
+    return <Layout title={"Project"}>
         {
             activeEdit
                 ? <Edit closePage={handleDisableEditMode} edit={activeEdit}/>
@@ -70,13 +85,13 @@ const Project: React.FC<{ project: ProjectType }> = () => {
                     </MyCorrections>
                     <MyCorrectionsList>
                         {
-                            project?.revisions?.map(edit => {
+                            revisions?.map(edit => {
                                 const statusImgPath = getStatusImg(edit.status)
                                 return <MyCorrectionsItem key={edit.revision_id}>
                                     <MyCorrectionsEdit onClick={() => setEditMode(edit)}>
                                         <span/>{edit.name}
                                     </MyCorrectionsEdit>
-                                    <MyCorrectionsBox >
+                                    <MyCorrectionsBox>
                                         <MyCorrectionsIcon>
                                             <picture>
                                                 <source srcSet={statusImgPath} type="image/webp"/>
@@ -88,9 +103,10 @@ const Project: React.FC<{ project: ProjectType }> = () => {
                                         </MyCorrectionsAction>
                                     </MyCorrectionsBox>
                                     <MyCorrectionsDesc>
-                                        {edit.description}
+                                        {edit.next_action || edit.description}
                                     </MyCorrectionsDesc>
-                                    <MyCorrectionsButton className="my-corrections__btn btn-2" onClick={() => setEditMode(edit)}>see
+                                    <MyCorrectionsButton className="my-corrections__btn btn-2"
+                                                         onClick={() => setEditMode(edit)}>see
                                         Detail
                                     </MyCorrectionsButton>
                                 </MyCorrectionsItem>
@@ -99,7 +115,7 @@ const Project: React.FC<{ project: ProjectType }> = () => {
                     </MyCorrectionsList>
                 </>
         }
-    </MainLayOut>
+    </Layout>
 
 }
 

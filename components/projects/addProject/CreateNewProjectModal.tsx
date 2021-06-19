@@ -6,7 +6,7 @@ import {RemoveItemIcon} from "../members/AddMemberToProjectModal";
 import {useDispatch, useSelector} from "react-redux";
 import {ProjectAPI} from "../../../src/api/ProjectAPI";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
-import {ProjectPostType} from "../../../src/types/projectTypes";
+import {ProjectPostType, ProjectType} from "../../../src/types/projectTypes";
 import {getUserId} from "../../../src/redux/projects-selector";
 import {InputIdDivButton} from "../../styled/buttons/popup/PopupButtons";
 import {
@@ -19,6 +19,8 @@ import {
     PopupItem,
     PopupTitle
 } from "../../styled/modals/components";
+import {useHttp} from "../../../src/utils/hooks/http.hook";
+import {UserType} from "../../../src/types/userTypes";
 
 type PropsType = {
     hideBlock: () => void
@@ -28,6 +30,7 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
     const dispatch = useDispatch()
     const {handleSubmit, register, watch} = useForm()
     const addProjectRef = React.useRef(null)
+    const {clearError, request, error, loading} = useHttp()
 
     const [isInputDateMode, setIsInputDateMode] = React.useState(false)
     const [addedIds, setAddedIds] = React.useState([] as string[])
@@ -42,7 +45,7 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
     useOutsideAlerter(addProjectRef, hideBlock)
     const handleCloseModal = () => hideBlock()
 
-    const onSubmit = (data: { name: string, freeEdits: string, deadline: string }) => {
+    const onSubmit = async (data: { name: string, freeEdits: string, deadline: string }) => {
         const invitations = addedIds.map(userId => ({user_id: userId}))
         let project = {
             name: data.name,
@@ -52,10 +55,12 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
             invitations,
         } as ProjectPostType
 
-        userId && ProjectAPI.createProject(userId, project).then(res => {
-            dispatch(actionsProjects.addProject(res))
+        let response = userId && await request<ProjectType>(`users/${userId}/projects`, "post", project)
+        if (response) {
+            dispatch(actionsProjects.addProject(response))
+            dispatch(actionsProjects.setActiveProject(response))
             hideBlock()
-        })
+        }
     }
 
     return <CustomPopup className={"popup__create"} modalBodyRef={addProjectRef}>

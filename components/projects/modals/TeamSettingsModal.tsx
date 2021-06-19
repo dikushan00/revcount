@@ -26,19 +26,14 @@ type PropsType = {
 export const TeamSettingsModal: React.FC<PropsType> = ({hideBlock, users}) => {
     const dispatch = useDispatch()
     const {show} = useToast()
-    const {clearError, request, error, loading} = useHttp()
+    const {clearError, request, error} = useHttp()
     const project = useSelector((state: AppStateType) => state.projects.activeProject)
 
     const changeUsersRole = async (userId: number, roleId: number) => {
         let role = userRoleSelections.find(item => item.id === roleId)
-        let projectUsers = project?.users?.map(item => {
-            if (item.user_id === userId)
-                return {...item, role}
-            return item
-        })
-        let projectPost = {...project, users: projectUsers}
 
-        let response = project?.project_id && await request<ProjectType>(`projects/${project?.project_id}`, "post", projectPost)
+        let response = project?.project_id && role &&
+            await request<ProjectType>(`projects/${project?.project_id}/user/${userId}`, "post", {role: role.name})
         if (response) {
             dispatch(actionsProjects.setActiveProject(response))
             hideBlock()
@@ -48,7 +43,6 @@ export const TeamSettingsModal: React.FC<PropsType> = ({hideBlock, users}) => {
     React.useEffect(() => {
         error && show(error)
         return () => clearError()
-
     }, [error])
 
     return <CustomPopup className={"popup__team"}>
@@ -69,7 +63,7 @@ export const TeamSettingsModal: React.FC<PropsType> = ({hideBlock, users}) => {
                                     }
                                 </div>
                                 <div className="popup__name">
-                                    {user.name} {user.isOwner && "(You)"}
+                                    {user.first_name} {user.isOwner && "(You)"}
                                 </div>
                             </label>
                             <PopupProfession className="popup__profession">
@@ -78,7 +72,7 @@ export const TeamSettingsModal: React.FC<PropsType> = ({hideBlock, users}) => {
                                     <PopupSelect onChange={(e) => {
                                         let roleId = e.currentTarget.value
                                         changeUsersRole(user.user_id, +roleId)
-                                    }} defaultValue={user.role.id} id="popup-select-1" className="popup__select">
+                                    }} defaultValue={user?.role?.id || 2} id="popup-select-1" className="popup__select">
                                         {userRoleSelections.map((item, index) => {
                                             return <option key={index} value={item.id}>{item.name}</option>
                                         })}

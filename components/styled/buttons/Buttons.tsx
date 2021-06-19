@@ -316,7 +316,7 @@ export const SideBarFooterButton = styled.button`
         margin-left: calc(0px + 10 * ((100vw - 320px) / 1600));
       }
     `
-export  const SideBarBlockButton = styled.button`
+export const SideBarBlockButton = styled.button`
       height: calc(30px + 22 * ((100vw - 320px) / 1600));
       width: 100%;
       font-size: calc(7px + 9 * ((100vw - 320px) / 1600));
@@ -398,12 +398,30 @@ export  const SideBarBlockButton = styled.button`
       }
     `
 
-export const SideBarAcceptButton = styled(SideBarBlockButton)`
+export const BlockSideBarButton = styled.button`
+  padding-left: calc(5px + 10 * ((100vw - 320px) / 1600));
+  padding-right: calc(5px + 9 * ((100vw - 320px) / 1600));
+  height: calc(20px + 10 * ((100vw - 320px) / 1600));
+  font-size: calc(10px + 2 * ((100vw - 320px) / 1600));
+  line-height: calc(10px + 8 * ((100vw - 320px) / 1600));
+  border-radius: 100px;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  font-weight: 500;
+`
+
+export const SideBarAcceptButton = styled(BlockSideBarButton)`
       background: #229b68;
       color: #FFFFFF;
       margin-right: 5px;
     `
-export const SideBarDeclineButton = styled(SideBarBlockButton)`
+export const SideBarDeclineButton = styled(BlockSideBarButton)`
       border: 1px solid #ef6868;
       background: transparent;
       color: #EF6868;

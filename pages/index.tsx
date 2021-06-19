@@ -1,5 +1,4 @@
 import {BorderedButton, Btn} from "../components/styled/buttons/Buttons";
-import {MainLayOut} from "../components/layouts/MainLayOut";
 import React from "react";
 import {CreateNewProjectModal} from "../components/projects/addProject/CreateNewProjectModal";
 import {JoinProjectModal} from "../components/projects/modals/JoinProjectModal";
@@ -11,6 +10,7 @@ import {
     MainText,
     MainTitle
 } from "../components/styled/mainPage/components";
+import {Layout} from "../components/layouts/Layout";
 
 export default function Home() {
 
@@ -19,7 +19,7 @@ export default function Home() {
         joinProject: false
     })
 
-    return <MainLayOut title={"Revcount"} isProjectSideBarMode={false}>
+    return <Layout title={"Revcount"} isProjectSideBarMode={false}>
         <MainSection>
             <MainBlock>
                 <MainTitle>
@@ -52,6 +52,6 @@ export default function Home() {
             isModalMode.joinProject &&
             <JoinProjectModal hideBlock={() => setIsModalMode(state => ({...state, joinProject: false}))}/>
         }
-    </MainLayOut>
+    </Layout>
 }
 

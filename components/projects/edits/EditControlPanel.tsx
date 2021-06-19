@@ -242,6 +242,7 @@ export const OfferConditionsBlock: React.FC<{ offer?: ValidOfferType | null, reg
             <div className="offer-edits__box offer-edits__box--days">
                 <input ref={register} className="offer-edits__input" type="text" name="days"
                        placeholder={offer?.days.toString() || "0"}
+                       max={1000}
                        defaultValue={offer?.days.toString()}/>
                 <div className="offer-edits__designation">days</div>
             </div>
@@ -253,6 +254,7 @@ export const OfferConditionsBlock: React.FC<{ offer?: ValidOfferType | null, reg
             <div className="offer-edits__box offer-edits__box--time">
                 <input ref={register} className="offer-edits__input" type="text" name="hours"
                        placeholder={offer?.hours.toString() || "0"}
+                       max={24}
                        defaultValue={offer?.hours.toString()}/>
                 <div className="offer-edits__designation">hrs.</div>
             </div>
@@ -264,8 +266,7 @@ export const OfferConditionsBlock: React.FC<{ offer?: ValidOfferType | null, reg
             <div className="offer-edits__box offer-edits__box--total">
                 <input ref={register} className="offer-edits__input" type="number" name="balance"
                        placeholder={offer?.amount.toString()}
-                       max={24}
-                       defaultValue={offer?.amount.toString() || "0"}/>
+                       defaultValue={offer?.amount}/>
                 <div className="offer-edits__designation">$</div>
             </div>
         </div>

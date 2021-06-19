@@ -1,5 +1,5 @@
 import React from 'react';
-import {WorkspaceMessageType} from "../../../src/types/projectTypes";
+import {OfferType, WorkspaceMessageType} from "../../../src/types/projectTypes";
 import {
     LeftWorkspace, LeftWorkspaceDesc,
     LeftWorkspaceInput,
@@ -14,8 +14,8 @@ type TimeLeftType = {
     seconds: string | null
 }
 
-export const EditWorkspaceWindow: React.FC<{ isOwner: boolean, isOfferExist: boolean, workspace: WorkspaceMessageType[] | undefined, deadline: string | null | undefined }> =
-    ({workspace, deadline, isOwner, isOfferExist}) => {
+export const EditWorkspaceWindow: React.FC<{ isOwner: boolean, isOfferExist: boolean,offer: OfferType | null, workspace: WorkspaceMessageType[] | undefined, deadline: string | null | undefined }> =
+    ({workspace, deadline, isOwner, offer, isOfferExist}) => {
         const [timeLeft, setTimeLeft] = React.useState<TimeLeftType>({
             days: null,
             minutes: null,
@@ -52,7 +52,7 @@ export const EditWorkspaceWindow: React.FC<{ isOwner: boolean, isOfferExist: boo
                     })
                 }
             </ul>}
-            {deadline && <LeftTimeWorkspace timeLeft={timeLeft}/>}
+            {offer?.status === "ACCEPTED" && deadline && <LeftTimeWorkspace timeLeft={timeLeft}/>}
         </div>
     }
 

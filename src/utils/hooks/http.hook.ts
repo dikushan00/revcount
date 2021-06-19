@@ -7,43 +7,32 @@ export const useHttp = () => {
     const [loading, setLoading] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
 
-    let defaultHeaders: any
-    if (!process.browser ) {
-        debugger
-    } else
-        defaultHeaders = {
+    const request = React.useCallback(async <T extends any>(url: string, method: MethodsNamesType = "get",
+                                                            body: {} = {},
+                                                            headers = {}) => {
+        setLoading(true)
+
+        let defaultHeaders = {
             "Authorization": "Bearer " + localStorage.getItem("token")
         }
-
-    const makeRequest = (instance: any) => {
-
-        return React.useCallback(async <T extends any>(url: string, method: MethodsNamesType = "get",
-                                                       body: {} = {},
-                                                       headers = {}) => {
-
-            setLoading(true)
-            try {
+        try {
+            //@ts-ignore
+            const response = await instance[method](url, body, {...headers, ...defaultHeaders})
+            const data: T = await response.data
+            if (!response.data) {
                 //@ts-ignore
-                const response = await instance[method](url, body, {...headers, ...defaultHeaders})
-                const data: T = await response.data
-                if (!response.data) {
-                    //@ts-ignore
-                    throw new Error(data.message || "Что-то пошло не так")
-                }
-                setLoading(false)
-                return data
-            } catch (e) {
-                setLoading(false)
-                setError(e.message)
-                // throw e
+                throw new Error(data.message || "Что-то пошло не так")
             }
-        }, [])
-    }
-
-    const request = makeRequest(instance)
-    const authRequest = makeRequest(loginInstance)
+            setLoading(false)
+            return data
+        } catch (e) {
+            setLoading(false)
+            setError(e.message)
+            // throw e
+        }
+    }, [])
 
     const clearError = () => setError(null)
 
-    return {loading, request, authRequest, error, clearError}
+    return {loading, request, error, clearError}
 }
