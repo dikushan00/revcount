@@ -7,9 +7,8 @@ import {Toast, useToast} from "../components/common/blocks/Toast";
 import {AuthHeader} from "../components/auth/AuthHeader";
 import {AuthImg} from "../components/auth/AuthImg";
 import {SocialNetworksSignUp} from "../components/auth/SocialNetworksSignUp";
-import {actionsAuth} from "../src/redux/auth-reducer";
 import {useRouter} from "next/router";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {SignUpButton} from "../components/styled/buttons/Buttons";
 import {
     BreadCrumbs,
@@ -26,8 +25,8 @@ import {
     SignUpSection,
     SignUpTitle
 } from "../components/styled/signUp/components";
-import {getIsAuth} from "../src/redux/auth-selector";
 import {Layout} from "../components/layouts/Layout";
+import {actionsAuth} from "../src/redux/auth-reducer";
 
 export default function Login() {
     const {register, errors, handleSubmit} = useForm()
@@ -36,13 +35,10 @@ export default function Login() {
     const dispatch = useDispatch()
     const {request, error, loading, clearError} = useHttp()
 
-    const isAuth = useSelector(getIsAuth)
-
     const onSubmit = async (data: { first_name: string, username: string, password: string }) => {
+        let response = await request<{token: string}>("users/token", "post", data, null, false)
 
-        let response = await request<{token: string}>("users/token", "post", data)
-        if(response) {
-            router.push("/")
+        if (response && response?.token) {
             dispatch(actionsAuth.setNewAuth(response.token, null))
             localStorage.setItem("token", response.token)
         }
@@ -50,16 +46,13 @@ export default function Login() {
 
     React.useEffect(() => {
         error && show(error)
-
         return () => clearError()
     }, [error])
 
-    if(isAuth) router.push("/")
-
     return <Layout layoutId={2} title={"Login"}>
-        <AuthHeader />
+        <AuthHeader/>
         <SignUpSection>
-            <Container >
+            <Container>
                 <BreadCrumbs>
                     <BreadCrumbsList>
                         <li>
@@ -71,29 +64,32 @@ export default function Login() {
                     </BreadCrumbsList>
                 </BreadCrumbs>
                 <SignUpContent>
-                    <SignUpForm onSubmit={handleSubmit(onSubmit)}>
+                    <SignUpForm action = "" onSubmit={handleSubmit(onSubmit)}>
                         <SignUpTitle className="signup__title">
                             Login
                         </SignUpTitle>
                         <SignUpDesc>
-                            Don't&nbsp; have an&nbsp; account yet?&nbsp; —  <Link href="/"><a className="signup__link">Sign Up</a></Link>
+                            Don't&nbsp; have an&nbsp; account yet?&nbsp; — <Link href="/"><a className="signup__link">Sign
+                            Up</a></Link>
                         </SignUpDesc>
                         <SignUpLine>
                             <SignUpInput ref={register} required={true} name="username"
-                                   placeholder="Your name" type="text"/>
+                                         placeholder="Your name" type="text"/>
                             {
                                 errors.name && <ValidationError/>
                             }
                         </SignUpLine>
                         <SignUpLine>
-                            <SignUpInput ref={register} required={true} name="password" placeholder="Password" type="password"/>
+                            <SignUpInput ref={register} required={true} name="password" placeholder="Password"
+                                         type="password"/>
                         </SignUpLine>
                         <SignUpBlock>
-                            <SignUpButton disabled={loading} type="submit" className="signup__btn btn">Login</SignUpButton>
-                            <SocialNetworksSignUp />
+                            <SignUpButton disabled={loading} type="submit"
+                                          className="signup__btn btn">Login</SignUpButton>
+                            <SocialNetworksSignUp/>
                         </SignUpBlock>
                     </SignUpForm>
-                    <AuthImg />
+                    <AuthImg/>
                 </SignUpContent>
             </Container>
         </SignUpSection>

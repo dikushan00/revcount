@@ -4,13 +4,12 @@ import {EditType, ProjectType, StatusesNamesType} from "../../src/types/projectT
 import {ProjectStatsInfo} from "../../components/projects/ProjectStatsInfo";
 import {useDispatch, useSelector} from "react-redux";
 import {actionsProjects, getProjectUsers} from "../../src/redux/projects-reducer";
-import {Edit} from "../../components/projects/edits/Edit";
 import {useRouter} from "next/router";
-import {getActiveEdit, getActiveProject} from "../../src/redux/projects-selector";
-import {useHttp} from "../../src/utils/hooks/http.hook";
+import {getActiveProject} from "../../src/redux/projects-selector";
 import {MyCorrectionsButton, ProjectsButton} from "../../components/styled/buttons/Buttons";
 import {
-    MyCorrections, MyCorrectionsAction,
+    MyCorrections,
+    MyCorrectionsAction,
     MyCorrectionsBox,
     MyCorrectionsDesc,
     MyCorrectionsEdit,
@@ -21,34 +20,40 @@ import {
     ProjectsHeader
 } from "../../components/styled/projects/components";
 import {Layout} from "../../components/layouts/Layout";
+import {AppStateType} from "../../src/redux/store-redux";
+import {ProjectAPI} from "../../src/api/ProjectAPI";
 
 const Project: React.FC<{ project: ProjectType }> = () => {
     const dispatch = useDispatch()
     const router = useRouter()
-    const {request} = useHttp()
     const {projectId} = router.query
 
     const project = useSelector(getActiveProject)
-    const activeEdit = useSelector(getActiveEdit)
-
-    const [revisions, setRevisions] = React.useState<EditType[] | null>(null)
+    const revisions = useSelector((state: AppStateType) => state.projects.revisions)
 
     React.useEffect(() => {
         if (projectId) {
-            const getData = async () => {
-                let project = await request<ProjectType>(`projects/${+projectId}`)
-                if (project) {
-                    dispatch(actionsProjects.setActiveProject({...project, role: {id: 1, name: "Owner"}}))
+            project?.project_id !== +projectId && ProjectAPI.getProject(+projectId).then(response => {
+                if (response) {
+                    dispatch(actionsProjects.setActiveProject({...response, role: {id: 1, name: "Owner"}}))
                 }
-                let revisions = await request<EditType[]>(`projects/${projectId}/revisions`)
-                if (revisions) {
-                    setRevisions(revisions)
-                    // dispatch(actionsProjects.addRevisionsToProject(revisions, +projectId))
-                }
-            }
-            getData()
+            }).catch(e => {
+                console.log(e)
+            })
         }
-    }, [projectId])
+    }, [projectId, project])
+
+    React.useEffect(() => {
+        if (projectId && revisions.revisionsList.length === 0 && revisions.projectId !== +projectId) {
+            ProjectAPI.getRevisions(+projectId).then(response => {
+                if (response) {
+                    dispatch(actionsProjects.setRevisions(+projectId, response))
+                }
+            }).catch(e => {
+                console.log(e)
+            })
+        }
+    }, [projectId, revisions])
 
     React.useEffect(() => {
         project && !project.users && dispatch(getProjectUsers(+project.project_id))
@@ -56,65 +61,56 @@ const Project: React.FC<{ project: ProjectType }> = () => {
 
     React.useEffect(() => {
         project && dispatch(actionsProjects.setActiveProject(project))
-
-        return () => {
-            dispatch(actionsProjects.setActiveProject(null))
-        }
     }, [project])
 
-    const handleDisableEditMode = () => dispatch(actionsProjects.setActiveEdit(null))
     const setEditMode = (edit: EditType | null) => {
-        dispatch(actionsProjects.setActiveEdit(edit))
+        router.push(`${projectId}/revisions/${edit?.revision_id}`)
     }
 
     return <Layout title={"Project"}>
-        {
-            activeEdit
-                ? <Edit closePage={handleDisableEditMode} edit={activeEdit}/>
-                : <>
-                    <div className="projects">
-                        <ProjectsHeader>
-                            {project?.role?.name === "Owner" && <AddCorrectionLink projectId={projectId as string}/>}
-                            <ProjectStatsInfo project={project}/>
-                        </ProjectsHeader>
-                    </div>
-                    <MyCorrections>
-                        <MyCorrectionsTitle>
-                            My corrections
-                        </MyCorrectionsTitle>
-                    </MyCorrections>
-                    <MyCorrectionsList>
-                        {
-                            revisions?.map(edit => {
-                                const statusImgPath = getStatusImg(edit.status)
-                                return <MyCorrectionsItem key={edit.revision_id}>
-                                    <MyCorrectionsEdit onClick={() => setEditMode(edit)}>
-                                        <span/>{edit.name}
-                                    </MyCorrectionsEdit>
-                                    <MyCorrectionsBox>
-                                        <MyCorrectionsIcon>
-                                            <picture>
-                                                <source srcSet={statusImgPath} type="image/webp"/>
-                                                <img src={statusImgPath} alt="loading"/>
-                                            </picture>
-                                        </MyCorrectionsIcon>
-                                        <MyCorrectionsAction>
-                                            {edit.status}
-                                        </MyCorrectionsAction>
-                                    </MyCorrectionsBox>
-                                    <MyCorrectionsDesc>
-                                        {edit.next_action || edit.description}
-                                    </MyCorrectionsDesc>
-                                    <MyCorrectionsButton className="my-corrections__btn btn-2"
-                                                         onClick={() => setEditMode(edit)}>see
-                                        Detail
-                                    </MyCorrectionsButton>
-                                </MyCorrectionsItem>
-                            })
-                        }
-                    </MyCorrectionsList>
-                </>
-        }
+        <>
+            <div className="projects">
+                <ProjectsHeader>
+                    {project?.role?.name === "Owner" && <AddCorrectionLink projectId={projectId as string}/>}
+                    <ProjectStatsInfo project={project}/>
+                </ProjectsHeader>
+            </div>
+            <MyCorrections>
+                <MyCorrectionsTitle>
+                    My corrections
+                </MyCorrectionsTitle>
+            </MyCorrections>
+            <MyCorrectionsList>
+                {
+                    revisions?.revisionsList?.map(edit => {
+                        const statusImgPath = getStatusImg(edit.status)
+                        return <MyCorrectionsItem key={edit.revision_id}>
+                            <MyCorrectionsEdit onClick={() => setEditMode(edit)}>
+                                <span/>{edit.name}
+                            </MyCorrectionsEdit>
+                            <MyCorrectionsBox>
+                                <MyCorrectionsIcon>
+                                    <picture>
+                                        <source srcSet={statusImgPath} type="image/webp"/>
+                                        <img src={statusImgPath} alt="loading"/>
+                                    </picture>
+                                </MyCorrectionsIcon>
+                                <MyCorrectionsAction>
+                                    {edit.status}
+                                </MyCorrectionsAction>
+                            </MyCorrectionsBox>
+                            <MyCorrectionsDesc>
+                                {edit.next_action || edit.description}
+                            </MyCorrectionsDesc>
+                            <MyCorrectionsButton className="my-corrections__btn btn-2"
+                                                 onClick={() => setEditMode(edit)}>see
+                                Detail
+                            </MyCorrectionsButton>
+                        </MyCorrectionsItem>
+                    })
+                }
+            </MyCorrectionsList>
+        </>
     </Layout>
 
 }

@@ -6,17 +6,18 @@ import {ValidationError} from "../../common/form/ValidationError";
 import {useDispatch} from "react-redux";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
 import {Toast, useToast} from "../../common/blocks/Toast";
-import {useHttp} from "../../../src/utils/hooks/http.hook";
-import {ProjectType} from "../../../src/types/projectTypes";
 import {
     PopupButton,
     PopupClose,
     PopupDesc,
     PopupForm,
-    PopupIcon, PopupInput, PopupInputDate,
+    PopupIcon,
+    PopupInput,
+    PopupInputDate,
     PopupItem,
     PopupTitle
 } from "../../styled/modals/components";
+import {ProjectAPI} from "../../../src/api/ProjectAPI";
 
 type PropsType = {
     hideBlock: () => void
@@ -26,25 +27,30 @@ export const JoinProjectModal: React.FC<PropsType> = ({hideBlock}) => {
     const dispatch = useDispatch()
     const {handleSubmit, register, errors} = useForm()
     const {show} = useToast()
-    const {clearError, request, error, loading} = useHttp()
     const joinProjectRef = React.useRef(null)
+
+    const [error, setError] = React.useState("")
 
     useOutsideAlerter(joinProjectRef, hideBlock)
 
     const onSubmit = async (data: { projectId: number, username: string, hoursRate: number }) => {
-        let response = data.projectId && await request<ProjectType>(`projects/${data.projectId}/users`, "post", {
+
+        ProjectAPI.joinToProject(data.projectId, {
             username: data.username,
             hoursRate: data.hoursRate
+        }).then (response => {
+            if (response) {
+                dispatch(actionsProjects.addProject(response))
+                hideBlock()
+            }
+        }).catch(e =>{
+            setError(e.message)
         })
-        if (response) {
-            dispatch(actionsProjects.addProject(response))
-            hideBlock()
-        }
     }
 
     React.useEffect(() => {
         error && show(error)
-        return () => clearError()
+        return () => setError("")
     }, [error])
 
     return <CustomPopup className={"popup__join"} modalBodyRef={joinProjectRef}>
@@ -79,7 +85,7 @@ export const JoinProjectModal: React.FC<PropsType> = ({hideBlock}) => {
             <PopupDesc className="popup__descr">
                 Set the cost of one hour of your work in dollars
             </PopupDesc>
-            <PopupButton disabled={loading} type="submit">Join the project</PopupButton>
+            <PopupButton type="submit">Join the project</PopupButton>
         </PopupForm>
         <Toast/>
     </CustomPopup>

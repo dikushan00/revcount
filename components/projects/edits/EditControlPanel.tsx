@@ -1,15 +1,13 @@
 import React from 'react';
 import {EditType, ProjectType, StatusesNamesType} from "../../../src/types/projectTypes";
 import {MakePaymentModal} from "../modals/MakePaymentModal";
-import {useDispatch} from "react-redux";
 import {useRouter} from "next/router";
-import {ValidOfferType} from "./Edit";
-import {useHttp} from "../../../src/utils/hooks/http.hook";
 import {Toast, useToast} from "../../common/blocks/Toast";
 import {
     BlueEditButton,
     CompleteButton,
-    OfferEditsAcceptButton, OfferEditsDeclineButton,
+    OfferEditsAcceptButton,
+    OfferEditsDeclineButton,
     PanelEditsButton
 } from "../../styled/buttons/revisionButtons/RevisionsButtons";
 import {
@@ -17,12 +15,16 @@ import {
     ControlEditsHeader,
     ControlEditsLabel,
     EditsLabel,
-    OfferEdits, OfferEditsBlock,
+    OfferEdits,
+    OfferEditsBlock,
     OfferEditsForm,
-    OfferEditsHeader, OfferEditsReserveBtn,
+    OfferEditsHeader,
+    OfferEditsReserveBtn,
     PanelEdits,
     PanelEditsItem
 } from "../../styled/edit/components";
+import {ValidOfferType} from "../../../pages/projects/[projectId]/revisions/[revisionId]";
+import {ProjectAPI} from "../../../src/api/ProjectAPI";
 
 type PropsType = { offer: ValidOfferType | null, edit: EditType | null, project: ProjectType | null, closePage: () => void }
 
@@ -32,51 +34,36 @@ export const EditControlPanel: React.FC<PropsType> = ({
                                                           edit,
                                                           project
                                                       }) => {
-    const dispatch = useDispatch()
     const router = useRouter()
     const {show} = useToast()
-    const {request, error, clearError} = useHttp()
     const [isPaymentModalShowMode, setIsPaymentModalShowMode] = React.useState(false)
-
-    const changeStatus = (status: StatusesNamesType) => {
-        let edits = project?.revisions
-        let editId = edit?.revision_id
-
-        if (edits && editId) {
-            edits = edits.map(item => {
-                if (item.revision_id === editId) {
-                    return {
-                        ...item,
-                        description: "",
-                        status: status
-                    }
-                }
-                return item
-            })
-        }
-
-        return edits || []
-    }
+    const [error, setError] = React.useState("")
 
     const handleReserveMoney = async () => {
         // let changedStatusEdits: EditType[] = changeStatus("Performing")
+        project?.project_id && ProjectAPI.reserveMoney(project.project_id, {}).then(response => {
+            if(response) {
+                router.push("/projects/" + project?.project_id)
+                closePage()
+                setIsPaymentModalShowMode(false)
+            }
+        }).then(e => {
+            console.log(e)
+        })
 
-        let response = await request(`projects/${project?.project_id}/reserve`, "post")
-        if(response) {
-            router.push("/projects/" + project?.project_id)
-            closePage()
-            setIsPaymentModalShowMode(false)
-        }
     }
     const handleAcceptOffer = async () => {
         // let changedStatusEdits: EditType[] = changeStatus("Performing")
 
-        let response = await request(`projects/${project?.project_id}/accept_offer`, "post")
-        if(response) {
-            router.push("/projects/" + project?.project_id)
-            closePage()
-            setIsPaymentModalShowMode(false)
-        }
+        project?.project_id && ProjectAPI.acceptOffer(project.project_id, {}).then(response => {
+            if(response) {
+                router.push("/projects/" + project?.project_id)
+                closePage()
+                setIsPaymentModalShowMode(false)
+            }
+        }).then(e => {
+            console.log(e)
+        })
     }
     const handleDeclineOffer = () => {
         router.push("/projects/" + project?.project_id)
@@ -85,19 +72,22 @@ export const EditControlPanel: React.FC<PropsType> = ({
     const handleCompleteProject = async () => {
         // let changedStatusEdits: EditType[] = changeStatus("Performing")
 
-        let response = await request(`projects/${project?.project_id}/complete_project`, "post")
-        if(response) {
-            router.push("/projects/" + project?.project_id)
-            closePage()
-            setIsPaymentModalShowMode(false)
-        }
+        project?.project_id && ProjectAPI.completeProject(project.project_id, {}).then(response => {
+            if(response) {
+                router.push("/projects/" + project?.project_id)
+                closePage()
+                setIsPaymentModalShowMode(false)
+            }
+        }).catch(e => {
+            console.log(e)
+        })
     }
 
     const enablePaymentMode = () => setIsPaymentModalShowMode(true)
 
     React.useEffect(() => {
         error && show(error)
-        return () => clearError()
+        return () => setError("")
     }, [error])
 
     return <>

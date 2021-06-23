@@ -30,6 +30,9 @@ import {
 } from "../components/styled/signUp/components";
 import {getIsAuth} from "../src/redux/auth-selector";
 import {Layout} from "../components/layouts/Layout";
+import {Simulate} from "react-dom/test-utils";
+
+type SignUpResponseType = { "user_id": number, username: string, error: any, first_name: string, token: string }
 
 export default function SignUp() {
     const {register, errors, handleSubmit} = useForm()
@@ -48,7 +51,7 @@ export default function SignUp() {
             return
         }
 
-        let response = await request<{ "user_id": number, username: string, error: any, first_name: string, token: string }>("users/register", "post", data)
+        let response = await request<SignUpResponseType>("users/register", "post", data, null, false)
         if (response) {
             router.push("/")
             dispatch(actionsAuth.setNewAuth(response.token, null, response.user_id))

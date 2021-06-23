@@ -7,10 +7,10 @@ import {AppStateType} from "../../../src/redux/store-redux";
 import {copyTextToClipboard} from "../../../src/utils/copyToClipboard";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
 import {Toast, useToast} from "../../common/blocks/Toast";
-import {useHttp} from "../../../src/utils/hooks/http.hook";
-import {ProjectType} from "../../../src/types/projectTypes";
 import {
-    PopupActions, PopupActionsItem, PopupActionsLink,
+    PopupActions,
+    PopupActionsItem,
+    PopupActionsLink,
     PopupClose,
     PopupForm,
     PopupProfession,
@@ -18,6 +18,7 @@ import {
     PopupTabsLine,
     PopupTitle
 } from "../../styled/modals/components";
+import {ProjectAPI} from "../../../src/api/ProjectAPI";
 
 type PropsType = {
     hideBlock: () => void
@@ -26,23 +27,26 @@ type PropsType = {
 export const TeamSettingsModal: React.FC<PropsType> = ({hideBlock, users}) => {
     const dispatch = useDispatch()
     const {show} = useToast()
-    const {clearError, request, error} = useHttp()
-    const project = useSelector((state: AppStateType) => state.projects.activeProject)
+
+    const projectId = useSelector((state: AppStateType) => state.projects.activeProject?.project_id)
+    const [error, setError] = React.useState("")
 
     const changeUsersRole = async (userId: number, roleId: number) => {
         let role = userRoleSelections.find(item => item.id === roleId)
 
-        let response = project?.project_id && role &&
-            await request<ProjectType>(`projects/${project?.project_id}/user/${userId}`, "post", {role: role.name})
-        if (response) {
-            dispatch(actionsProjects.setActiveProject(response))
-            hideBlock()
-        }
+        projectId && role && ProjectAPI.changeProjectUsersRole(+projectId, {role: role.name}).then(response => {
+            if (response) {
+                dispatch(actionsProjects.setActiveProject(response))
+                hideBlock()
+            }
+        }).catch(e => {
+            setError(e.message)
+        })
     }
 
     React.useEffect(() => {
         error && show(error)
-        return () => clearError()
+        return () => setError("")
     }, [error])
 
     return <CustomPopup className={"popup__team"}>

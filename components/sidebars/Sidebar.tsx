@@ -1,15 +1,15 @@
 import React from "react"
 import Link from 'next/link'
 import {CreateNewProjectModal} from "../projects/addProject/CreateNewProjectModal";
-import {InviteStatusType, ProjectType} from "../../src/types/projectTypes";
+import {ProjectType} from "../../src/types/projectTypes";
 import {useDispatch, useSelector} from "react-redux";
 import {AppStateType} from "../../src/redux/store-redux";
 import {actionsProjects} from "../../src/redux/projects-reducer";
 import {AcceptInvitationModal} from "../projects/modals/AcceptInvitationModal";
 import {getInvitations, getUserId} from "../../src/redux/projects-selector";
-import {useHttp} from "../../src/utils/hooks/http.hook";
 import {
-    SideBarAcceptButton, SideBarBlockAddButton,
+    SideBarAcceptButton,
+    SideBarBlockAddButton,
     SideBarBlockButton,
     SideBarButton,
     SideBarDeclineButton,
@@ -17,12 +17,16 @@ import {
 } from "../styled/buttons/Buttons";
 import {
     SidebarActions,
-    SidebarAside, SidebarBlockInvitation, SidebarBlockItem,
-    SidebarContent, SidebarFooter,
+    SidebarAside,
+    SidebarBlockInvitation,
+    SidebarBlockItem,
+    SidebarContent,
+    SidebarFooter,
     SidebarHeader,
     SidebarLogo,
     SidebarLogoLink
 } from "../styled/sidebar/components";
+import {ProjectAPI} from "../../src/api/ProjectAPI";
 
 type ActionNamesType = "projects" | "invitations"
 
@@ -99,26 +103,32 @@ export type AcceptProjectUserType = { invitationId: number, name: string, hoursR
 
 const InvitationProjects: React.FC<InvitationProjectsPropsType> = () => {
     const dispatch = useDispatch()
-    const {request, loading} = useHttp()
 
     const [acceptProjectId, setAcceptProjectId] = React.useState<number | null>(null)
     const invitations = useSelector(getInvitations)
     const userId = useSelector(getUserId)
 
     const handleAcceptProject = async (data: AcceptProjectUserType) => {
-        let response = await request(`users/${userId}/invitations/${data.invitationId}`, "patch", {status: "ACCEPTED" as InviteStatusType})
-        if (response) {
-            setAcceptProjectId(null)
-            dispatch(actionsProjects.acceptProject(data.invitationId))
-        }
+        userId && ProjectAPI.acceptProject(+userId, +data.invitationId).then(response => {
+            if (response) {
+                setAcceptProjectId(null)
+                dispatch(actionsProjects.acceptProject(data.invitationId))
+            }
+        }).catch(e => {
+            console.log(e)
+        })
+
     }
 
     const handleDeclineProject = async (invitationId: number) => {
-        let response = await request(`users/${userId}/invitations/${invitationId}`, "patch", {status: "DECLINED" as InviteStatusType})
-        if (response) {
-            setAcceptProjectId(null)
-            dispatch(actionsProjects.acceptProject(invitationId))
-        }
+        userId && ProjectAPI.declineProject(+userId, +invitationId).then(response => {
+            if (response) {
+                setAcceptProjectId(null)
+                dispatch(actionsProjects.declineProject(invitationId))
+            }
+        }).catch(e => {
+            console.log(e)
+        })
     }
 
     return <>
@@ -130,9 +140,9 @@ const InvitationProjects: React.FC<InvitationProjectsPropsType> = () => {
                             <span/> {item.project_name}
                         </SideBarBlockButton>
                         <div className="block-sidebar__body">
-                            <SideBarAcceptButton disabled={loading} onClick={() => setAcceptProjectId(item.invitation_id)}>Accept
+                            <SideBarAcceptButton onClick={() => setAcceptProjectId(item.invitation_id)}>Accept
                             </SideBarAcceptButton>
-                            <SideBarDeclineButton disabled={loading} onClick={() => handleDeclineProject(item.invitation_id)}>Decline
+                            <SideBarDeclineButton onClick={() => handleDeclineProject(item.invitation_id)}>Decline
                             </SideBarDeclineButton>
                         </div>
                     </SidebarBlockItem>
@@ -151,12 +161,14 @@ const Projects: React.FC<{ projects: ProjectType[] | null, handleAddNewProject: 
                                                                                                      handleAddNewProject,
                                                                                                      projects
                                                                                                  }) => {
+    const activeProject = useSelector((state: AppStateType) => state.projects.activeProject)
     return <ul className="sidebar__block block-sidebar">
         {
             projects?.map((item, index) => {
                 return <Link key={item.project_id} href={"/projects/" + item.project_id}>
                     <SidebarBlockItem className="block-sidebar__item">
-                        <SideBarBlockButton>
+                        {/*@ts-ignore*/}
+                        <SideBarBlockButton isActive = {activeProject?.project_id === item.project_id}>
                             <span/> {item.name}
                         </SideBarBlockButton>
                     </SidebarBlockItem>

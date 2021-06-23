@@ -3,19 +3,25 @@ import {EditType, InviteProjectType, OfferType, ProjectType, StatusType} from ".
 import {TaskTypeWithFlag} from "../../components/projects/edits/EditTasksPanel";
 import {RoleType, UserType} from "../types/userTypes";
 import {ProjectAPI} from "../api/ProjectAPI";
-import {act} from "react-dom/test-utils";
 
-const defaultTaskObj = [{
+export const defaultTaskObj = [{
     id: 1,
     description: "",
     name: "",
-    isEdit: false,
+    isEdit: true,
     files: []
 }] as TaskTypeWithFlag[]
 
 const initialState = {
     projects: null as ProjectType[] | null,
     invitations: null as InviteProjectType[] | null,
+    tasks: defaultTaskObj,
+    revisions: {
+        projectId: null as number | null,
+        revisionsList: [] as EditType[]
+    },
+    activeEdit: null as EditType | null,
+    activeProject: null as ProjectType | null,
     statuses: [
         {
             "id": 1,
@@ -38,9 +44,6 @@ const initialState = {
             "key": "editing"
         }
     ] as StatusType[] | null, //you can make an endpoint to get statuses
-    tasks: defaultTaskObj,
-    activeEdit: null as EditType | null,
-    activeProject: null as ProjectType | null
 };
 
 type ProjectsInitialStateType = typeof initialState;
@@ -133,6 +136,7 @@ export const projects_reducer = (
             })
             return {
                 ...state,
+                revisions: action.projectId === state.revisions.projectId ?  {...state.revisions, revisionsList: [...state.revisions.revisionsList, action.edit]} : state.revisions ,
                 activeProject: state.activeProject &&
                     {
                         ...state.activeProject,
@@ -169,6 +173,15 @@ export const projects_reducer = (
                 },
             };
         }
+        case "REVCOUNT/PROJECTS/SET_REVISIONS": {
+            return {
+                ...state,
+                revisions: {
+                    projectId: action.projectId,
+                    revisionsList: action.revisions || []
+                },
+            };
+        }
         case "REVCOUNT/PROJECTS/SET_TASKS": {
             return {
                 ...state,
@@ -184,7 +197,7 @@ export const projects_reducer = (
             }
             return {
                 ...state,
-                tasks: [...state.tasks, {id, name: "", isEdit: false, files: [], description: ""}],
+                tasks: [...state.tasks, {id, name: "", isEdit: true, files: [], description: ""}],
             };
         }
         case "REVCOUNT/PROJECTS/ENABLE_EDIT_MODE_TO_TASK": {
@@ -251,6 +264,8 @@ export const actionsProjects = {
         ({type: "REVCOUNT/PROJECTS/ADD_EDIT_TO_PROJECT", edit, projectId} as const),
     setInvitations: (invitations: InviteProjectType[]) =>
         ({type: "REVCOUNT/PROJECTS/SET_INVITATIONS", invitations} as const),
+    setRevisions: (projectId: number | null, revisions: EditType[] | null) =>
+        ({type: "REVCOUNT/PROJECTS/SET_REVISIONS", projectId, revisions} as const),
     setTasks: (tasks: TaskTypeWithFlag[] | null) =>
         ({type: "REVCOUNT/PROJECTS/SET_TASKS", tasks} as const),
     setProjectUsers: (users: UserType[]) =>

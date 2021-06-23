@@ -36,7 +36,7 @@ export const EditTasksList: React.FC<PropsType> = ({register, tasks, enableEditM
                     </TaskEditsTop>
                     <TaskEditsBody className="task-edits__body">
                         <TaskEditsTextarea ref={register} name={"description_" + task.id}
-                                           placeholder="Describe the task clearly..." defaultValue={""}/>
+                                           placeholder="Describe the task clearly..." defaultValue={task?.description || ""}/>
                     </TaskEditsBody>
                 </TaskEditsItem>
             })
@@ -51,7 +51,7 @@ const EditBox: React.FC<{ taskId: number, registerRef: any }> = ({taskId, regist
                 <TaskEditsFile ref={registerRef} type="file" name={"file1_" + taskId} id="input__file" multiple/>
                 <label htmlFor="input__file" className="task-edits__file-button">
                     <TaskEditsFileIcon>
-                      <ImgWrapper path={"/img/edit/link.svg"}/>
+                        <ImgWrapper path={"/img/edit/link.svg"}/>
                     </TaskEditsFileIcon>
                 </label>
             </TaskEditsWrapper>
@@ -66,9 +66,9 @@ const EditBox: React.FC<{ taskId: number, registerRef: any }> = ({taskId, regist
             <div className="task-edits__wrapper">
                 <TaskEditsFile ref={registerRef} type="file" name={"file3_" + taskId} id="input__file" multiple/>
                 <label htmlFor="input__file" className="task-edits__file-button">
-                        <TaskEditsFileIcon>
-                            <ImgWrapper path={"/img/edit/movie.svg"}/>
-                        </TaskEditsFileIcon>
+                    <TaskEditsFileIcon>
+                        <ImgWrapper path={"/img/edit/movie.svg"}/>
+                    </TaskEditsFileIcon>
                 </label>
             </div>
         </TaskEditsWrap>

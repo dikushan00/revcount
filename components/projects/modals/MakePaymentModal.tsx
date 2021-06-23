@@ -4,7 +4,6 @@ import {AppStateType} from "../../../src/redux/store-redux";
 import {CustomPopup} from "../../common/blocks/CustomPopup";
 import {useForm} from "react-hook-form";
 import {useOutsideAlerter} from "../../../src/utils/hooks/outsideClick";
-import {ValidOfferType} from "../edits/Edit";
 import {
     PopupBlock,
     PopupBox,
@@ -18,6 +17,7 @@ import {
     PopupTitle
 } from "../../styled/modals/components";
 import {ImgWrapper} from "../../common/blocks/ImgWrapper";
+import {ValidOfferType} from "../../../pages/projects/[projectId]/revisions/[revisionId]";
 
 export const MakePaymentModal: React.FC<{ hideBlock: () => void, handleReserveMoney: () => void, offer: ValidOfferType | null }>
     = ({handleReserveMoney, offer, hideBlock}) => {

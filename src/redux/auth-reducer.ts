@@ -7,7 +7,7 @@ const initialState = {
     isAuth: false as boolean,
     token: null as string | null,
     roles: null as RoleType | null,
-    userId: 1 as number | null,
+    userId: null as number | null,
     isFetching: false
 }
 
@@ -64,11 +64,11 @@ export const checkAuthMe = (): GetThunkType => async (dispatch) => {
         dispatch(actionsAuth.setIsFetching(true))
         let response = await AuthAPI.checkAuth()
         if (response && response.user_id) {
-            dispatch(actionsAuth.setIsFetching(false))
             let token = localStorage.getItem("token")
             token && dispatch(actionsAuth.setNewAuth(token, null, response.user_id))
             //@ts-ignore
             dispatch(actionsProfile.setProfile(response))
+            dispatch(actionsAuth.setIsFetching(false))
         }
     } catch (e) {
         dispatch(actionsAuth.setIsFetching(false))

@@ -4,36 +4,38 @@ import {useOutsideAlerter} from '../../../src/utils/hooks/outsideClick';
 import {useForm} from "react-hook-form";
 import {RemoveItemIcon} from "../members/AddMemberToProjectModal";
 import {useDispatch, useSelector} from "react-redux";
-import {ProjectAPI} from "../../../src/api/ProjectAPI";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
-import {ProjectPostType, ProjectType} from "../../../src/types/projectTypes";
+import {ProjectPostType} from "../../../src/types/projectTypes";
 import {getUserId} from "../../../src/redux/projects-selector";
 import {InputIdDivButton} from "../../styled/buttons/popup/PopupButtons";
 import {
     InputTag,
-    PopupClose, PopupDesc,
+    PopupClose,
+    PopupDesc,
     PopupForm,
     PopupIcon,
     PopupInput,
-    PopupInputDate, PopupInputId,
+    PopupInputDate,
+    PopupInputId,
     PopupItem,
     PopupTitle
 } from "../../styled/modals/components";
-import {useHttp} from "../../../src/utils/hooks/http.hook";
-import {UserType} from "../../../src/types/userTypes";
+import {Toast, useToast} from "../../common/blocks/Toast";
+import {ProjectAPI} from "../../../src/api/ProjectAPI";
 
 type PropsType = {
     hideBlock: () => void
 }
 export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
 
+    const {show} = useToast()
     const dispatch = useDispatch()
     const {handleSubmit, register, watch} = useForm()
     const addProjectRef = React.useRef(null)
-    const {clearError, request, error, loading} = useHttp()
 
     const [isInputDateMode, setIsInputDateMode] = React.useState(false)
     const [addedIds, setAddedIds] = React.useState([] as string[])
+    const [error, setError] = React.useState("")
 
     const userId = useSelector(getUserId)
 
@@ -55,13 +57,22 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
             invitations,
         } as ProjectPostType
 
-        let response = userId && await request<ProjectType>(`users/${userId}/projects`, "post", project)
-        if (response) {
-            dispatch(actionsProjects.addProject(response))
-            dispatch(actionsProjects.setActiveProject(response))
-            hideBlock()
-        }
+        userId && ProjectAPI.createProject(project, +userId).then(response => {
+            if (response) {
+                dispatch(actionsProjects.addProject(response))
+                dispatch(actionsProjects.setActiveProject(response))
+                hideBlock()
+            }
+        }).catch(e => {
+            setError(e.message)
+            console.log(e)
+        })
     }
+
+    React.useEffect(() => {
+        error && show(error)
+        return () => setError("")
+    }, [error])
 
     return <CustomPopup className={"popup__create"} modalBodyRef={addProjectRef}>
         <PopupClose onClick={handleCloseModal}/>
@@ -133,7 +144,6 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
             }}>Create a project
             </InputIdDivButton>
         </PopupForm>
+        <Toast />
     </CustomPopup>
-
-
 }

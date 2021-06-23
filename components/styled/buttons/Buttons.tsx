@@ -260,143 +260,143 @@ export const SignUpButton = styled(Btn)`
 `
 
 export const TeamProjectButton = styled(Btn2)`
-      width: 100%;
-      margin-top: calc(15px + 2 * ((100vw - 320px) / 1600));
-      -webkit-box-pack: center;
-      -ms-flex-pack: center;
-      justify-content: center;
+  width: 100%;
+  margin-top: calc(15px + 2 * ((100vw - 320px) / 1600));
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
 
-      span {
-        margin-left: 4px;
-      }
-    `
+  span {
+    margin-left: 4px;
+  }
+`
 
 export const TeamProjectSettingsButton = styled.button`
-      background-color: transparent;
-      display: -webkit-box;
-      display: -ms-flexbox;
-      display: flex;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
+  background-color: transparent;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
 
-      svg {
-        width: calc(10px + 8 * ((100vw - 320px) / 1600));
-        height: calc(10px + 8 * ((100vw - 320px) / 1600));
-        -webkit-transition: all 0.3s ease 0s;
-        -o-transition: all 0.3s ease 0s;
-        transition: all 0.3s ease 0s;
-      }
+  svg {
+    width: calc(10px + 8 * ((100vw - 320px) / 1600));
+    height: calc(10px + 8 * ((100vw - 320px) / 1600));
+    -webkit-transition: all 0.3s ease 0s;
+    -o-transition: all 0.3s ease 0s;
+    transition: all 0.3s ease 0s;
+  }
 
-      &:hover svg path {
-        fill: #0076ff;
-      }
-    `
+  &:hover svg path {
+    fill: #0076ff;
+  }
+`
 
 export const EditButton = styled(Btn2)``
 export const SideBarButton = styled(Btn3)``
 export const SideBarFooterButton = styled.button`
-      display: -ms-inline-flexbox;
-      display: inline-flex;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-      padding-left: calc(3px + 22 * ((100vw - 320px) / 1600));
-      padding-right: calc(3px + 22 * ((100vw - 320px) / 1600));
-      height: calc(20px + 37 * ((100vw - 320px) / 1600));
-      background: #ebedf5;
-      border-radius: 100px;
-      font-weight: 500;
-      font-size: calc(6px + 8 * ((100vw - 320px) / 1600));
-      line-height: calc(6px + 15 * ((100vw - 320px) / 1600));
-      color: #868594;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  padding-left: calc(3px + 22 * ((100vw - 320px) / 1600));
+  padding-right: calc(3px + 22 * ((100vw - 320px) / 1600));
+  height: calc(20px + 37 * ((100vw - 320px) / 1600));
+  background: #ebedf5;
+  border-radius: 100px;
+  font-weight: 500;
+  font-size: calc(6px + 8 * ((100vw - 320px) / 1600));
+  line-height: calc(6px + 15 * ((100vw - 320px) / 1600));
+  color: #868594;
 
-      svg {
-        width: calc(5px + 5 * ((100vw - 320px) / 1600));
-        margin-left: calc(0px + 10 * ((100vw - 320px) / 1600));
-      }
-    `
+  svg {
+    width: calc(5px + 5 * ((100vw - 320px) / 1600));
+    margin-left: calc(0px + 10 * ((100vw - 320px) / 1600));
+  }
+`
 export const SideBarBlockButton = styled.button`
-      height: calc(30px + 22 * ((100vw - 320px) / 1600));
-      width: 100%;
-      font-size: calc(7px + 9 * ((100vw - 320px) / 1600));
-      line-height: calc(7px + 17 * ((100vw - 320px) / 1600));
-      background: #f3f5f7;
-      display: -ms-inline-flexbox;
-      display: inline-flex;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-      padding-left: 9%;
-      background: #f3f5f7;
+  height: calc(30px + 22 * ((100vw - 320px) / 1600));
+  width: 100%;
+  font-size: calc(7px + 9 * ((100vw - 320px) / 1600));
+  line-height: calc(7px + 17 * ((100vw - 320px) / 1600));
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  padding-left: 9%;
+  //@ts-ignore
+  background: ${(props:{isActive: boolean}) => props?.isActive ? "#f3f5f7" : "inherit"};
 
-      span {
-        width: 3px;
-        height: 3px;
-        border-radius: 50%;
-        background: #f701a5;
-        display: inline-block;
-        margin-right: calc(1px + 9 * ((100vw - 320px) / 1600));
-        position: relative;
-      }
+  span {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #f701a5;
+    display: inline-block;
+    margin-right: calc(1px + 9 * ((100vw - 320px) / 1600));
+    position: relative;
+  }
 
-      span::before,
-      span::after {
-        content: "";
-        position: absolute;
-        width: 3px;
-        height: 3px;
-        border-radius: 50%;
-        background: #f701a5;
-        display: inline-block;
-        -webkit-transition: all 0.3s ease 0s;
-        -o-transition: all 0.3s ease 0s;
-        transition: all 0.3s ease 0s;
-      }
+  span::before,
+  span::after {
+    content: "";
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #f701a5;
+    display: inline-block;
+    -webkit-transition: all 0.3s ease 0s;
+    -o-transition: all 0.3s ease 0s;
+    transition: all 0.3s ease 0s;
+  }
 
-      span::before {
-        top: -5px;
-        left: 0;
-      }
+  span::before {
+    top: -5px;
+    left: 0;
+  }
 
-      span::after {
-        bottom: -5px;
-        left: 0;
-      }
+  span::after {
+    bottom: -5px;
+    left: 0;
+  }
 
-      &:hover span::before {
-        top: 0;
-      }
+  &:hover span::before {
+    top: 0;
+  }
 
-      &:hover span::after {
-        bottom: 0;
-      }
+  &:hover span::after {
+    bottom: 0;
+  }
 
-      &.block-sidebar-open {
-        background-color: transparent;
-      }
+  &.block-sidebar-open {
+    background-color: transparent;
+  }
 
-      &.block-sidebar-open span {
-        width: 6px;
-        height: 6px;
-      }
+  &.block-sidebar-open span {
+    width: 6px;
+    height: 6px;
+  }
 
-      &.block-sidebar-open span::before,
-      &.block-sidebar-open span::after {
-        display: none;
-      }
+  &.block-sidebar-open span::before,
+  &.block-sidebar-open span::after {
+    display: none;
+  }
 
-      &.block-sidebar-open .block-sidebar__body {
-        display: block !important;
-      }
+  &.block-sidebar-open .block-sidebar__body {
+    display: block !important;
+  }
 
 
-      @media screen and (max-width: 1300px) {
-        & {
-          padding-left: 4%;
-        }
-      }
-    `
+  @media screen and (max-width: 1300px) {
+    & {
+      padding-left: 4%;
+    }
+  }
+`
 
 export const BlockSideBarButton = styled.button`
   padding-left: calc(5px + 10 * ((100vw - 320px) / 1600));
@@ -417,31 +417,31 @@ export const BlockSideBarButton = styled.button`
 `
 
 export const SideBarAcceptButton = styled(BlockSideBarButton)`
-      background: #229b68;
-      color: #FFFFFF;
-      margin-right: 5px;
-    `
+  background: #229b68;
+  color: #FFFFFF;
+  margin-right: 5px;
+`
 export const SideBarDeclineButton = styled(BlockSideBarButton)`
-      border: 1px solid #ef6868;
-      background: transparent;
-      color: #EF6868;
-    `
-export const SideBarBlockAddButton= styled.button`
-      width: 100%;
-      font-weight: 500;
-      color: #868594;
-      height: calc(30px + 24 * ((100vw - 320px) / 1600));
-      display: -ms-inline-flexbox;
-      display: inline-flex;
-      -webkit-box-align: center;
-      -ms-flex-align: center;
-      align-items: center;
-      font-size: calc(10px + 6 * ((100vw - 320px) / 1600));
-      line-height: calc(11px + 13 * ((100vw - 320px) / 1600));
-      padding-left: 10%;
-      background-color: transparent;
+  border: 1px solid #ef6868;
+  background: transparent;
+  color: #EF6868;
+`
+export const SideBarBlockAddButton = styled.button`
+  width: 100%;
+  font-weight: 500;
+  color: #868594;
+  height: calc(30px + 24 * ((100vw - 320px) / 1600));
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  font-size: calc(10px + 6 * ((100vw - 320px) / 1600));
+  line-height: calc(11px + 13 * ((100vw - 320px) / 1600));
+  padding-left: 10%;
+  background-color: transparent;
 
-      span {
-        margin-right: 4px;
-      }
-    `
+  span {
+    margin-right: 4px;
+  }
+`

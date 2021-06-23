@@ -1,27 +1,33 @@
 import React from "react";
-import {instance, loginInstance} from "../../api/API";
-import Axios from "axios";
+import {instance} from "../../api/API";
+import {useSelector} from "react-redux";
+import {AppStateType} from "../../redux/store-redux";
 
 type MethodsNamesType = "get" | "post" | "put" | "patch" | "delete"
 export const useHttp = () => {
     const [loading, setLoading] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
+    const token = useSelector((state: AppStateType) => state.auth.token)
 
     const request = React.useCallback(async <T extends any>(url: string, method: MethodsNamesType = "get",
                                                             body: {} = {},
-                                                            headers = {}) => {
+                                                            headers: {} | null = {} , isTokenRequired: boolean = true) => {
+        if(!token && isTokenRequired) {
+            setError("Please refresh the page!")
+            return
+        }
+        let defaultHeaders = {
+            "Authorization": "Bearer " + (token || localStorage.getItem("token"))
+        }
         setLoading(true)
 
-        let defaultHeaders = {
-            "Authorization": "Bearer " + localStorage.getItem("token")
-        }
         try {
             //@ts-ignore
             const response = await instance[method](url, body, {...headers, ...defaultHeaders})
             const data: T = await response.data
             if (!response.data) {
                 //@ts-ignore
-                throw new Error(data.message || "Что-то пошло не так")
+                throw new Error(response?.message && data.message || "Что-то пошло не так")
             }
             setLoading(false)
             return data
@@ -30,7 +36,7 @@ export const useHttp = () => {
             setError(e.message)
             // throw e
         }
-    }, [])
+    }, [token])
 
     const clearError = () => setError(null)
 

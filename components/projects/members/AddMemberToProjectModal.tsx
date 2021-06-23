@@ -22,6 +22,8 @@ import {
     PopupTabsNav,
     PopupTitle
 } from "../../styled/modals/components";
+import {getToken} from "../../../src/redux/projects-selector";
+import {ProjectAPI} from "../../../src/api/ProjectAPI";
 
 type PropsType = {
     hideBlock: () => void
@@ -34,16 +36,17 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
     const dispatch = useDispatch()
     const modalRef = React.useRef(null)
     const {show} = useToast()
-    const {clearError, request, error, loading} = useHttp()
+    const [error, setError] = React.useState("")
 
     const contacts = useSelector((state: AppStateType) => state.profile.contacts)
+    const token = useSelector(getToken)
     const [activeTabId, setActiveTabId] = React.useState<number>(1)
 
     const [tabs,] = React.useState<{ className?: string, title: string, Component: () => JSX.Element }[]>(
         [
             {
                 title: "E-mail",
-                Component: () => <InviteMemberViaEmail loading={loading} hookForm={hookForm}
+                Component: () => <InviteMemberViaEmail hookForm={hookForm}
                                                        hideBlock={hideBlock}/>
             },
             {
@@ -53,7 +56,7 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
             },
             {
                 title: "From contacts",
-                Component: () => <InviteMemberFromContacts loading={loading} hookForm={hookForm} hideBlock={hideBlock}/>
+                Component: () => <InviteMemberFromContacts hookForm={hookForm} hideBlock={hideBlock}/>
             }
         ])
 
@@ -66,11 +69,15 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
     }, [contacts])
 
     const sendRequestUsers = async (data: any) => {
-        let response = projectId && await request<UserType[]>(`projects/${projectId}/invitations`, "post", data)
-        if (response) {
-            response && dispatch(actionsProjects.addUsersToProject(response))
-            hideBlock()
-        }
+        projectId && ProjectAPI.sendInvitation(+projectId, data).then(response => {
+            if (response) {
+                response && dispatch(actionsProjects.addUsersToProject(response))
+                hideBlock()
+            }
+        }).catch(e => {
+            setError(e.message)
+            console.log(e)
+        })
     }
     const onSubmit = async (data: { email?: string }) => {
         let contactId = 0
@@ -88,7 +95,7 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
 
     React.useEffect(() => {
         error && show(error)
-        return () => clearError()
+        return () => setError("null")
     }, [error])
 
     useOutsideAlerter(modalRef, hideBlock)
@@ -162,8 +169,6 @@ const InviteMemberFromContacts: React.FC<ModalItemPropsType> = ({hookForm}) => {
 }
 
 const InviteMemberViaId: React.FC<InviteViaIdType> = ({hideBlock, projectId}) => {
-
-    const dispatch = useDispatch()
     const {show} = useToast()
     const {clearError, request, error, loading} = useHttp()
     const [addedIds, setAddedIds] = React.useState([] as string[])
