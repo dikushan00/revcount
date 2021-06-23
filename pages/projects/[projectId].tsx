@@ -33,27 +33,29 @@ const Project: React.FC<{ project: ProjectType }> = () => {
 
     React.useEffect(() => {
         if (projectId) {
-            project?.project_id !== +projectId && ProjectAPI.getProject(+projectId).then(response => {
+            ProjectAPI.getProject(+projectId).then(response => {
                 if (response) {
                     dispatch(actionsProjects.setActiveProject({...response, role: {id: 1, name: "Owner"}}))
                 }
             }).catch(e => {
+                dispatch(actionsProjects.setActiveProject(null))
                 console.log(e)
             })
         }
-    }, [projectId, project])
+    }, [projectId])
 
     React.useEffect(() => {
-        if (projectId && revisions.revisionsList.length === 0 && revisions.projectId !== +projectId) {
+        if (projectId) {
             ProjectAPI.getRevisions(+projectId).then(response => {
                 if (response) {
                     dispatch(actionsProjects.setRevisions(+projectId, response))
                 }
             }).catch(e => {
+                dispatch(actionsProjects.setRevisions(null, null))
                 console.log(e)
             })
         }
-    }, [projectId, revisions])
+    }, [projectId])
 
     React.useEffect(() => {
         project && !project.users && dispatch(getProjectUsers(+project.project_id))

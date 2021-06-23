@@ -328,7 +328,7 @@ export const SideBarBlockButton = styled.button`
   align-items: center;
   padding-left: 9%;
   //@ts-ignore
-  background: ${(props:{isActive: boolean}) => props?.isActive ? "#f3f5f7" : "inherit"};
+  background: ${(props:{isActive?: boolean}) => props?.isActive ? "#f3f5f7" : "inherit"};
 
   span {
     width: 3px;

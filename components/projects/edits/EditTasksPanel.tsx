@@ -71,15 +71,6 @@ export const EditTasksPanel: React.FC<PropsType> = ({
 
     const enableEditMode = (taskId: number) => {
         dispatch(actionsProjects.enableEditModeToTask(taskId))
-        // setTasks((state) => {
-        //     if (state && state?.length > 0)
-        //         return state.map(item => {
-        //             if (item.id === taskId)
-        //                 return {...item, isEdit: !item.isEdit}
-        //             return item
-        //         })
-        //     return state
-        // })
     }
 
     const deleteTask = (taskId: number) => {

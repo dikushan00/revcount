@@ -31,22 +31,18 @@ const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = () => {
 
     React.useEffect(() => {
         if (projectId && revisionId) {
-            if (revisions.revisionsList?.length === 0 && revisions.projectId !== +projectId) {
-                ProjectAPI.getRevisions(+projectId).then(response => {
-                    if (response) {
-                        dispatch(actionsProjects.setRevisions(+projectId, response))
-                        let revision = response?.find((item: any) => item.revision_id === +revisionId)
-                        revision && setRevision(revision)
-                    }
-                }).catch(e => {
-                    console.log(e)
-                })
-            } else {
-                let revision = revisions?.revisionsList?.find(item => item.revision_id === +revisionId)
-                revision && setRevision(revision)
-            }
+            ProjectAPI.getRevisions(+projectId).then(response => {
+                if (response) {
+                    dispatch(actionsProjects.setRevisions(+projectId, response))
+                    let revision = response?.find((item: any) => item.revision_id === +revisionId)
+                    revision && setRevision(revision)
+                }
+            }).catch(e => {
+                dispatch(actionsProjects.setRevisions(null, null))
+                console.log(e)
+            })
         }
-    }, [projectId, revisionId, revisions])
+    }, [projectId, revisionId])
 
     React.useEffect(() => {
         const getOffer = async () => {
@@ -88,7 +84,8 @@ const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = () => {
                 </EditsButton>
             </EditsHeader>
             <EditProgressBar status={revision?.status}/>
-            <EditTasksPanel editName = {revision?.name} projectId={projectId} projectTasks={revision?.tasks} type={"changeEdit"}/>
+            <EditTasksPanel editName={revision?.name} projectId={projectId} projectTasks={revision?.tasks}
+                            type={"changeEdit"}/>
             <EditWorkspaceWindow isOfferExist={!!offer} offer={offer} isOwner={project?.role?.name === "Owner"}
                                  workspace={revision?.workspace} deadline={offer?.deadline}/>
             {
