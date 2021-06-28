@@ -6,8 +6,10 @@ import {actionsProjects, defaultTaskObj} from "../../../src/redux/projects-reduc
 import {AppStateType} from "../../../src/redux/store-redux";
 import {TaskEditsButton} from "../../styled/buttons/revisionButtons/RevisionsButtons";
 import {
-    EditForm,
-    EditsLabel, FormEditBox, FormEditHeader, FormEditInput,
+    EditsLabel,
+    FormEditBox,
+    FormEditHeader,
+    FormEditInput,
     FormEditLabel,
     FormEditWrapper,
     TaskEdits,
@@ -16,11 +18,11 @@ import {
     TaskEditsHeader,
     TaskEditsInner
 } from "../../styled/edit/components";
-import {useForm} from "react-hook-form";
+import {Controller, useForm} from "react-hook-form";
 import {useRouter} from "next/router";
 import {useHttp} from "../../../src/utils/hooks/http.hook";
 import {Toast, useToast} from "../../common/blocks/Toast";
-import {act} from "react-dom/test-utils";
+import {ValidationError} from "../../common/form/ValidationError";
 
 export interface TaskTypeWithFlag extends TaskType {
     isEdit: boolean
@@ -28,25 +30,26 @@ export interface TaskTypeWithFlag extends TaskType {
 
 type PropsType = {
     type: "addNewEdit" | "changeEdit",
-    projectTasks?: TaskType[], register?: any,
-    projectId?: string |string[] | undefined,
+    projectTasks?: TaskType[],
+    control?: any,
+    projectId?: string | string[] | undefined,
     editName?: string | null
 }
 
 export const EditTasksPanel: React.FC<PropsType> = ({
                                                         type,
-                                                        register,
+                                                        control,
                                                         editName,
                                                         projectId,
                                                         projectTasks
                                                     }) => {
 
-    const {register: changeRegister, handleSubmit, watch} = useForm()
+    const {control: changeControl, errors, handleSubmit, watch} = useForm()
     const {request, error, clearError} = useHttp()
     const {show} = useToast()
     const dispatch = useDispatch()
     const router = useRouter()
-    const tasks = useSelector((state:AppStateType) => state.projects.tasks)
+    const tasks = useSelector((state: AppStateType) => state.projects.tasks)
 
     const [isTasksShow, setIsTasksShow] = React.useState(true)
 
@@ -82,7 +85,6 @@ export const EditTasksPanel: React.FC<PropsType> = ({
     const toggleTasksShowMode = () => {
         setIsTasksShow(is => !is)
     }
-
     const sortTasks = (obj: any) => {
         let editPost: EditType = {
             name: watch("name"),
@@ -137,15 +139,17 @@ export const EditTasksPanel: React.FC<PropsType> = ({
         error && show(error)
         return () => clearError()
     }, [error])
+
     return <>
         {
-            type === "addNewEdit" ? <>
+            type === "addNewEdit"
+                ? <>
                     <FormEditWrapper>
                         <FormEditLabel>
                             Edit Task’s
                         </FormEditLabel>
                         <EditTasksList deleteTask={deleteTask} tasks={tasks} enableEditMode={enableEditMode}
-                                       register={register}/>
+                                       control={control} errors={errors}/>
                     </FormEditWrapper>
                     <TaskEditsInner className="task-edits__inner">
                         <TaskEditsButton onClick={addTask}>Add new task <span>+</span></TaskEditsButton>
@@ -162,8 +166,14 @@ export const EditTasksPanel: React.FC<PropsType> = ({
                             </EditsLabel>
                             <div style={{marginTop: "calc(15px + 9 * ((100vw - 320px) / 1600))"}}/>
                             <FormEditBox>
-                                <FormEditInput ref={register} type="text" name="name" placeholder="Write name here"
-                                               defaultValue={editName || ""}/>
+                                {editName && <Controller
+                                        as={<FormEditInput placeholder="Write name here" type="text"/>}
+                                        name="name"
+                                        rules={{required: true}}
+                                        control={changeControl}
+                                        defaultValue={editName}
+                                    />}
+                                {errors.name && <ValidationError/>}
                             </FormEditBox>
                         </FormEditHeader>
                         <div style={{marginTop: "13px"}}/>
@@ -178,8 +188,8 @@ export const EditTasksPanel: React.FC<PropsType> = ({
                                 </svg>
                             </TaskEditsArrow>
                         </TaskEditsHeader>
-                        <EditTasksList deleteTask={deleteTask} tasks={tasks} enableEditMode={enableEditMode}
-                                       register={changeRegister}/>
+                        <EditTasksList errors={errors} deleteTask={deleteTask} tasks={tasks} enableEditMode={enableEditMode}
+                                       control={changeControl}/>
                         <TaskEditsInner className="task-edits__inner">
                             <TaskEditsButton onClick={addTask}>Add new task <span>+</span></TaskEditsButton>
                             <TaskEditsCorrectionButton type={"submit"}>Save correction</TaskEditsCorrectionButton>

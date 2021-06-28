@@ -3,7 +3,7 @@ import Link from "next/link"
 import {EditType, ProjectType, StatusesNamesType} from "../../src/types/projectTypes"
 import {ProjectStatsInfo} from "../../components/projects/ProjectStatsInfo";
 import {useDispatch, useSelector} from "react-redux";
-import {actionsProjects, getProjectUsers} from "../../src/redux/projects-reducer";
+import {actionsProjects, getProjectInfo} from "../../src/redux/projects-reducer";
 import {useRouter} from "next/router";
 import {getActiveProject} from "../../src/redux/projects-selector";
 import {MyCorrectionsButton, ProjectsButton} from "../../components/styled/buttons/Buttons";
@@ -58,7 +58,7 @@ const Project: React.FC<{ project: ProjectType }> = () => {
     }, [projectId])
 
     React.useEffect(() => {
-        project && !project.users && dispatch(getProjectUsers(+project.project_id))
+        project && dispatch(getProjectInfo(+project.project_id))
     }, [project])
 
     React.useEffect(() => {

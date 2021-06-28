@@ -2,34 +2,40 @@ import React from 'react';
 import {useOutsideAlerter} from '../../../src/utils/hooks/outsideClick';
 import {CustomPopup} from "../../common/blocks/CustomPopup";
 import {CopyInviteItems} from "../modals/TeamSettingsModal";
-import {useDispatch, useSelector} from "react-redux";
-import {AppStateType} from "../../../src/redux/store-redux";
+import {useDispatch} from "react-redux";
 import {ProfileAPI} from "../../../src/api/ProfileAPI";
 import {actionsProfile} from "../../../src/redux/profile-reducer";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
-import {useForm} from "react-hook-form";
+import {Controller, useForm} from "react-hook-form";
 import {Toast, useToast} from "../../common/blocks/Toast";
-import {useHttp} from "../../../src/utils/hooks/http.hook";
-import {UserType} from "../../../src/types/userTypes";
 import {Btn2, Btn2Div} from "../../styled/buttons/Buttons";
 import {IdBlockButton} from "../../styled/buttons/popup/PopupButtons";
 import {
-    IdBlockItem, IdBlockNumber, InputTag,
+    IdBlockItem,
+    IdBlockNumber,
+    InputTag,
     PopupClose,
-    PopupForm, PopupInputId, PopupItem,
-    PopupTabs, PopupTabsBlock, PopupTabsBody, PopupTabsColumn,
-    PopupTabsItem, PopupTabsLine,
+    PopupForm,
+    PopupInputId,
+    PopupItem,
+    PopupTabs,
+    PopupTabsBlock,
+    PopupTabsBody,
+    PopupTabsColumn,
+    PopupTabsItem,
+    PopupTabsLine,
     PopupTabsNav,
     PopupTitle
 } from "../../styled/modals/components";
-import {getToken} from "../../../src/redux/projects-selector";
-import {ProjectAPI} from "../../../src/api/ProjectAPI";
+import {ContactPostType, ProjectAPI} from "../../../src/api/ProjectAPI";
+import {ValidationError} from "../../common/form/ValidationError";
 
 type PropsType = {
     hideBlock: () => void
     projectId: number | null | undefined
 }
-
+type ContactType = { user_id: number, name: string, first_name: string, checked: boolean }
+// { className?: string, title: string, Component: () => JSX.Element }[]
 export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, projectId}) => {
 
     const hookForm = useForm()
@@ -38,27 +44,48 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
     const {show} = useToast()
     const [error, setError] = React.useState("")
 
-    const contacts = useSelector((state: AppStateType) => state.profile.contacts)
-    const token = useSelector(getToken)
+    const [contacts, setContacts] = React.useState<ContactType[]>([
+        {
+            user_id: 646,
+            name: "Samuel Finnes",
+            first_name: "Samuel Finnes",
+            checked: true
+        },
+        {
+            user_id: 546,
+            name: "Sophie Archduches",
+            first_name: "Sophie Archduches",
+            checked: false
+        },
+        {
+            user_id: 446,
+            name: "Denzel Forman",
+            first_name: "Denzel Forman",
+            checked: false
+        }
+    ])
+
+    // const contacts = useSelector((state: AppStateType) => state.profile.contacts)
     const [activeTabId, setActiveTabId] = React.useState<number>(1)
 
-    const [tabs,] = React.useState<{ className?: string, title: string, Component: () => JSX.Element }[]>(
-        [
-            {
-                title: "E-mail",
-                Component: () => <InviteMemberViaEmail hookForm={hookForm}
+    const tabs = [
+        {
+            title: "E-mail",
+            Component: () => <InviteMemberViaEmail hookForm={hookForm}
+                                                   hideBlock={hideBlock}/>
+        },
+        {
+            title: "ID invitation",
+            Component: () => <InviteMemberViaId projectId={projectId} hideBlock={hideBlock}/>,
+            className: "input-id-button"
+        },
+        {
+            title: "From contacts",
+            Component: () => <InviteMemberFromContacts contacts={contacts} onClickRadio={onClickRadio}
+                                                       hookForm={hookForm}
                                                        hideBlock={hideBlock}/>
-            },
-            {
-                title: "ID invitation",
-                Component: () => <InviteMemberViaId projectId={projectId} hideBlock={hideBlock}/>,
-                className: "input-id-button"
-            },
-            {
-                title: "From contacts",
-                Component: () => <InviteMemberFromContacts hookForm={hookForm} hideBlock={hideBlock}/>
-            }
-        ])
+        }
+    ]
 
     React.useEffect(() => {
         !contacts && ProfileAPI.getContacts().then(res => {
@@ -68,7 +95,7 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
         })
     }, [contacts])
 
-    const sendRequestUsers = async (data: any) => {
+    const sendRequestUsers = async (data: ContactPostType[]) => {
         projectId && ProjectAPI.sendInvitation(+projectId, data).then(response => {
             if (response) {
                 response && dispatch(actionsProjects.addUsersToProject(response))
@@ -79,29 +106,40 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
             console.log(e)
         })
     }
+    const onClickRadio = (id: number) => {
+        let edited = contacts.map(item => {
+            if (item.user_id === +id)
+                return {...item, checked: !item.checked}
+            return {...item}
+        })
+        edited && setContacts(edited)
+    }
+
     const onSubmit = async (data: { email?: string }) => {
-        let contactId = 0
-        for (let key in data) {
-            //@ts-ignore
-            let splitId = data[key].split["_"]
-            contactId = splitId && splitId[1]
-        }
+
+        const contactsPostData: ContactPostType[] = []
+        contacts.forEach(item => {
+            if (item.checked && projectId)
+                contactsPostData.push({user_id: item.user_id, project_id: projectId})
+        })
         if (data?.email) {
+            //@ts-ignore
             await sendRequestUsers(data)
-        } else if (contactId) {
-            await sendRequestUsers({user_id: contactId.toString()})
+        } else if (contactsPostData.length) {
+            await sendRequestUsers(contactsPostData)
         }
+        debugger
     }
 
     React.useEffect(() => {
         error && show(error)
-        return () => setError("null")
+        return () => setError("")
     }, [error])
 
     useOutsideAlerter(modalRef, hideBlock)
 
     return <CustomPopup className={"popup__invite"} modalBodyRef={modalRef}>
-        <PopupClose onClick={hideBlock} />
+        <PopupClose onClick={hideBlock}/>
         <PopupTitle className="popup__title">
             Invite with:
         </PopupTitle>
@@ -112,7 +150,7 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
                     {
                         tabs.map((tab, index) => {
                             return <PopupTabsItem key={index} onClick={() => setActiveTabId(index)}
-                                        className={"tabs-popup__item" + (index === activeTabId ? " tabs-open" : "")}>{tab.title}</PopupTabsItem>
+                                                  className={"tabs-popup__item" + (index === activeTabId ? " tabs-open" : "")}>{tab.title}</PopupTabsItem>
                         })
                     }
                 </PopupTabsNav>
@@ -138,40 +176,59 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
 
 const InviteMemberViaEmail: React.FC<ModalItemPropsType> = ({hookForm}) => {
     return <PopupTabsLine className="tabs-popup__line">
-        <input required={true} ref={hookForm?.register} className="tabs-popup__input"
-               placeholder="E-mail, comma separated" type="email"
-               name="email"/>
+        <Controller as={<input className="tabs-popup__input" placeholder="E-mail, comma separated"/>}
+                    name={`email`}
+                    rules={{required: true, pattern: /.+@.+\..+/i}}
+                    control={hookForm?.control}
+                    defaultValue={""}
+        />
+        {hookForm?.errors[`email`] && <ValidationError>This field is required or check your email</ValidationError>}
         <Btn2 type={"submit"} className={"tabs-popup__btn"}>Send invite</Btn2>
     </PopupTabsLine>
 }
-const InviteMemberFromContacts: React.FC<ModalItemPropsType> = ({hookForm}) => {
-    const contacts = useSelector((state: AppStateType) => state.profile.contacts)
+const InviteMemberFromContacts: React.FC<ModalItemPropsType> = ({hookForm, contacts, onClickRadio}) => {
+    // const contacts = useSelector((state: AppStateType) => state.profile.contacts)
+    const [isOneItemChecked, setIsOneItemChecked] = React.useState(true)
+    React.useEffect(() => {
+        let isChecked = contacts?.some(item => item.checked)
+        setIsOneItemChecked(!!isChecked)
+    }, [contacts])
 
     return <PopupTabsColumn className="tabs-popup__column">
         <ul className="tabs-popup__inner">
             {
-                contacts?.map(c => {
+                contacts?.map((c) => {
                     return <li key={c.user_id} className="tabs-popup__box">
                         <label htmlFor={"radio-" + c.user_id} className="tabs-popup__label">
                             {c.first_name}
-                            <input ref={hookForm?.register} required={true} type="radio" id={"radio-" + c.user_id}
-                                   defaultChecked
-                                   className="tabs-popup__radio" name={"contact_" + c.user_id}/>
-                            <span className="tabs-popup__custom"/>
+                            <Controller
+                                as={<input value={c.user_id} defaultValue={c.user_id} checked={c.checked} type="radio"
+                                           id={`contact_${c.user_id}`} className="tabs-popup__radio"/>}
+                                name={`contact_${c.user_id}`}
+                                // rules={{required: true}}
+                                control={hookForm?.control}
+                                defaultValue={c.user_id}
+                            />
+                            <span onClick={() => onClickRadio && onClickRadio(c.user_id)}
+                                  className="tabs-popup__custom"/>
                         </label>
                     </li>
+                    {
+                        hookForm?.errors[`contact_${c.user_id}`] && <ValidationError/>
+                    }
                 })
             }
         </ul>
-        <Btn2 disabled={!!contacts} type={"submit"} className={"tabs-popup__btn"}>Send invite</Btn2>
+        <Btn2 disabled={!contacts || !isOneItemChecked} type={"submit"} className={"tabs-popup__btn"}>Send invite</Btn2>
     </PopupTabsColumn>
 
 }
 
 const InviteMemberViaId: React.FC<InviteViaIdType> = ({hideBlock, projectId}) => {
     const {show} = useToast()
-    const {clearError, request, error, loading} = useHttp()
+    const dispatch = useDispatch()
     const [addedIds, setAddedIds] = React.useState([] as string[])
+    const [error, setError] = React.useState("")
 
     const handleDeleteId = (id: string) => {
         const edited = addedIds.filter(item => item !== id)
@@ -180,11 +237,13 @@ const InviteMemberViaId: React.FC<InviteViaIdType> = ({hideBlock, projectId}) =>
     const onSubmit = async () => {
         const invitations = projectId && addedIds.map(userId => ({user_id: +userId, project_id: +projectId}))
 
-        let response = invitations && await request<UserType[]>(`invitations`, "post", invitations)
-        if (response) {
-            // response && dispatch(actionsProjects.addUsersToProject(response))
+        invitations && invitations.length && ProjectAPI.addMemberToProjectViaId(invitations).then(response => {
+            dispatch(actionsProjects.addUserToProject(response))
             hideBlock()
-        }
+        }).catch(res => {
+            let errorMessage = res.response.data.message
+            setError(errorMessage)
+        })
     }
 
     const onPressEnter = (e: any) => {
@@ -206,13 +265,18 @@ const InviteMemberViaId: React.FC<InviteViaIdType> = ({hideBlock, projectId}) =>
 
     React.useEffect(() => {
         error && show(error)
-        return () => clearError()
+        return () => setError("")
     }, [error])
 
     const onClick = () => {
-        if (!loading)
-            addedIds && onSubmit()
+        // if (!loading)
+        addedIds.length && onSubmit()
     }
+
+    React.useEffect(() => {
+        error && show(error)
+        return () => setError("")
+    }, [error])
 
     return <PopupTabsLine className="tabs-popup__line">
         <PopupItem className="popup__item">
@@ -254,7 +318,9 @@ export const RemoveItemIcon = () => {
 interface ModalItemPropsType {
     loading?: boolean
     hideBlock: () => void
-    hookForm?: { register: any, errors: any }
+    hookForm?: { register: any, errors: any, control: any }
+    contacts?: ContactType[]
+    onClickRadio?: (n: number) => void
 }
 
 interface InviteViaIdType extends ModalItemPropsType {

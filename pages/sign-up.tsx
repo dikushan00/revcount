@@ -1,8 +1,7 @@
 import React from 'react';
 import Link from 'next/link'
-import {useForm} from "react-hook-form";
+import {Controller, useForm} from "react-hook-form";
 import {ValidationError} from "../components/common/form/ValidationError";
-import {checkPassword} from "../src/utils/checkPassword";
 import {useHttp} from "../src/utils/hooks/http.hook";
 import {Toast, useToast} from "../components/common/blocks/Toast";
 import {AuthHeader} from "../components/auth/AuthHeader";
@@ -30,26 +29,19 @@ import {
 } from "../components/styled/signUp/components";
 import {getIsAuth} from "../src/redux/auth-selector";
 import {Layout} from "../components/layouts/Layout";
-import {Simulate} from "react-dom/test-utils";
 
 type SignUpResponseType = { "user_id": number, username: string, error: any, first_name: string, token: string }
 
 export default function SignUp() {
-    const {register, errors, handleSubmit} = useForm()
+    const { errors, handleSubmit, control} = useForm()
     const router = useRouter()
     const {show} = useToast()
     const dispatch = useDispatch()
 
     const {request, error, loading, clearError} = useHttp()
     const isAuth = useSelector(getIsAuth)
-    const [isPasswordValid, setIsPasswordValid] = React.useState(true)
 
     const onSubmit = async (data: { first_name: string, username: string, password: string }) => {
-        let isPassWordValid = checkPassword(data.password)
-        if (!isPassWordValid) {
-            setIsPasswordValid(false)
-            return
-        }
 
         let response = await request<SignUpResponseType>("users/register", "post", data, null, false)
         if (response) {
@@ -91,7 +83,7 @@ export default function SignUp() {
                     </BreadCrumbsList>
                 </BreadCrumbs>
                 <SignUpContent>
-                    <SignUpForm onSubmit={handleSubmit(onSubmit)} action="/" className="signup__form">
+                    <SignUpForm onSubmit={handleSubmit(onSubmit)} className="signup__form">
                         <SignUpTitle>
                             Sign up
                         </SignUpTitle>
@@ -100,28 +92,28 @@ export default function SignUp() {
                             <Link href="/login"><a className="signup__link">Login</a></Link>
                         </SignUpDesc>
                         <SignUpLine>
-                            <SignUpInput ref={register} required={true} name="first_name"
-                                         placeholder="Your name" type="text"/>
-                            {
-                                errors.name && <ValidationError/>
-                            }
+                            <Controller as={<SignUpInput placeholder="Your name" type="text"/>} name="first_name"
+                                        rules={{required: true}}
+                                        control={control}
+                                        defaultValue={""}
+                            />
+                            {errors.first_name && <ValidationError/>}
                         </SignUpLine>
                         <SignUpLine>
-                            <SignUpInput ref={register} required={true} name="username"
-                                         placeholder="Your E-mail" type="email"/>
-                            {
-                                errors.email && <ValidationError/>
-                            }
+                            <Controller as={<SignUpInput placeholder="Your E-mail" />} name="username"
+                                        rules={{required: true, pattern: /.+@.+\..+/i}}
+                                        control={control}
+                                        defaultValue={""}
+                            />
+                            {errors.username && <ValidationError>This field is required or check your email</ValidationError>}
                         </SignUpLine>
                         <SignUpLine>
-                            <SignUpInput ref={register} required={true} onFocus={() => setIsPasswordValid(true)}
-                                         name="password" placeholder="Password" type="password"/>
-                            {
-                                errors.password && <ValidationError/>
-                            }
-                            {
-                                !isPasswordValid && <ValidationError>This password is not valid!</ValidationError>
-                            }
+                            <Controller as={<SignUpInput placeholder="Password" type="password"/>} name="password"
+                                        rules={{required: true , pattern: /^[A-Za-z0-9]\w{7,15}$/}}
+                                        control={control}
+                                        defaultValue={""}
+                            />
+                            {errors.password && <ValidationError>This field is required or check your password</ValidationError>}
                         </SignUpLine>
                         <SignUpBlock>
                             <SignUpButton disabled={loading} type="submit">Create an account</SignUpButton>

@@ -11,12 +11,16 @@ export interface ProjectPostType {
     revisions?: EditType[],
     invitations: { user_id: string | number }[],
     actionsHistory?: ActionHistoryType[]
+    workspace?: WorkspaceMessageType[]
+    message?: string
 }
 
 export interface ProjectType extends ProjectPostType {
     project_id: number
     role?: RoleType
 }
+
+export type ProjectObjKeysType = keyof ProjectType
 
 export interface InviteProjectType {
     invitation_id: number,
@@ -25,12 +29,13 @@ export interface InviteProjectType {
     status: InviteStatusType
 }
 
-type ActionHistoryType = {
+export type ActionHistoryType = {
     id: number,
-    "action": string,
-    "time": string,
-    "offer": OfferType,
-    "edit": EditType
+    action: string,
+    time: string,
+    offer: OfferType,
+    validOffer: { hours: number | null, days: number | null, amount: number },
+    edit: EditType
 }
 
 export type OfferType = {

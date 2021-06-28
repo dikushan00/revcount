@@ -11,13 +11,30 @@ import {
     MainTitle
 } from "../components/styled/mainPage/components";
 import {Layout} from "../components/layouts/Layout";
+import {useSelector} from "react-redux";
+import {getProjects, getProjectsIsFetching} from "../src/redux/projects-selector";
+import {useRouter} from "next/router";
+import Preloader from "../components/common/preloader/Preloader";
 
 export default function Home() {
+
+    const router = useRouter()
+    const isFetching = useSelector(getProjectsIsFetching)
+    const projects = useSelector(getProjects)
 
     const [isModalMode, setIsModalMode] = React.useState({
         createProject: false,
         joinProject: false
     })
+
+    React.useEffect(() => {
+        if(projects && projects.length > 0) {
+            let defaultActiveProject = projects[0]
+            defaultActiveProject && router.push(`/projects/${defaultActiveProject?.project_id}`)
+        }
+    }, [projects])
+
+    if(isFetching) return <Preloader theme />
 
     return <Layout title={"Revcount"} isProjectSideBarMode={false}>
         <MainSection>

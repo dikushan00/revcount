@@ -45,6 +45,15 @@ const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = () => {
     }, [projectId, revisionId])
 
     React.useEffect(() => {
+        revision?.revision_id && ProjectAPI.getRevisionWorkspace(revision.revision_id).then(res => {
+            //@ts-ignore
+            workspace && setRevision(state => ({...state, res}))
+        }).catch(e => {
+            console.log(e)
+        })
+    }, [revision])
+
+    React.useEffect(() => {
         const getOffer = async () => {
             if (project?.project_id && revision?.revision_id) {
                 let offer = await request<OfferType>(`revisions/${revision.revision_id}/offer`)
@@ -57,7 +66,7 @@ const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = () => {
                         amount: offer.amount,
                         deadline: offer.deadline
                     }
-                    setOffer(offerObj)
+                    offerObj && setOffer(offerObj)
                 }
             }
         }
@@ -100,4 +109,4 @@ const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = () => {
 };
 
 export default Edit
-export type ValidOfferType = { amount: number, days: number, hours: number, deadline: string, status: InviteStatusType }
+export type ValidOfferType = { amount: number, days: number | null, hours: number | null, deadline: string, status: InviteStatusType }

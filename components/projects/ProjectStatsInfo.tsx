@@ -1,5 +1,5 @@
 import React from "react";
-import {ProjectType} from "../../src/types/projectTypes";
+import {ProjectObjKeysType, ProjectType} from "../../src/types/projectTypes";
 import {calculateDaysLeft} from "../../src/utils/calculateDaysLeft";
 import {
     ProjectsList,
@@ -9,7 +9,6 @@ import {
     ProjectsListMetrics
 } from "../styled/projects/components";
 
-
 export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({project}) => {
     const addInfo = (info: string | number) => <sup>+{info} d.</sup>
 
@@ -18,25 +17,28 @@ export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({pro
             imgPath: "/img/projects/flame.svg",
             title: "Deadline",
             className: "deadline",
-            field: "deadline",
+            field: "deadline" as ProjectObjKeysType,
+            unit: "d.",
             addInfo: addInfo,
             addContent: null
         },
         {
             imgPath: "/img/projects/free.svg",
             title: "Free edits",
-            field: "freeEdits",
+            field: "freeEdits" as ProjectObjKeysType,
             className: "edits",
+            unit: "h.",
             addContent: null
         },
-    ] as any[]
+    ] as { imgPath: string, title: string, field: ProjectObjKeysType, className: string , unit: string, addContent: any}[]
 
     if (project?.role?.name === "Owner")
         data.push(
             {
                 imgPath: "/img/projects/credit-card.svg",
                 title: "Balance",
-                field: "balance",
+                field: "balance" as ProjectObjKeysType,
+                unit: "$",
                 className: "balance",
                 addContent: <div className="projects-list__add">+</div>,
             })
@@ -44,8 +46,10 @@ export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({pro
     return <ProjectsList>
         {
             data.map((item, index) => {
-                //@ts-ignore
-                let timeLeft = project && project[item.field] && calculateDaysLeft(project[item.field] || 0)
+                let fieldItem: any = project && project[item.field]
+                if (item.field === "deadline") {
+                    fieldItem = fieldItem && calculateDaysLeft(fieldItem || 0).days
+                }
                 return <ProjectsListItem key={index} className={item.className}>
                     <ProjectsListIcon>
                         <picture>
@@ -59,7 +63,7 @@ export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({pro
                         </ProjectsListLabel>
                         <ProjectsListMetrics>
                             {/*@ts-ignore*/}
-                            {project ? timeLeft?.days : "-"} d. {item.addInfo && project?.addDeadline && item.addInfo(project?.addDeadline)}
+                            {fieldItem ? `${fieldItem} ${item.unit}` : "-"} {item.addInfo && project?.addDeadline && item.addInfo(project?.addDeadline)}
                         </ProjectsListMetrics>
                     </ProjectsListBody>
                     {

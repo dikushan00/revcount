@@ -1,9 +1,9 @@
 import {Provider} from "react-redux";
 import {useStore} from "../src/redux/store-redux"
-
-import "../styles/App.css"
 import NextNProgress from "nextjs-progressbar";
 import React from "react";
+import "../styles/App.css"
+import {InitComponent} from "../components/App/InitComponent";
 
 export default function MyApp({Component, pageProps}) {
     const store = useStore(pageProps.initialReduxState)
@@ -16,7 +16,9 @@ export default function MyApp({Component, pageProps}) {
                 stopDelayMs={200}
                 height={2}
             />
-            <Component {...pageProps} />
+            <InitComponent>
+                <Component {...pageProps} />
+            </InitComponent>
         </Provider>
     )
 }

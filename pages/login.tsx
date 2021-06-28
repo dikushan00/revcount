@@ -1,13 +1,12 @@
 import React from 'react';
 import Link from 'next/link'
-import {useForm} from "react-hook-form";
+import {Controller, useForm} from "react-hook-form";
 import {ValidationError} from "../components/common/form/ValidationError";
 import {useHttp} from "../src/utils/hooks/http.hook";
 import {Toast, useToast} from "../components/common/blocks/Toast";
 import {AuthHeader} from "../components/auth/AuthHeader";
 import {AuthImg} from "../components/auth/AuthImg";
 import {SocialNetworksSignUp} from "../components/auth/SocialNetworksSignUp";
-import {useRouter} from "next/router";
 import {useDispatch} from "react-redux";
 import {SignUpButton} from "../components/styled/buttons/Buttons";
 import {
@@ -29,14 +28,13 @@ import {Layout} from "../components/layouts/Layout";
 import {actionsAuth} from "../src/redux/auth-reducer";
 
 export default function Login() {
-    const {register, errors, handleSubmit} = useForm()
+    const {errors, control, handleSubmit} = useForm()
     const {show} = useToast()
-    const router = useRouter()
     const dispatch = useDispatch()
     const {request, error, loading, clearError} = useHttp()
 
     const onSubmit = async (data: { first_name: string, username: string, password: string }) => {
-        let response = await request<{token: string}>("users/token", "post", data, null, false)
+        let response = await request<{ token: string }>("users/token", "post", data, null, false)
 
         if (response && response?.token) {
             dispatch(actionsAuth.setNewAuth(response.token, null))
@@ -64,24 +62,31 @@ export default function Login() {
                     </BreadCrumbsList>
                 </BreadCrumbs>
                 <SignUpContent>
-                    <SignUpForm action = "" onSubmit={handleSubmit(onSubmit)}>
+                    <SignUpForm action="" onSubmit={handleSubmit(onSubmit)}>
                         <SignUpTitle className="signup__title">
                             Login
                         </SignUpTitle>
                         <SignUpDesc>
-                            Don't&nbsp; have an&nbsp; account yet?&nbsp; — <Link href="/"><a className="signup__link">Sign
+                            Don't&nbsp; have an&nbsp; account yet?&nbsp; — <Link href="/sign-up"><a className="signup__link">Sign
                             Up</a></Link>
                         </SignUpDesc>
                         <SignUpLine>
-                            <SignUpInput ref={register} required={true} name="username"
-                                         placeholder="Your name" type="text"/>
-                            {
-                                errors.name && <ValidationError/>
-                            }
+                            <Controller as={<SignUpInput placeholder="Your name" type="text"/>}
+                                        name="username"
+                                        rules={{required: true, pattern: /.+@.+\..+/i}}
+                                        control={control}
+                                        defaultValue={""}
+                            />
+                            {errors.username && <ValidationError/>}
                         </SignUpLine>
                         <SignUpLine>
-                            <SignUpInput ref={register} required={true} name="password" placeholder="Password"
-                                         type="password"/>
+                            <Controller as={<SignUpInput placeholder="Password" type="password"/>}
+                                        name="password"
+                                        rules={{required: true}}
+                                        control={control}
+                                        defaultValue={""}
+                            />
+                            {errors.password && <ValidationError/>}
                         </SignUpLine>
                         <SignUpBlock>
                             <SignUpButton disabled={loading} type="submit"

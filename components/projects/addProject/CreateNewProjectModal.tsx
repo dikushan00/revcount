@@ -1,18 +1,17 @@
-import React from 'react';
+import React, {KeyboardEventHandler} from 'react';
 import {CustomPopup} from "../../common/blocks/CustomPopup";
 import {useOutsideAlerter} from '../../../src/utils/hooks/outsideClick';
-import {useForm} from "react-hook-form";
+import {Controller, useForm} from "react-hook-form";
 import {RemoveItemIcon} from "../members/AddMemberToProjectModal";
 import {useDispatch, useSelector} from "react-redux";
 import {actionsProjects} from "../../../src/redux/projects-reducer";
 import {ProjectPostType} from "../../../src/types/projectTypes";
 import {getUserId} from "../../../src/redux/projects-selector";
-import {InputIdDivButton} from "../../styled/buttons/popup/PopupButtons";
+import {InputIdButton} from "../../styled/buttons/popup/PopupButtons";
 import {
     InputTag,
     PopupClose,
     PopupDesc,
-    PopupForm,
     PopupIcon,
     PopupInput,
     PopupInputDate,
@@ -22,15 +21,18 @@ import {
 } from "../../styled/modals/components";
 import {Toast, useToast} from "../../common/blocks/Toast";
 import {ProjectAPI} from "../../../src/api/ProjectAPI";
+import {ValidationError} from "../../common/form/ValidationError";
 
 type PropsType = {
     hideBlock: () => void
 }
+
 export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
+
 
     const {show} = useToast()
     const dispatch = useDispatch()
-    const {handleSubmit, register, watch} = useForm()
+    const {handleSubmit, control, formState: {errors}} = useForm();
     const addProjectRef = React.useRef(null)
 
     const [isInputDateMode, setIsInputDateMode] = React.useState(false)
@@ -48,7 +50,17 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
     const handleCloseModal = () => hideBlock()
 
     const onSubmit = async (data: { name: string, freeEdits: string, deadline: string }) => {
+        if (!addedIds.length) {
+            setError("User ID field must not be empty")
+            return
+        }
         const invitations = addedIds.map(userId => ({user_id: userId}))
+
+        let isDeadlineValid = new Date(data.deadline).getTime() > new Date().getTime()
+        if (!isDeadlineValid) {
+            setError("Deadline may not be earlier than next day!")
+            return
+        }
         let project = {
             name: data.name,
             deadline: data.deadline,
@@ -58,15 +70,31 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
         } as ProjectPostType
 
         userId && ProjectAPI.createProject(project, +userId).then(response => {
-            if (response) {
-                dispatch(actionsProjects.addProject(response))
-                dispatch(actionsProjects.setActiveProject(response))
-                hideBlock()
-            }
-        }).catch(e => {
-            setError(e.message)
-            console.log(e)
+            dispatch(actionsProjects.addProject(response))
+            dispatch(actionsProjects.setActiveProject(response))
+            hideBlock()
+        }).catch(res => {
+            let errorMessage = res.response.data.message
+            setError(errorMessage)
         })
+    }
+
+    const onPressEnterOnInput = (e:KeyboardEventHandler<HTMLInputElement>) => {
+        //@ts-ignore
+        if (e.code === "Enter") {
+            //@ts-ignore
+            let id = +e.target.value
+            let isNumber = !isNaN(id)
+            let isExist = addedIds.some(item => item === id.toString())
+            if (isExist)
+                return
+
+            if (isNumber && id > 0 && !isExist) {
+                setAddedIds(state => ([...state, id.toString()]))
+                //@ts-ignore
+                e.target.value = ""
+            }
+        }
     }
 
     React.useEffect(() => {
@@ -79,13 +107,25 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
         <PopupTitle className="popup__title">
             Create a new project
         </PopupTitle>
-        <PopupForm onSubmit={handleSubmit(onSubmit)} className="popup__form">
+        <div className="popup__form">
             <PopupItem className="popup__item">
-                <PopupInput ref={register} name="name" type="text" placeholder="Project name" className="popup__input"/>
+                <Controller as={<PopupInput type="text" placeholder="Project name" className="popup__input"/>}
+                            name="name"
+                            rules={{required: true}}
+                            control={control}
+                            defaultValue={""}
+                />
+
+                {errors.name && <ValidationError/>}
             </PopupItem>
             <PopupItem className="popup__item">
-                <PopupInput ref={register} name="freeEdits" type="text"
-                            placeholder="Free edits in hours" className="popup__input"/>
+                <Controller as={<PopupInput placeholder="Free edits in hours" className="popup__input"/>}
+                            name="freeEdits"
+                            rules={{required: true, pattern: /^[1-9]+/}}
+                            control={control}
+                            defaultValue={""}
+                />
+                {errors.freeEdits && <ValidationError>This field is required and should be number</ValidationError>}
             </PopupItem>
             <PopupItem className="popup__item">
                 <PopupIcon htmlFor="inpdate" className="popup__icon">
@@ -96,10 +136,17 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
                             fill="#1078F1"/>
                     </svg>
                 </PopupIcon>
-                <PopupInputDate ref={register} name={"deadline"} id="inpdate" type={isInputDateMode ? "date" : "text"}
-                       onBlur={() => setIsInputDateMode(false)} onFocus={() => setIsInputDateMode(true)}
-                       placeholder="Set a deadline"
-                       className="popup__input popup__input--date"/>
+                <Controller as={<PopupInputDate id="inpdate" type={isInputDateMode ? "date" : "text"}
+                                                onBlur={() => setIsInputDateMode(false)}
+                                                onFocus={() => setIsInputDateMode(true)}
+                                                placeholder="Set a deadline"
+                                                className="popup__input popup__input--date"/>}
+                            name="deadline"
+                            rules={{required: true}}
+                            control={control}
+                            defaultValue={""}
+                />
+                {errors.deadline && <ValidationError/>}
             </PopupItem>
             <PopupItem className="popup__item">
                 <PopupInputId className="popup__input popup__input--id">
@@ -113,37 +160,15 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
                             </div>
                         })
                     }
-                    <InputTag id="inpid" onKeyPress={e => {
-                        if (e.code === "Enter") {
-                            //@ts-ignore
-                            let text = e.target.value
-                            let isExist = addedIds.some(item => item === text)
-                            if (isExist)
-                                return
-
-                            if (text.length > 0 && !isExist) {
-                                setAddedIds(state => ([...state, text]))
-                                //@ts-ignore
-                                e.target.value = ""
-                            }
-                        }
-                    }} type="text" className="input_tag"/>
+                    {/*@ts-ignore */}
+                    <InputTag id="inpid" onKeyPress={onPressEnterOnInput} type="text" className="input_tag"/>
                 </PopupInputId>
             </PopupItem>
             <PopupDesc className="popup__descr">
                 Enter a unique user ID for the invitation, comma separated
             </PopupDesc>
-
-            <InputIdDivButton onClick={() => {
-                let data = {
-                    name: watch("name"),
-                    freeEdits: watch("freeEdits"),
-                    deadline: watch("deadline")
-                }
-                onSubmit(data)
-            }}>Create a project
-            </InputIdDivButton>
-        </PopupForm>
-        <Toast />
+            <InputIdButton onClick={handleSubmit(onSubmit)}>Create a project</InputIdButton>
+        </div>
+        <Toast/>
     </CustomPopup>
 }

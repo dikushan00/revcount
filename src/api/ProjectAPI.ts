@@ -1,11 +1,12 @@
 import {instance} from "./API";
 import {
+    ActionHistoryType,
     EditType,
     InviteProjectType,
     InviteStatusType,
     OfferType,
     ProjectPostType,
-    ProjectType
+    ProjectType, WorkspaceMessageType
 } from "../types/projectTypes";
 import {UserType} from "../types/userTypes";
 
@@ -17,7 +18,7 @@ export const ProjectAPI =  {
             }
         }).then(res => res.data)
     },
-    createProject(project: any, userId: number) {
+    async createProject(project: any, userId: number) {
         return instance.post<ProjectType>(`users/${userId}/projects`, project, {
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("token")
@@ -36,6 +37,12 @@ export const ProjectAPI =  {
         hoursRate: number | string
     }) {
         return instance.post(`projects/${projectId}/users`, data).then(res => res.data)
+    },
+    addMemberToProjectViaId(data: {
+        user_id: number,
+        project_id: number
+    }[]) {
+        return instance.post(`projects/invitations`, data).then(res => res.data)
     },
     changeProjectUsersRole(projectId: number, data: { role: string }) {
         return instance.post(`projects/${projectId}/users`, data).then(res => res.data)
@@ -75,6 +82,12 @@ export const ProjectAPI =  {
     getStatuses() {
         return instance && instance.get("statuses").then(res => res.data)
     },
+    getRevisionWorkspace(revisionId: number) {
+        return instance && instance.get<WorkspaceMessageType[]>(`revisions/${revisionId}/workspace`).then(res => res.data)
+    },
+    getProjectActions(projectId: number) {
+        return instance && instance.get<ActionHistoryType[]>(`projects/${projectId}/actions`).then(res => res.data)
+    },
     getInvitations(userId: number) {
         return instance && instance.get<InviteProjectType[]>(`users/${userId}/invitations`, {
             headers: {
@@ -82,11 +95,19 @@ export const ProjectAPI =  {
             }
         }).then(res => res.data)
     },
-    sendInvitation(projectId: number, body: {user_id: string}[]) {
-        return instance && instance.post<any>(`projects/${projectId}/invitations`, body).then(res => res.data)
+    sendInvitation(projectId: number, body: ContactPostType[]) {
+        return instance && instance.post<any>(`projects/${projectId}/invitations`, body, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            }
+        }).then(res => res.data)
     },
-    sendInvitationByContact(projectId: number, body: {user_id: string}) {
-        return instance && instance.post<any>(`projects/${projectId}/invitations`, body).then(res => res.data)
+    sendInvitationByContact(projectId: number, body: ContactPostType[]) {
+        return instance && instance.post<any>(`projects/${projectId}/invitations`, body, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            }
+        }).then(res => res.data)
     },
     acceptProject(userId: number, invitationId: number) {
         return instance.patch(`users/${userId}/invitations/${invitationId}`, {status: "ACCEPTED" as InviteStatusType}).then(res => res.data)
@@ -95,3 +116,5 @@ export const ProjectAPI =  {
         return instance.patch(`users/${userId}/invitations/${invitationId}`, {status: "DECLINED" as InviteStatusType}).then(res => res.data)
     }
 }
+
+export interface ContactPostType {user_id: number, project_id: number}

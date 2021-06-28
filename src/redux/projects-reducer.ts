@@ -1,8 +1,16 @@
 import {InferActionsTypes, ThunkType} from "./store-redux";
-import {EditType, InviteProjectType, OfferType, ProjectType, StatusType} from "../types/projectTypes";
+import {
+    ActionHistoryType,
+    EditType,
+    InviteProjectType,
+    OfferType,
+    ProjectType,
+    StatusType, WorkspaceMessageType
+} from "../types/projectTypes";
 import {TaskTypeWithFlag} from "../../components/projects/edits/EditTasksPanel";
 import {RoleType, UserType} from "../types/userTypes";
 import {ProjectAPI} from "../api/ProjectAPI";
+import {calculateDaysLeft} from "../utils/calculateDaysLeft";
 
 export const defaultTaskObj = [{
     id: 1,
@@ -22,6 +30,7 @@ const initialState = {
     },
     activeEdit: null as EditType | null,
     activeProject: null as ProjectType | null,
+    isFetching: false,
     statuses: [
         {
             "id": 1,
@@ -89,6 +98,18 @@ export const projects_reducer = (
                 },
             };
         }
+        case "REVCOUNT/PROJECTS/ADD_USER_TO_PROJECT": {
+            return {
+                ...state,
+                //@ts-ignore
+                activeProject: {
+                    ...state.activeProject,
+                    users: state.activeProject?.users
+                        ? [...state.activeProject.users, action.payload]
+                        : [action.payload]
+                },
+            };
+        }
         case "REVCOUNT/PROJECTS/ACCEPT_PROJECT": {
             let acceptedProject = state.invitations && state.invitations.find(p => p.invitation_id === action.invitationId)
             if (!acceptedProject)
@@ -136,7 +157,10 @@ export const projects_reducer = (
             })
             return {
                 ...state,
-                revisions: action.projectId === state.revisions.projectId ?  {...state.revisions, revisionsList: [...state.revisions.revisionsList, action.edit]} : state.revisions ,
+                revisions: action.projectId === state.revisions.projectId ? {
+                    ...state.revisions,
+                    revisionsList: [...state.revisions.revisionsList, action.edit]
+                } : state.revisions,
                 activeProject: state.activeProject &&
                     {
                         ...state.activeProject,
@@ -222,6 +246,19 @@ export const projects_reducer = (
                 statuses: action.statuses,
             };
         }
+        case "REVCOUNT/PROJECTS/SET_PROJECT_ACTIONS": {
+            let actions = action.payload.map(item => {
+                if(item.offer) {
+                    let deadline = calculateDaysLeft(item.offer.deadline)
+                    return {...item, validOffer: {...deadline, amount: item.offer.amount}}
+                }
+                return item
+            })
+            return {
+                ...state,
+                activeProject: state.activeProject && {...state.activeProject, actionsHistory: actions},
+            };
+        }
         case "REVCOUNT/PROJECTS/SET_ACTIVE_PROJECT": {
             return {
                 ...state,
@@ -240,6 +277,9 @@ export const projects_reducer = (
                 },
             };
         }
+        case "REVCOUNT/PROJECTS/SET_FETCHING": {
+            return {...state, isFetching: action.payload}
+        }
         default:
             return {...state}
     }
@@ -252,6 +292,8 @@ export const actionsProjects = {
         ({type: "REVCOUNT/PROJECTS/ADD_PROJECT", project} as const),
     addRoleToProject: (role: RoleType) =>
         ({type: "REVCOUNT/PROJECTS/ADD_ROLE_TO_PROJECT", role} as const),
+    addUserToProject: (user: UserType) =>
+        ({type: "REVCOUNT/PROJECTS/ADD_USER_TO_PROJECT", payload: user} as const),
     addUsersToProject: (users: UserType[]) =>
         ({type: "REVCOUNT/PROJECTS/ADD_USERS_TO_PROJECT", users} as const),
     acceptProject: (invitationId: number) =>
@@ -282,27 +324,47 @@ export const actionsProjects = {
         ({type: "REVCOUNT/PROJECTS/DELETE_TASK", taskId} as const),
     setStatuses: (statuses: StatusType[]) =>
         ({type: "REVCOUNT/PROJECTS/SET_STATUSES", statuses} as const),
+    setProjectActions: (actions: ActionHistoryType[]) =>
+        ({type: "REVCOUNT/PROJECTS/SET_PROJECT_ACTIONS", payload: actions} as const),
     setActiveProject: (project: ProjectType | null) =>
         ({type: "REVCOUNT/PROJECTS/SET_ACTIVE_PROJECT", project} as const),
     setActiveProjectOffer: (revisionId: number, offer: OfferType) =>
         ({type: "REVCOUNT/PROJECTS/SET_ACTIVE_PROJECT_OFFER", offer, revisionId} as const),
     setActiveEdit: (edit: EditType | null) =>
         ({type: "REVCOUNT/PROJECTS/SET_ACTIVE_EDIT", edit} as const),
+    setIsFetching: (isFetching: boolean) =>
+        ({type: "REVCOUNT/PROJECTS/SET_FETCHING", payload: isFetching} as const),
 }
 
 export const getProjects = (userId: number): GetThunkType => async (dispatch) => {
-    userId && await ProjectAPI.getProjects(userId).then(res => {
-        dispatch(actionsProjects.setProjects(res))
-    }).catch(e => {
-        console.log(e)
-    })
+    if (userId) {
+        dispatch(actionsProjects.setIsFetching(true))
+        await ProjectAPI.getProjects(userId).then(res => {
+            dispatch(actionsProjects.setIsFetching(false))
+            if (res && res.length > 0) {
+                dispatch(actionsProjects.setProjects(res))
+            }
+        }).catch(e => {
+            dispatch(actionsProjects.setIsFetching(false))
+            console.log(e)
+        })
+    }
 }
-export const getProjectUsers = (projectId: number): GetThunkType => async (dispatch) => {
-    projectId && await ProjectAPI.getProjectUsers(projectId).then(res => {
-        res && dispatch(actionsProjects.setProjectUsers(res))
-    }).catch(e => {
-        console.log(e)
-    })
+export const getProjectInfo = (projectId: number): GetThunkType => async (dispatch, getState) => {
+    const project = getState().projects.activeProject
+    if (projectId) {
+        !project?.users && await ProjectAPI.getProjectUsers(projectId).then(res => {
+            res && dispatch(actionsProjects.setProjectUsers(res))
+        }).catch(e => {
+            console.log(e)
+        })
+
+        !project?.actionsHistory && await ProjectAPI.getProjectActions(projectId).then(res => {
+            res && dispatch(actionsProjects.setProjectActions(res))
+        }).catch(e => {
+            console.log(e)
+        })
+    }
 }
 export const getInvitations = (userId: number): GetThunkType => async (dispatch) => {
     userId && await ProjectAPI.getInvitations(userId).then(res => {
