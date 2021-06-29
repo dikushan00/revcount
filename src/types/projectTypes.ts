@@ -9,7 +9,7 @@ export interface ProjectPostType {
     balance: number
     users?: UserType[],
     revisions?: EditType[],
-    invitations: { user_id: string | number }[],
+    invitations: { username: string }[],
     actionsHistory?: ActionHistoryType[]
     workspace?: WorkspaceMessageType[]
     message?: string

@@ -6,7 +6,7 @@ import {SidebarRight} from "../sidebars/SidebarRight";
 import {Sidebar} from "../sidebars/Sidebar";
 import {useDispatch, useSelector} from "react-redux";
 import {actionsProjects, getInvitations, getProjects} from "../../src/redux/projects-reducer";
-import {getUserId} from "../../src/redux/projects-selector";
+import {getUserId, getProjects as getProjectsSelector} from "../../src/redux/projects-selector";
 import {Redirect} from "../common/tools/Router";
 import {Page, PageWrapper, Wrapper} from "../styled/mainPage/components";
 import {getIsAuth} from "../../src/redux/auth-selector";
@@ -18,7 +18,6 @@ export const MainLayOut: React.FC<{ title: string, isProjectSideBarMode?: boolea
                                                                                             title = "Revcount",
                                                                                             isProjectSideBarMode = true
                                                                                         }) => {
-    const router = useRouter()
     const userId = useSelector(getUserId)
     const isAuth = useSelector(getIsAuth)
 
@@ -30,8 +29,6 @@ export const MainLayOut: React.FC<{ title: string, isProjectSideBarMode?: boolea
             dispatch(getInvitations(userId))
         }
     }, [userId])
-
-    tryUpdateActiveProject(router, dispatch)
 
     if (!isAuth) return <Redirect to="login"/>
 
@@ -55,13 +52,14 @@ export const MainLayOut: React.FC<{ title: string, isProjectSideBarMode?: boolea
     </>
 }
 
-const tryUpdateActiveProject = (router: { query: any }, dispatch: any) => {
-    let isProjectPage = false
-    for (let key in router.query) {
-        if (key === "projectId") {
-            isProjectPage = true
-        }
-    }
-    if (!isProjectPage)
-        dispatch(actionsProjects.setActiveProject(null))
-}
+// const tryUpdateActiveProject = (router: { query: any }, dispatch: any) => {
+//     let isProjectPage = false
+//     for (let key in router.query) {
+//         if (key === "projectId") {
+//             isProjectPage = true
+//         }
+//     }
+//
+//     if (!isProjectPage)
+//         dispatch(actionsProjects.setActiveProject(null))
+// }

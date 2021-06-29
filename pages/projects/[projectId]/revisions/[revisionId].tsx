@@ -12,14 +12,14 @@ import {EditControlPanel} from "../../../../components/projects/edits/EditContro
 import {ArtistsControlPanel} from "../../../../components/projects/edits/artist/ArtistsControlPanel";
 import {MainLayOut} from "../../../../components/layouts/MainLayOut";
 import {useRouter} from "next/router";
-import {AppStateType} from "../../../../src/redux/store-redux";
 import {actionsProjects} from "../../../../src/redux/projects-reducer";
 import {ProjectAPI} from "../../../../src/api/ProjectAPI";
+import {MakePaymentModal} from "../../../../components/projects/modals/MakePaymentModal";
 
 const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = () => {
 
     const project = useSelector(getActiveProject)
-    const {request, error} = useHttp()
+    const {request} = useHttp()
     const router = useRouter()
     const dispatch = useDispatch()
 
@@ -27,7 +27,6 @@ const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = () => {
 
     const [offer, setOffer] = React.useState<ValidOfferType | null>(null)
     const [revision, setRevision] = React.useState<EditType | null>(null)
-    const revisions = useSelector((state: AppStateType) => state.projects.revisions)
 
     React.useEffect(() => {
         if (projectId && revisionId) {

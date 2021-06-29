@@ -512,6 +512,7 @@ img {
 .popup__sec {
     top: 0;
     left: 0;
+    z-index: 1000;
     position: fixed;
     width: 100%;
     min-height: 100vh;

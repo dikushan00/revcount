@@ -64,7 +64,6 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
             checked: false
         }
     ])
-
     // const contacts = useSelector((state: AppStateType) => state.profile.contacts)
     const [activeTabId, setActiveTabId] = React.useState<number>(1)
 
@@ -73,17 +72,6 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
             title: "E-mail",
             Component: () => <InviteMemberViaEmail hookForm={hookForm}
                                                    hideBlock={hideBlock}/>
-        },
-        {
-            title: "ID invitation",
-            Component: () => <InviteMemberViaId projectId={projectId} hideBlock={hideBlock}/>,
-            className: "input-id-button"
-        },
-        {
-            title: "From contacts",
-            Component: () => <InviteMemberFromContacts contacts={contacts} onClickRadio={onClickRadio}
-                                                       hookForm={hookForm}
-                                                       hideBlock={hideBlock}/>
         }
     ]
 

@@ -57,7 +57,6 @@ export const actionsApp = {
 export const init = (): GetThunkType => async (dispatch, getState) => {
     let isAuth = getState().auth.userId
     if (isAuth) return
-
     let checkAuth = dispatch(checkAuthMe()).catch(() => {
         return null
     })

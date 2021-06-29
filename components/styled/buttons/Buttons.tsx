@@ -221,6 +221,10 @@ export const Btn3 = styled.button`
   }
 `
 
+export const Btn2AllWidth = styled(Btn2)`
+  width: 100%;
+  justify-content: center;
+`
 export const BorderedButton = styled(Btn2)`
   font-weight: 600;
 `

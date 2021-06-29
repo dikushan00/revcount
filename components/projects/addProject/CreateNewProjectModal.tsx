@@ -22,6 +22,8 @@ import {
 import {Toast, useToast} from "../../common/blocks/Toast";
 import {ProjectAPI} from "../../../src/api/ProjectAPI";
 import {ValidationError} from "../../common/form/ValidationError";
+import {router} from "next/client";
+import {useRouter} from "next/router";
 
 type PropsType = {
     hideBlock: () => void
@@ -31,30 +33,31 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
 
 
     const {show} = useToast()
+    const router = useRouter()
     const dispatch = useDispatch()
     const {handleSubmit, control, formState: {errors}} = useForm();
     const addProjectRef = React.useRef(null)
 
     const [isInputDateMode, setIsInputDateMode] = React.useState(false)
-    const [addedIds, setAddedIds] = React.useState([] as string[])
+    const [addedEmails, setAddedEmails] = React.useState([] as string[])
     const [error, setError] = React.useState("")
 
     const userId = useSelector(getUserId)
 
     const handleDeleteId = (id: string) => {
-        const edited = addedIds.filter(item => item !== id)
-        setAddedIds(edited)
+        const edited = addedEmails.filter(item => item !== id)
+        setAddedEmails(edited)
     }
 
     useOutsideAlerter(addProjectRef, hideBlock)
     const handleCloseModal = () => hideBlock()
 
     const onSubmit = async (data: { name: string, freeEdits: string, deadline: string }) => {
-        if (!addedIds.length) {
-            setError("User ID field must not be empty")
-            return
-        }
-        const invitations = addedIds.map(userId => ({user_id: userId}))
+        // if (!addedEmails.length) {
+        //     setError("User ID field must not be empty")
+        //     return
+        // }
+        const invitations = addedEmails.map(email => ({username: email}))
 
         let isDeadlineValid = new Date(data.deadline).getTime() > new Date().getTime()
         if (!isDeadlineValid) {
@@ -73,6 +76,7 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
             dispatch(actionsProjects.addProject(response))
             dispatch(actionsProjects.setActiveProject(response))
             hideBlock()
+            router.push(`/projects/${response.project_id}`)
         }).catch(res => {
             let errorMessage = res.response.data.message
             setError(errorMessage)
@@ -83,14 +87,15 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
         //@ts-ignore
         if (e.code === "Enter") {
             //@ts-ignore
-            let id = +e.target.value
-            let isNumber = !isNaN(id)
-            let isExist = addedIds.some(item => item === id.toString())
+            let email = e.target.value
+            let isEmailValid = email.length && email.match(/.+@.+\..+/i)
+
+            let isExist = addedEmails.some(item => item === email)
             if (isExist)
                 return
 
-            if (isNumber && id > 0 && !isExist) {
-                setAddedIds(state => ([...state, id.toString()]))
+            if (isEmailValid) {
+                setAddedEmails(state => ([...state, email]))
                 //@ts-ignore
                 e.target.value = ""
             }
@@ -151,10 +156,10 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
             <PopupItem className="popup__item">
                 <PopupInputId className="popup__input popup__input--id">
                     {
-                        addedIds.map(id => {
-                            return <div key={id} className="id-block__item">
-                                <div className="id-block__number">{id}</div>
-                                <span onClick={() => handleDeleteId(id)} className="id-block__btn">
+                        addedEmails.map(email => {
+                            return <div key={email} className="id-block__item">
+                                <div className="id-block__number">{email}</div>
+                                <span onClick={() => handleDeleteId(email)} className="id-block__btn">
                                 <RemoveItemIcon/>
                             </span>
                             </div>
@@ -165,7 +170,7 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
                 </PopupInputId>
             </PopupItem>
             <PopupDesc className="popup__descr">
-                Enter a unique user ID for the invitation, comma separated
+                Enter a unique username for the invitation, comma separated
             </PopupDesc>
             <InputIdButton onClick={handleSubmit(onSubmit)}>Create a project</InputIdButton>
         </div>

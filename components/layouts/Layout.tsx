@@ -5,7 +5,12 @@ import Preloader from "../common/preloader/Preloader";
 import {useSelector} from "react-redux";
 import {AppStateType} from "../../src/redux/store-redux";
 
-export const Layout: React.FC<{ title: string, layoutId?: 1 | 2 , isProjectSideBarMode?: boolean}> = ({layoutId = 1, title,isProjectSideBarMode, children}) => {
+export const Layout: React.FC<{ title: string, layoutId?: 1 | 2, isProjectSideBarMode?: boolean }> = ({
+                                                                                                          layoutId = 1,
+                                                                                                          title,
+                                                                                                          isProjectSideBarMode,
+                                                                                                          children
+                                                                                                      }) => {
 
     const initialized = useSelector((state: AppStateType) => state.app.initialized);
 
@@ -16,7 +21,7 @@ export const Layout: React.FC<{ title: string, layoutId?: 1 | 2 , isProjectSideB
     if (!initialized) {
         return <Preloader theme/>;
     }
-    return <CurrentLayout title={title} isProjectSideBarMode = {isProjectSideBarMode}>
-        {children}
+    return <CurrentLayout title={title} isProjectSideBarMode={isProjectSideBarMode}>
+         {children}
     </CurrentLayout>
 }
