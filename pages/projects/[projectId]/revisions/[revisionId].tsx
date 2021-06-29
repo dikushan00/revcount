@@ -1,7 +1,7 @@
 import React from 'react';
 import {EditType, InviteStatusType, OfferType} from "../../../../src/types/projectTypes";
 import {useDispatch, useSelector} from "react-redux";
-import {getActiveProject} from "../../../../src/redux/projects-selector";
+import {getActiveProject, getProjects} from "../../../../src/redux/projects-selector";
 import {useHttp} from "../../../../src/utils/hooks/http.hook";
 import {calculateDaysLeft} from "../../../../src/utils/calculateDaysLeft";
 import {Edits, EditsButton, EditsHeader, EditsTitle} from "../../../../components/styled/edit/components";
@@ -14,11 +14,11 @@ import {MainLayOut} from "../../../../components/layouts/MainLayOut";
 import {useRouter} from "next/router";
 import {actionsProjects} from "../../../../src/redux/projects-reducer";
 import {ProjectAPI} from "../../../../src/api/ProjectAPI";
-import {MakePaymentModal} from "../../../../components/projects/modals/MakePaymentModal";
 
 const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = () => {
 
     const project = useSelector(getActiveProject)
+    const projects = useSelector(getProjects)
     const {request} = useHttp()
     const router = useRouter()
     const dispatch = useDispatch()
@@ -53,24 +53,27 @@ const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = () => {
     }, [revision])
 
     React.useEffect(() => {
+        let activeProject = projects && projectId && projects.find(item => item.project_id === +projectId)
+        activeProject && dispatch(actionsProjects.setActiveProject(activeProject))
+    }, [projects])
+
+    React.useEffect(() => {
         const getOffer = async () => {
-            if (project?.project_id && revision?.revision_id) {
-                let offer = await request<OfferType>(`revisions/${revision.revision_id}/offer`)
-                if (offer) {
-                    let timeLeft = calculateDaysLeft(offer.deadline)
-                    let offerObj = {
-                        days: timeLeft.days,
-                        hours: timeLeft.hours,
-                        status: offer.status,
-                        amount: offer.amount,
-                        deadline: offer.deadline
-                    }
-                    offerObj && setOffer(offerObj)
+            let offer = revisionId && await request<OfferType>(`revisions/${revisionId}/offer`)
+            if (offer) {
+                let timeLeft = calculateDaysLeft(offer.deadline)
+                let offerObj = {
+                    days: timeLeft.days,
+                    hours: timeLeft.hours,
+                    status: offer.status,
+                    amount: offer.amount,
+                    deadline: offer.deadline
                 }
+                offerObj && setOffer(offerObj)
             }
         }
         getOffer()
-    }, [project, revision])
+    }, [])
 
     const closePage = () => {
         router.push(`/projects/${projectId}`)

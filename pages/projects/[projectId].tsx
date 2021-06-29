@@ -57,14 +57,6 @@ const Project: React.FC<{ project: ProjectType }> = () => {
         }
     }, [projectId])
 
-    React.useEffect(() => {
-        project && dispatch(getProjectInfo(+project.project_id))
-    }, [project])
-
-    React.useEffect(() => {
-        project && dispatch(actionsProjects.setActiveProject(project))
-    }, [project])
-
     const setEditMode = (edit: EditType | null) => {
         router.push(`${projectId}/revisions/${edit?.revision_id}`)
     }

@@ -3,7 +3,7 @@ import {AddMemberToProjectModal} from "../projects/members/AddMemberToProjectMod
 import {TeamSettingsModal} from "../projects/modals/TeamSettingsModal";
 import {useDispatch, useSelector} from "react-redux";
 import {getActiveProject, getUserId} from "../../src/redux/projects-selector";
-import {actionsProjects} from "../../src/redux/projects-reducer";
+import {actionsProjects, getProjectInfo} from "../../src/redux/projects-reducer";
 import {TeamProjectButton, TeamProjectSettingsButton} from "../styled/buttons/Buttons";
 import {
     Notices, NoticesItem, NoticesLabel, NoticesList, NoticesText, NoticesTime,
@@ -25,6 +25,10 @@ export const SidebarRight = () => {
         inviteMember: false,
         teamSettings: false
     })
+
+    React.useEffect(() => {
+        activeProject && !activeProject.users && dispatch(getProjectInfo(+activeProject.project_id))
+    }, [activeProject])
 
     const onEditClick = (editId: number | null) => {
         let activeEdit = activeProject?.revisions?.find(item => item.revision_id === editId) || null
