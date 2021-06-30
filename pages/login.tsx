@@ -90,7 +90,7 @@ export default function Login() {
                         </SignUpLine>
                         <SignUpBlock>
                             <SignUpButton disabled={loading} type="submit"
-                                          className="signup__btn btn">Login</SignUpButton>
+                                          className="signup__btn btn">{loading ? "Pending..." : "Login"}</SignUpButton>
                             <SocialNetworksSignUp/>
                         </SignUpBlock>
                     </SignUpForm>

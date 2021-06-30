@@ -5,19 +5,7 @@ import {CustomPopup} from "../../common/blocks/CustomPopup";
 import {Controller, useForm} from "react-hook-form";
 import {useOutsideAlerter} from "../../../src/utils/hooks/outsideClick";
 import {CardElement, useElements, useStripe} from "@stripe/react-stripe-js";
-import {
-    PopupBlock,
-    PopupBox,
-    PopupClose,
-    PopupDesc,
-    PopupForm,
-    PopupInfo,
-    PopupInput,
-    PopupItem,
-    PopupLink,
-    PopupTitle
-} from "../../styled/modals/components";
-import {ImgWrapper} from "../../common/blocks/ImgWrapper";
+import {PopupClose, PopupForm, PopupInfo, PopupInput, PopupItem, PopupTitle} from "../../styled/modals/components";
 import {ValidationError} from "../../common/form/ValidationError";
 import {Btn2AllWidth} from "../../styled/buttons/Buttons";
 import axios from "axios";
@@ -36,8 +24,6 @@ export const MakePaymentModal: React.FC<{ hideBlock: () => void, handleReserveMo
 
     const elements = useElements()
     const stripe = useStripe()
-
-    const [paymentMethod, setPaymentMethod] = React.useState<{ id: number, name: PaymentMethodsNames } | null>(null)
 
     useOutsideAlerter(modalRef, hideBlock)
 
@@ -117,47 +103,11 @@ export const MakePaymentModal: React.FC<{ hideBlock: () => void, handleReserveMo
 
             {checkoutError && <ValidationError>{checkoutError}</ValidationError>}
             <Btn2AllWidth disabled={false} type={"submit"} className={"tabs-popup__btn"}>
-                {isProcessing ? "Processing..." : `Pay $${price}`}</Btn2AllWidth>
-            <PopupDesc className="popup__descr">
-                Choose a payment method
-            </PopupDesc>
-            <PopupBlock className="popup__block">
-                {
-                    paymentMethods?.map((item, index) => {
-                        return <PopupBox key={index} onClick={() => setPaymentMethod({
-                            id: item.id,
-                            name: item.name
-                        })} className={"popup__box " + (paymentMethod?.id === item.id ? "active" : "")}>
-                            <PopupLink className="popup__link">
-                                <ImgWrapper path={item.imgPath}/>
-                            </PopupLink>
-                        </PopupBox>
-                    })
-                }
-            </PopupBlock>
+                {isProcessing ? "Processing..." : `Pay $${price}`}
+            </Btn2AllWidth>
         </PopupForm>
     </CustomPopup>
 }
-
-const paymentMethods = [
-    {
-        id: 1,
-        imgPath: "/img/modal/master-card.svg",
-        name: "Master Card",
-    },
-    {
-        id: 2,
-        imgPath: "/img/modal/googlePay.svg",
-        name: "Google Pay"
-    },
-    {
-        id: 3,
-        imgPath: "/img/modal/paypal.svg",
-        name: "Paypal"
-    }
-] as { id: number, name: PaymentMethodsNames, imgPath: string }[]
-
-type PaymentMethodsNames = "Master Card" | "Google Pay" | "Paypal"
 
 const CardElementContainer = styled.div`
   height: 40px;

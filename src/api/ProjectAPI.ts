@@ -96,7 +96,7 @@ export const ProjectAPI =  {
         }).then(res => res.data)
     },
     sendInvitation(projectId: number, body: ContactPostType[]) {
-        return instance && instance.post<any>(`projects/${projectId}/invitations`, body, {
+        return instance && instance.post<any>(`invitations`, body, {
             headers: {
                 "Authorization": "Bearer " + localStorage.getItem("token")
             }
@@ -117,4 +117,4 @@ export const ProjectAPI =  {
     }
 }
 
-export interface ContactPostType {user_id: number, project_id: number}
+export interface ContactPostType {username: string, project_id: number}[]

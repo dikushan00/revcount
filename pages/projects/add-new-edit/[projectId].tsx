@@ -34,7 +34,7 @@ export default function AddNewEdit() {
 
     const router = useRouter()
     const {projectId} = router.query
-    const {clearError, request, error, loading} = useHttp()
+    const {clearError, request, error} = useHttp()
     const {show} = useToast()
     const dispatch = useDispatch()
 
@@ -83,7 +83,6 @@ export default function AddNewEdit() {
         return editPost
     }
     const onSubmit = async (obj: any) => {
-        debugger
         let editPost = sortTasks(obj)
         let response = projectId && await request<EditType>(`projects/${projectId}/revisions`, "post", editPost)
         if (response) {

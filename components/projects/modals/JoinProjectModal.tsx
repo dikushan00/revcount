@@ -44,7 +44,7 @@ export const JoinProjectModal: React.FC<PropsType> = ({hideBlock}) => {
                 hideBlock()
             }
         }).catch(e =>{
-            setError(e.message)
+            setError(e.response.data.message)
         })
     }
 

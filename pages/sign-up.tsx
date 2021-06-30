@@ -116,7 +116,7 @@ export default function SignUp() {
                             {errors.password && <ValidationError>This field is required or check your password</ValidationError>}
                         </SignUpLine>
                         <SignUpBlock>
-                            <SignUpButton disabled={loading} type="submit">Create an account</SignUpButton>
+                            <SignUpButton disabled={loading} type="submit">{loading ? "Pending..." : "Create an account"}</SignUpButton>
                             <SocialNetworksSignUp/>
                         </SignUpBlock>
                     </SignUpForm>
