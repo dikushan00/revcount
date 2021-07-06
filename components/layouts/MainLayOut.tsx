@@ -5,12 +5,13 @@ import {Content} from "../content/Content";
 import {SidebarRight} from "../sidebars/SidebarRight";
 import {Sidebar} from "../sidebars/Sidebar";
 import {useDispatch, useSelector} from "react-redux";
-import {actionsProjects, getInvitations, getProjects} from "../../src/redux/projects-reducer";
-import {getUserId, getProjects as getProjectsSelector} from "../../src/redux/projects-selector";
+import {getInvitations, getProjects} from "../../src/redux/projects-reducer";
+import {getUserId} from "../../src/redux/projects-selector";
 import {Redirect} from "../common/tools/Router";
 import {Page, PageWrapper, Wrapper} from "../styled/mainPage/components";
 import {getIsAuth} from "../../src/redux/auth-selector";
-import {useRouter} from "next/router";
+import {AppStateType} from "../../src/redux/store-redux";
+import Preloader from "../common/preloader/Preloader";
 
 //main layout with sidebars, header and content
 export const MainLayOut: React.FC<{ title: string, isProjectSideBarMode?: boolean }> = ({
@@ -20,6 +21,7 @@ export const MainLayOut: React.FC<{ title: string, isProjectSideBarMode?: boolea
                                                                                         }) => {
     const userId = useSelector(getUserId)
     const isAuth = useSelector(getIsAuth)
+    const isFirstEnter = useSelector((state: AppStateType) => state.auth.isFirstEnter)
 
     const dispatch = useDispatch()
 
@@ -30,7 +32,8 @@ export const MainLayOut: React.FC<{ title: string, isProjectSideBarMode?: boolea
         }
     }, [userId])
 
-    if (!isAuth) return <Redirect to="login"/>
+    if (isFirstEnter) return <Preloader />
+    if (!isFirstEnter && !isAuth) return <Redirect to="login"/>
 
     return <>
         <Head>

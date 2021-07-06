@@ -4,8 +4,6 @@ import {init} from "../../src/redux/app-reducer";
 
 import {Elements} from "@stripe/react-stripe-js";
 import {loadStripe} from "@stripe/stripe-js";
-import {AppStateType} from "../../src/redux/store-redux";
-import {AuthLayout} from "../layouts/AuthLayout";
 import Preloader from "../common/preloader/Preloader";
 import {getIsInitialized} from "../../src/redux/app-selector";
 

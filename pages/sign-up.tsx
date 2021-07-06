@@ -45,7 +45,7 @@ export default function SignUp() {
 
         let response = await request<SignUpResponseType>("users/register", "post", data, null, false)
         if (response) {
-            router.push("/")
+            await router.push("/")
             dispatch(actionsAuth.setNewAuth(response.token, null, response.user_id))
             dispatch(actionsProfile.setProfile({
                 user_id: response.user_id,
@@ -54,6 +54,7 @@ export default function SignUp() {
                 first_name: response.first_name
             }))
             localStorage.setItem("token", response.token)
+            window.location.reload();
         }
     }
 

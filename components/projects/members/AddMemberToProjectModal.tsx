@@ -139,16 +139,18 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
 }
 
 const InviteMemberViaEmail: React.FC<ModalItemPropsType> = ({hookForm}) => {
-    return <PopupTabsLine className="tabs-popup__line">
-        <Controller as={<input className="tabs-popup__input" placeholder="E-mail, comma separated"/>}
-                    name={`email`}
-                    rules={{required: true, pattern: /.+@.+\..+/i}}
-                    control={hookForm?.control}
-                    defaultValue={""}
-        />
+    return <>
+        <PopupTabsLine className="tabs-popup__line">
+            <Controller as={<input className="tabs-popup__input" placeholder="E-mail, comma separated"/>}
+                        name={`email`}
+                        rules={{required: true, pattern: /.+@.+\..+/i}}
+                        control={hookForm?.control}
+                        defaultValue={""}
+            />
+            <Btn2 type={"submit"} className={"tabs-popup__btn"}>Send invite</Btn2>
+        </PopupTabsLine>
         {hookForm?.errors[`email`] && <ValidationError>This field is required or check your email</ValidationError>}
-        <Btn2 type={"submit"} className={"tabs-popup__btn"}>Send invite</Btn2>
-    </PopupTabsLine>
+    </>
 }
 
 export const RemoveItemIcon = () => {

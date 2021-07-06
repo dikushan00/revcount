@@ -11,8 +11,8 @@ export const SideBarPage = styled.div`
 export const SidebarAside = styled.aside`
   background-color: #fff;
   height: 100vh;
-  -webkit-box-shadow: 0px 0px 15px rgba(24, 46, 122, 0.03);
-  box-shadow: 0px 0px 15px rgba(24, 46, 122, 0.03);
+  -webkit-box-shadow: 0 0 15px rgba(24, 46, 122, 0.03);
+  box-shadow: 0 0 15px rgba(24, 46, 122, 0.03);
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -44,6 +44,7 @@ export const SidebarContent = styled.div`
   -webkit-box-flex: 1;
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
+  overflow: auto;
 `
 export const SidebarActions = styled.div`
   display: -webkit-box;
@@ -117,7 +118,7 @@ export const TeamProjectsItem = styled.li`
   -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
-  font-family: "Gilroy";
+  font-family: "Gilroy",sans-serif;
   margin-bottom: calc(10px + 5 * ((100vw - 320px) / 1600));
   font-weight: 500;
   font-size: calc(12px + 4 * ((100vw - 320px) / 1600));

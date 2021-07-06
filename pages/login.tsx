@@ -25,11 +25,13 @@ import {
     SignUpTitle
 } from "../components/styled/signUp/components";
 import {Layout} from "../components/layouts/Layout";
+import {useRouter} from "next/router";
 import {actionsAuth} from "../src/redux/auth-reducer";
 
 export default function Login() {
     const {errors, control, handleSubmit} = useForm()
     const {show} = useToast()
+    const router = useRouter()
     const dispatch = useDispatch()
     const {request, error, loading, clearError} = useHttp()
 
@@ -37,8 +39,10 @@ export default function Login() {
         let response = await request<{ token: string }>("users/token", "post", data, null, false)
 
         if (response && response?.token) {
-            dispatch(actionsAuth.setNewAuth(response.token, null))
+            dispatch(actionsAuth.setNewAuth(response.token, null, null , true))
             localStorage.setItem("token", response.token)
+            await router.push("/")
+            window.location.reload();
         }
     }
 
@@ -67,8 +71,7 @@ export default function Login() {
                             Login
                         </SignUpTitle>
                         <SignUpDesc>
-                            Don't&nbsp; have an&nbsp; account yet?&nbsp; — <Link href="/sign-up"><a className="signup__link">Sign
-                            Up</a></Link>
+                            Don't&nbsp; have an&nbsp; account yet?&nbsp; — <Link href="/sign-up"><a className="signup__link">Sign Up</a></Link>
                         </SignUpDesc>
                         <SignUpLine>
                             <Controller as={<SignUpInput placeholder="Your name" type="text"/>}

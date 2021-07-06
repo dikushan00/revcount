@@ -8,7 +8,6 @@ export const Layout: React.FC<{ title: string, layoutId?: 1 | 2, isProjectSideBa
                                                                                                           isProjectSideBarMode,
                                                                                                           children
                                                                                                       }) => {
-
     let CurrentLayout = MainLayOut
     if (layoutId === 2)
         CurrentLayout = AuthLayout

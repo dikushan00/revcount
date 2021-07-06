@@ -1,4 +1,5 @@
 import React from "react";
+import s from "./Preloader.module.css"
 
 type PropsType = {
     theme?: string | boolean //if true dark theme, default: white
@@ -6,8 +7,8 @@ type PropsType = {
 
 //preloader component
 const Preloader:React.FC<PropsType> = () => {
-  return <div className = "PreloaderWrap">
-        <div className={"ldsDualRing"}/>
+  return <div className ={s.PreloaderWrap}>
+        <div className={s.ldsDualRing}/>
       </div>
 };
 

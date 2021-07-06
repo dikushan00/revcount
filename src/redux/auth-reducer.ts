@@ -8,6 +8,7 @@ const initialState = {
     token: null as string | null,
     roles: null as RoleType | null,
     userId: null as number | null,
+    isFirstEnter: false,
     isFetching: false
 }
 
@@ -25,6 +26,8 @@ export const auth_reducer = (state = initialState, action: ActionsType): AuthIni
                 isAuth: true,
                 roles: action.roles,
                 token: action.token,
+                //@ts-ignore
+                isFirstEnter: action.isFirstEnter,
                 userId: action.userId
             }
         }
@@ -40,11 +43,12 @@ export const auth_reducer = (state = initialState, action: ActionsType): AuthIni
 }
 
 export const actionsAuth = {
-    setNewAuth: (token: string, roles: RoleType | null, userId?: number) => ({
+    setNewAuth: (token: string, roles: RoleType | null, userId?: number | null, isFirstEnter?: boolean) => ({
         type: 'REVCOUNT/AUTH/SET_NEW_AUTH',
         token,
         roles,
-        userId: userId || null
+        userId: userId || null,
+        isFirstEnter: isFirstEnter || false
     } as const),
     logout: () => ({
         type: 'REVCOUNT/AUTH/SET_NEW_AUTH',
