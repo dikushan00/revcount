@@ -4,11 +4,12 @@ import {
     EditType,
     InviteProjectType,
     OfferType,
+    ProjectRolesType,
     ProjectType,
-    StatusType, WorkspaceMessageType
+    StatusType
 } from "../types/projectTypes";
 import {TaskTypeWithFlag} from "../../components/projects/edits/EditTasksPanel";
-import {RoleType, UserType} from "../types/userTypes";
+import {UserType} from "../types/userTypes";
 import {ProjectAPI} from "../api/ProjectAPI";
 import {calculateDaysLeft} from "../utils/calculateDaysLeft";
 
@@ -83,7 +84,7 @@ export const projects_reducer = (
         case "REVCOUNT/PROJECTS/ADD_ROLE_TO_PROJECT": {
             return {
                 ...state,
-                activeProject: state.activeProject && {...state.activeProject, role: action.role},
+                activeProject: state.activeProject && {...state.activeProject, user_role: action.payload},
             };
         }
         case "REVCOUNT/PROJECTS/ADD_USERS_TO_PROJECT": {
@@ -277,6 +278,9 @@ export const projects_reducer = (
                 },
             };
         }
+        case "REVCOUNT/PROJECTS/SET_USER_ROLE": {
+            return {...state, activeProject: state.activeProject && {...state.activeProject, user_role: action.payload}}
+        }
         case "REVCOUNT/PROJECTS/SET_FETCHING": {
             return {...state, isFetching: action.payload}
         }
@@ -290,8 +294,8 @@ export const actionsProjects = {
         ({type: "REVCOUNT/PROJECTS/SET_PROJECTS", projects} as const),
     addProject: (project: ProjectType) =>
         ({type: "REVCOUNT/PROJECTS/ADD_PROJECT", project} as const),
-    addRoleToProject: (role: RoleType) =>
-        ({type: "REVCOUNT/PROJECTS/ADD_ROLE_TO_PROJECT", role} as const),
+    addRoleToProject: (role: ProjectRolesType) =>
+        ({type: "REVCOUNT/PROJECTS/ADD_ROLE_TO_PROJECT", payload: role} as const),
     addUserToProject: (user: UserType) =>
         ({type: "REVCOUNT/PROJECTS/ADD_USER_TO_PROJECT", payload: user} as const),
     addUsersToProject: (users: UserType[]) =>
@@ -332,20 +336,22 @@ export const actionsProjects = {
         ({type: "REVCOUNT/PROJECTS/SET_ACTIVE_PROJECT_OFFER", offer, revisionId} as const),
     setActiveEdit: (edit: EditType | null) =>
         ({type: "REVCOUNT/PROJECTS/SET_ACTIVE_EDIT", edit} as const),
+    setUserRole: (role: ProjectRolesType) =>
+        ({type: "REVCOUNT/PROJECTS/SET_USER_ROLE", payload: role} as const),
     setIsFetching: (isFetching: boolean) =>
         ({type: "REVCOUNT/PROJECTS/SET_FETCHING", payload: isFetching} as const),
 }
 
 export const getProjects = (userId: number): GetThunkType => async (dispatch) => {
     if (userId) {
-        dispatch(actionsProjects.setIsFetching(true))
+        // dispatch(actionsProjects.setIsFetching(true))
         await ProjectAPI.getProjects(userId).then(res => {
-            dispatch(actionsProjects.setIsFetching(false))
+            // dispatch(actionsProjects.setIsFetching(false))
             if (res && res.length > 0) {
                 dispatch(actionsProjects.setProjects(res))
             }
         }).catch(e => {
-            dispatch(actionsProjects.setIsFetching(false))
+            // dispatch(actionsProjects.setIsFetching(false))
             console.log(e)
         })
     }
@@ -361,11 +367,10 @@ export const getProjectInfo = (projectId: number): GetThunkType => async (dispat
 
         !project?.actionsHistory && await ProjectAPI.getProjectActions(projectId).then(res => {
             res && dispatch(actionsProjects.setProjectActions(res))
-        }).catch(e => {
-            console.log(e)
-        })
+        }).catch(e => {})
     }
 }
+
 export const getInvitations = (userId: number): GetThunkType => async (dispatch) => {
     userId && await ProjectAPI.getInvitations(userId).then(res => {
         dispatch(actionsProjects.setInvitations(res))

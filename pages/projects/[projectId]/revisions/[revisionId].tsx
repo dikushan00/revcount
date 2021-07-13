@@ -34,11 +34,10 @@ const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = () => {
                 if (response) {
                     dispatch(actionsProjects.setRevisions(+projectId, response))
                     let revision = response?.find((item: any) => item.revision_id === +revisionId)
-                    revision && setRevision(revision)
+                    revision && setRevision({...revision, isOfferAccepted: false})
                 }
             }).catch(e => {
                 dispatch(actionsProjects.setRevisions(null, null))
-                console.log(e)
             })
         }
     }, [projectId, revisionId])
@@ -48,7 +47,6 @@ const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = () => {
             //@ts-ignore
             workspace && setRevision(state => ({...state, res}))
         }).catch(e => {
-            console.log(e)
         })
     }, [revision])
 
@@ -58,11 +56,25 @@ const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = () => {
     }, [projects])
 
     React.useEffect(() => {
+        if (offer?.status === "ACCEPTED") {
+            //@ts-ignore
+            setRevision(prevState => ({...prevState, isOfferAccepted: true}))
+            setRevision((prevState) => {
+                if (prevState && prevState.status === "Approval") {
+                    return {...prevState, status: "Reservation"}
+                }
+                return prevState
+            })
+        }
+    }, [offer])
+
+    React.useEffect(() => {
         const getOffer = async () => {
             let offer = revisionId && await request<OfferType>(`revisions/${revisionId}/offer`)
             if (offer) {
                 let timeLeft = calculateDaysLeft(offer.deadline)
                 let offerObj = {
+                    offerId: offer.offer_id,
                     days: timeLeft.days,
                     hours: timeLeft.hours,
                     status: offer.status,
@@ -94,21 +106,21 @@ const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = () => {
                     Back to project
                 </EditsButton>
             </EditsHeader>
-            <EditProgressBar status={revision?.status}/>
+            <EditProgressBar revision={revision}/>
             <EditTasksPanel editName={revision?.name} projectId={projectId} projectTasks={revision?.tasks}
                             type={"changeEdit"}/>
-            <EditWorkspaceWindow isOfferExist={!!offer} offer={offer} isOwner={project?.role?.name === "Owner"}
+            <EditWorkspaceWindow isOfferExist={!!offer} offer={offer} isOwner={project?.user_role === "OWNER"}
                                  workspace={revision?.workspace} deadline={offer?.deadline}/>
             {
-                project?.role?.name === "Owner"
-                    ? <EditControlPanel closePage={closePage} offer={offer} project={project} edit={revision}/>
-                    : project?.role?.name === "Artist" && revision?.status === "Approval" && !offer &&
-                    <ArtistsControlPanel revisionId={revision?.revision_id} projectId={project.project_id}
-                                         role={project.role}/>
+                project?.user_role === "OWNER"
+                    ? <EditControlPanel setOffer={setOffer} closePage={closePage} offer={offer} project={project}
+                                        edit={revision}/>
+                    : project?.user_role === "ARTIST" && revision?.status === "Approval" && !offer &&
+                    <ArtistsControlPanel setOffer={setOffer} revisionId={revision?.revision_id}/>
             }
         </Edits>
     </MainLayOut>
 };
 
 export default Edit
-export type ValidOfferType = { amount: number, days: number | null, hours: number | null, deadline: string, status: InviteStatusType }
+export type ValidOfferType = { offerId: number, amount: number, days: number | null, hours: number | null, deadline: string, status: InviteStatusType }

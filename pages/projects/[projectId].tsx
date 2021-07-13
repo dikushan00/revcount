@@ -3,7 +3,7 @@ import Link from "next/link"
 import {EditType, ProjectType, StatusesNamesType} from "../../src/types/projectTypes"
 import {ProjectStatsInfo} from "../../components/projects/ProjectStatsInfo";
 import {useDispatch, useSelector} from "react-redux";
-import {actionsProjects, getProjectInfo} from "../../src/redux/projects-reducer";
+import {actionsProjects} from "../../src/redux/projects-reducer";
 import {useRouter} from "next/router";
 import {getActiveProject} from "../../src/redux/projects-selector";
 import {MyCorrectionsButton, ProjectsButton} from "../../components/styled/buttons/Buttons";
@@ -35,7 +35,7 @@ const Project: React.FC<{ project: ProjectType }> = () => {
         if (projectId) {
             ProjectAPI.getProject(+projectId).then(response => {
                 if (response) {
-                    dispatch(actionsProjects.setActiveProject({...response, role: {id: 1, name: "Owner"}}))
+                    dispatch(actionsProjects.setActiveProject(response))
                 }
             }).catch(e => {
                 dispatch(actionsProjects.setActiveProject(null))
@@ -65,7 +65,7 @@ const Project: React.FC<{ project: ProjectType }> = () => {
         <>
             <div className="projects">
                 <ProjectsHeader>
-                    {project?.role?.name === "Owner" && <AddCorrectionLink projectId={projectId as string}/>}
+                    {project?.user_role === "OWNER" && <AddCorrectionLink projectId={projectId as string}/>}
                     <ProjectStatsInfo project={project}/>
                 </ProjectsHeader>
             </div>

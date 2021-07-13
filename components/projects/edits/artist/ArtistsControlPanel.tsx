@@ -3,21 +3,22 @@ import {OfferConditionsBlock} from "../EditControlPanel";
 import {useForm} from "react-hook-form";
 import {useDispatch} from "react-redux";
 import {actionsProjects} from "../../../../src/redux/projects-reducer";
-import {RoleType} from "../../../../src/types/userTypes";
 import {useHttp} from "../../../../src/utils/hooks/http.hook";
 import {OfferType} from "../../../../src/types/projectTypes";
 import {OfferEditsAcceptButton} from "../../../styled/buttons/revisionButtons/RevisionsButtons";
-import {ControlEdits, EditsLabel, OfferEdits, OfferEditsForm, OfferEditsHeader} from "../../../styled/edit/components";
+import {ControlEdits, OfferEdits, OfferEditsForm} from "../../../styled/edit/components";
+import {ValidOfferType} from "../../../../pages/projects/[projectId]/revisions/[revisionId]";
 
-export const ArtistsControlPanel: React.FC<{ projectId: number, revisionId: number | undefined, role: RoleType }> = ({
-                                                                                                                                         role,
-                                                                                                                                         projectId,
-                                                                                                                                         revisionId,
-                                                                                                                                     }) => {
+type PropsType = {
+    revisionId: number | undefined,
+    setOffer: (n: ValidOfferType) => void
+}
+
+export const ArtistsControlPanel: React.FC<PropsType> = ({revisionId,}) => {
 
     const dispatch = useDispatch()
     const {handleSubmit, register} = useForm()
-    const {request, error} = useHttp()
+    const {request} = useHttp()
 
     const onSubmit = async (data: { days: string, hours: string, balance: string }) => {
         const {days, hours} = data
@@ -28,24 +29,23 @@ export const ArtistsControlPanel: React.FC<{ projectId: number, revisionId: numb
 
         let deadlineDate = new Date(deadline).toISOString()
 
-        let response = await request<OfferType>(`revisions/${revisionId}/offer`, "post", {deadline: deadlineDate, amount: data.balance})
-        if(response) {
+        let response = await request<OfferType>(`revisions/${revisionId}/offer`, "post", {
+            deadline: deadlineDate,
+            amount: data.balance
+        })
+        if (response) {
             revisionId && dispatch(actionsProjects.setActiveProjectOffer(revisionId, response))
+            //@ts-ignore
+            setOffer((state) => ({...state, status: "PENDING"}))
         }
     }
 
     return <ControlEdits>
         <OfferEdits>
-            {role.name !== "Artist" &&
-            <OfferEditsHeader>
-                <EditsLabel>
-                    Offer
-                </EditsLabel>
-            </OfferEditsHeader>}
             <OfferEditsForm onSubmit={handleSubmit(onSubmit)}>
                 <OfferConditionsBlock register={register}/>
                 <div className="offer-edits__block">
-                    <OfferEditsAcceptButton type={"submit"} >Send an offer</OfferEditsAcceptButton>
+                    <OfferEditsAcceptButton type={"submit"}>Send an offer</OfferEditsAcceptButton>
                 </div>
             </OfferEditsForm>
         </OfferEdits>

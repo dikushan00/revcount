@@ -26,10 +26,17 @@ import {
 import {ValidOfferType} from "../../../pages/projects/[projectId]/revisions/[revisionId]";
 import {ProjectAPI} from "../../../src/api/ProjectAPI";
 
-type PropsType = { offer: ValidOfferType | null, edit: EditType | null, project: ProjectType | null, closePage: () => void }
+type PropsType = {
+    offer: ValidOfferType | null,
+    edit: EditType | null,
+    project: ProjectType | null,
+    closePage: () => void
+    setOffer: (n: ValidOfferType) => void
+}
 
 export const EditControlPanel: React.FC<PropsType> = ({
                                                           offer,
+                                                          setOffer,
                                                           closePage,
                                                           edit,
                                                           project
@@ -42,38 +49,42 @@ export const EditControlPanel: React.FC<PropsType> = ({
     const handleReserveMoney = async () => {
         // let changedStatusEdits: EditType[] = changeStatus("Performing")
         project?.project_id && ProjectAPI.reserveMoney(project.project_id, {}).then(response => {
-            if(response) {
+            if (response) {
                 router.push("/projects/" + project?.project_id)
                 closePage()
                 setIsPaymentModalShowMode(false)
             }
-        }).then(e => {
-            console.log(e)
-        })
+        }).then(e => {})
 
     }
-    const handleAcceptOffer = async () => {
+    const handleAcceptOffer = async (e: any) => {
+        e.preventDefault()
         // let changedStatusEdits: EditType[] = changeStatus("Performing")
-
-        project?.project_id && ProjectAPI.acceptOffer(project.project_id, {}).then(response => {
-            if(response) {
-                router.push("/projects/" + project?.project_id)
-                closePage()
-                setIsPaymentModalShowMode(false)
+        offer?.offerId && ProjectAPI.acceptOffer(offer.offerId).then(response => {
+            if (response) {
+                //@ts-ignore
+                setOffer((state) => ({...state, status: "ACCEPTED"}))
             }
-        }).then(e => {
+        }).catch(e => {
             console.log(e)
         })
     }
-    const handleDeclineOffer = () => {
-        router.push("/projects/" + project?.project_id)
-        closePage()
+    const handleDeclineOffer = (e: any) => {
+        e.preventDefault()
+        offer?.offerId && ProjectAPI.declineOffer(offer.offerId).then(response => {
+            if (response) {
+                //@ts-ignore
+                setOffer((state) => ({...state, status: "DECLINED"}))
+            }
+        }).catch(e => {
+            console.log(e)
+        })
     }
     const handleCompleteProject = async () => {
         // let changedStatusEdits: EditType[] = changeStatus("Performing")
 
         project?.project_id && ProjectAPI.completeProject(project.project_id, {}).then(response => {
-            if(response) {
+            if (response) {
                 router.push("/projects/" + project?.project_id)
                 closePage()
                 setIsPaymentModalShowMode(false)
@@ -91,7 +102,7 @@ export const EditControlPanel: React.FC<PropsType> = ({
     }, [error])
 
     return <>
-        <Toast />
+        <Toast/>
         <ControlEdits>
             <ControlEditsHeader>
                 <ControlEditsLabel>
@@ -112,8 +123,8 @@ export const EditControlPanel: React.FC<PropsType> = ({
         </ControlEdits>
         {
             isPaymentModalShowMode &&
-            <MakePaymentModal handleReserveMoney={handleReserveMoney} hideBlock={() => setIsPaymentModalShowMode(false)}
-                              offer={offer}/>
+            <MakePaymentModal amount={offer?.amount || 0} handleReserveMoney={handleReserveMoney}
+                              hideBlock={() => setIsPaymentModalShowMode(false)}/>
         }
     </>
 }
@@ -122,12 +133,13 @@ type DefaultControlPanel = {
     editStatusName: StatusesNamesType | undefined,
     edit: EditType | null,
     offer: ValidOfferType | null,
-    handleAcceptOffer: () => void,
-    handleDeclineOffer: () => void,
+    handleAcceptOffer: (e: any) => Promise<void>,
+    handleDeclineOffer: (e: any) => void
     enablePaymentMode: () => void,
     handleReserveMoney: () => void,
     handleCompleteProject: () => void
 }
+
 const DefaultControlPanel: React.FC<DefaultControlPanel> = ({
                                                                 editStatusName,
                                                                 handleReserveMoney,
@@ -170,20 +182,21 @@ const DefaultControlPanel: React.FC<DefaultControlPanel> = ({
             </PanelEditsItem>}
         </PanelEdits>
         {
-            editStatusName === "Approval" && edit?.status && <AcceptOfferBlock
+            editStatusName === "Approval" && edit?.status && offer?.status === "PENDING" && <AcceptOfferBlock
                 offer={offer} handleAcceptOffer={handleAcceptOffer} handleDeclineOffer={handleDeclineOffer}/>
         }
         {
-            editStatusName === "Reservation" && !edit?.status && <ReservationControlBlock
+            editStatusName === "Reservation" && <ReservationControlBlock
                 offer={offer} handleReserveMoney={handleReserveMoney} enablePaymentMode={enablePaymentMode}/>
         }
     </>
 }
 const AcceptOfferBlock: React.FC<{
     offer: ValidOfferType | null,
-    handleAcceptOffer: () => void,
-    handleDeclineOffer: () => void
+    handleAcceptOffer: (e: any) => Promise<void>,
+    handleDeclineOffer: (e: any) => void
 }> = ({offer, handleAcceptOffer, handleDeclineOffer}) => {
+    // const {handleSubmit} = useForm()
     return <OfferEdits>
         <OfferEditsHeader>
             <EditsLabel>Offer</EditsLabel>
@@ -191,8 +204,8 @@ const AcceptOfferBlock: React.FC<{
         <OfferEditsForm>
             <OfferConditionsBlock offer={offer}/>
             <OfferEditsBlock>
-                <OfferEditsAcceptButton onClick={handleAcceptOffer} >Accept</OfferEditsAcceptButton>
-                <OfferEditsDeclineButton onClick={handleDeclineOffer}>Decline</OfferEditsDeclineButton>
+                <OfferEditsAcceptButton type="submit" onClick={handleAcceptOffer}>Accept</OfferEditsAcceptButton>
+                <OfferEditsDeclineButton type="submit" onClick={handleDeclineOffer}>Decline</OfferEditsDeclineButton>
             </OfferEditsBlock>
         </OfferEditsForm>
     </OfferEdits>
@@ -231,9 +244,9 @@ export const OfferConditionsBlock: React.FC<{ offer?: ValidOfferType | null, reg
             </div>
             <div className="offer-edits__box offer-edits__box--days">
                 <input ref={register} className="offer-edits__input" type="text" name="days"
-                       placeholder={offer?.days.toString() || "0"}
+                       placeholder={offer?.days?.toString() || "0"}
                        max={1000}
-                       defaultValue={offer?.days.toString()}/>
+                       defaultValue={offer?.days?.toString()}/>
                 <div className="offer-edits__designation">days</div>
             </div>
         </div>
@@ -243,9 +256,9 @@ export const OfferConditionsBlock: React.FC<{ offer?: ValidOfferType | null, reg
             </div>
             <div className="offer-edits__box offer-edits__box--time">
                 <input ref={register} className="offer-edits__input" type="text" name="hours"
-                       placeholder={offer?.hours.toString() || "0"}
+                       placeholder={offer?.hours?.toString() || "0"}
                        max={24}
-                       defaultValue={offer?.hours.toString()}/>
+                       defaultValue={offer?.hours?.toString()}/>
                 <div className="offer-edits__designation">hrs.</div>
             </div>
         </div>
@@ -318,7 +331,7 @@ const RemoveIcon = () => {
 const CompleteButtonComponent: React.FC<{ onClick: () => void }> = ({onClick}) => {
     return <CompleteButton onClick={onClick} className="panel-edits__btn">
 
-            Complete the project
+        Complete the project
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
              xmlns="http://www.w3.org/2000/svg">
             <path

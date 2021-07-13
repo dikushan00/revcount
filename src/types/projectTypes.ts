@@ -1,4 +1,4 @@
-import {RoleType, UserType} from "./userTypes";
+import {UserType} from "./userTypes";
 
 export interface ProjectPostType {
     name: string
@@ -7,6 +7,7 @@ export interface ProjectPostType {
     addDeadline?: number
     freeEdits?: number
     balance: number
+    user_role: ProjectRolesType
     users?: UserType[],
     revisions?: EditType[],
     invitations: { username: string }[],
@@ -15,9 +16,11 @@ export interface ProjectPostType {
     message?: string
 }
 
+export type ProjectRolesType = "OWNER" | "ARTIST"
+export type ValidProjectRolesType = "Owner" | "Artist"
+
 export interface ProjectType extends ProjectPostType {
     project_id: number
-    role?: RoleType
 }
 
 export type ProjectObjKeysType = keyof ProjectType
@@ -39,6 +42,7 @@ export type ActionHistoryType = {
 }
 
 export type OfferType = {
+    offer_id: number
     amount: number
     status: InviteStatusType
     deadline: string
@@ -58,6 +62,7 @@ export type EditType = {
     name: string
     next_action: string
     offer?: OfferType
+    isOfferAccepted?: boolean
     workspace?: WorkspaceMessageType[]
     tasks?: TaskType[]
 }

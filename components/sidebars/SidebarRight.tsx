@@ -6,19 +6,29 @@ import {getActiveProject, getUserId} from "../../src/redux/projects-selector";
 import {actionsProjects, getProjectInfo} from "../../src/redux/projects-reducer";
 import {TeamProjectButton, TeamProjectSettingsButton} from "../styled/buttons/Buttons";
 import {
-    Notices, NoticesItem, NoticesLabel, NoticesList, NoticesText, NoticesTime,
+    Notices,
+    NoticesItem,
+    NoticesLabel,
+    NoticesList,
+    NoticesText,
+    NoticesTime,
     SideBarPage,
     TeamProject,
     TeamProjectHeader,
-    TeamProjectLabel, TeamProjectsItem,
-    TeamProjectsList, TeamProjectsName, TeamProjectsRole
+    TeamProjectLabel,
+    TeamProjectsItem,
+    TeamProjectsList,
+    TeamProjectsName,
+    TeamProjectsRole
 } from "../styled/sidebar/components";
+import {ValidProjectRolesType} from "../../src/types/projectTypes";
 
 export const SidebarRight = () => {
 
     const dispatch = useDispatch()
     const activeProject = useSelector(getActiveProject)
 
+    const project = useSelector(getActiveProject)
     const userId = useSelector(getUserId)
 
     const [isModalMode, setIsModalMode] = React.useState({
@@ -34,6 +44,13 @@ export const SidebarRight = () => {
         let activeEdit = activeProject?.revisions?.find(item => item.revision_id === editId) || null
         dispatch(actionsProjects.setActiveEdit(activeEdit))
     }
+
+    React.useEffect(() => {
+        if (project && project.users && userId && !project.user_role) {
+            let role = project.users.find(item => item.user_id === userId)?.user_role || "ARTIST"
+            role && dispatch(actionsProjects.setUserRole(role))
+        }
+    }, [project, userId])
 
     return <>
         <SideBarPage>
@@ -51,19 +68,24 @@ export const SidebarRight = () => {
                         </svg>
                     </TeamProjectSettingsButton>
                 </TeamProjectHeader>
-                {activeProject?.role?.name === "Owner" &&
+                {activeProject?.user_role === "OWNER" &&
                 <TeamProjectButton onClick={() => setIsModalMode(state => ({...state, inviteMember: true}))}>
                     Add member<span>+</span>
                 </TeamProjectButton>}
                 <TeamProjectsList>
                     {
                         activeProject?.users?.map(user => {
+                            let userRole: ValidProjectRolesType = "Artist"
+                            if(user?.user_role) {
+                                let role = user.user_role.toLowerCase() as ValidProjectRolesType
+                                userRole = role.replace(role[0], role[0].toUpperCase()) as ValidProjectRolesType
+                            }
                             return <TeamProjectsItem key={user.user_id} className="team-project__item">
                                 <TeamProjectsName>
                                     <span/>{user.first_name} {user.user_id === userId && "(You)"}
                                 </TeamProjectsName>
                                 <TeamProjectsRole>
-                                    {user?.role?.name || "Artist"}
+                                    {userRole}
                                 </TeamProjectsRole>
                             </TeamProjectsItem>
                         })

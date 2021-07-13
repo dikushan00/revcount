@@ -1,12 +1,14 @@
 import React from 'react';
-import {OfferType, WorkspaceMessageType} from "../../../src/types/projectTypes";
+import {WorkspaceMessageType} from "../../../src/types/projectTypes";
 import {
-    LeftWorkspace, LeftWorkspaceDesc,
+    LeftWorkspace,
+    LeftWorkspaceDesc,
     LeftWorkspaceInput,
     LeftWorkspaceItem,
     LeftWorkspaceLabel,
     LeftWorkspaceList
 } from "../../styled/edit/components";
+import {ValidOfferType} from "../../../pages/projects/[projectId]/revisions/[revisionId]";
 
 type TimeLeftType = {
     days: string | null,
@@ -14,7 +16,7 @@ type TimeLeftType = {
     seconds: string | null
 }
 
-export const EditWorkspaceWindow: React.FC<{ isOwner: boolean, isOfferExist: boolean,offer: OfferType | null, workspace: WorkspaceMessageType[] | undefined, deadline: string | null | undefined }> =
+export const EditWorkspaceWindow: React.FC<{ isOwner: boolean, isOfferExist: boolean, offer: ValidOfferType | null, workspace: WorkspaceMessageType[] | undefined, deadline: string | null | undefined }> =
     ({workspace, deadline, isOwner, offer, isOfferExist}) => {
         const [timeLeft, setTimeLeft] = React.useState<TimeLeftType>({
             days: null,

@@ -10,7 +10,7 @@ import {
 } from "../types/projectTypes";
 import {UserType} from "../types/userTypes";
 
-export const ProjectAPI =  {
+export const ProjectAPI = {
     getProjects(userId: number) {
         return instance && instance.get<ProjectType[]>(`users/${userId}/projects`, {
             headers: {
@@ -64,8 +64,19 @@ export const ProjectAPI =  {
             }
         }).then(res => res.data)
     },
-    acceptOffer(projectId: number, data: any) {
-        return instance && instance.put(`projects/${projectId}/accept_offer`, data).then(res => res.data)
+    acceptOffer(offerId: number) {
+        return instance && instance.patch(`offers/${offerId}`, {status: "ACCEPTED"}, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            }
+        }).then(res => res.data)
+    },
+    declineOffer(offerId: number) {
+        return instance && instance.patch(`offers/${offerId}`, {status: "DECLINED"}, {
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            }
+        }).then(res => res.data)
     },
     reserveMoney(projectId: number, data: any) {
         return instance.put(`projects/${projectId}/reserve`, data).then(res => res.data)
@@ -117,4 +128,9 @@ export const ProjectAPI =  {
     }
 }
 
-export interface ContactPostType {username: string, project_id: number}[]
+export interface ContactPostType {
+    username: string,
+    project_id: number
+}
+
+[]

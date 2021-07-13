@@ -161,12 +161,11 @@ const Projects: React.FC<{ projects: ProjectType[] | null, handleAddNewProject: 
                                                                                                      handleAddNewProject,
                                                                                                      projects
                                                                                                  }) => {
-    const dispatch = useDispatch()
     const activeProject = useSelector((state: AppStateType) => state.projects.activeProject)
 
     return <ul className="sidebar__block block-sidebar">
         {
-            projects?.map((item, index) => {
+            projects?.map((item) => {
                 return <Link key={item.project_id} href={"/projects/" + item.project_id} >
                     <SidebarBlockItem className="block-sidebar__item">
                         {/*@ts-ignore*/}

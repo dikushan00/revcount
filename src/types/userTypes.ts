@@ -1,3 +1,4 @@
+import {ProjectRolesType} from "./projectTypes";
 
 export type ProfileType = {
     id?: number;
@@ -19,7 +20,7 @@ export type UserType = {
     user_id: number,
     username: string,
     isOwner?: boolean
-    role: RoleType,
+    user_role: ProjectRolesType,
     first_name: string,
     avatar?: string,
     last_name?: string

@@ -110,7 +110,7 @@ export default function SignUp() {
                         </SignUpLine>
                         <SignUpLine>
                             <Controller as={<SignUpInput placeholder="Password" type="password"/>} name="password"
-                                        rules={{required: true , pattern: /^[A-Za-z0-9]\w{7,15}$/}}
+                                        rules={{required: true , pattern: /^[A-Za-z0-9]\w{6,15}$/}}
                                         control={control}
                                         defaultValue={""}
                             />
