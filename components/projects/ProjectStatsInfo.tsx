@@ -77,7 +77,7 @@ export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({pro
                         </ProjectsListLabel>
                         <ProjectsListMetrics>
                             {/*@ts-ignore*/}
-                            {fieldItem && +fieldItem >= 0 ? `${fieldItem} ${item.unit}` : "-"} {item.addInfo && project?.addDeadline && item.addInfo(project?.addDeadline)}
+                            {fieldItem && +fieldItem >= 0 ? `${fieldItem} ${item.unit}` : <span style={{color: "red"}}>0 {item.unit}</span>} {item.addInfo && project?.addDeadline && item.addInfo(project?.addDeadline)}
                         </ProjectsListMetrics>
                     </ProjectsListBody>
                     {
