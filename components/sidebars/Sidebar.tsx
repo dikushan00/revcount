@@ -170,7 +170,7 @@ const Projects: React.FC<{ projects: ProjectType[] | null, handleAddNewProject: 
                     <SidebarBlockItem className="block-sidebar__item">
                         {/*@ts-ignore*/}
                         <SideBarBlockButton isActive = {activeProject?.project_id === item.project_id}>
-                            <span/> {item.name}
+                            <span/> {item.name || item.project_name || ""}
                         </SideBarBlockButton>
                     </SidebarBlockItem>
                 </Link>

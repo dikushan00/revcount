@@ -2,6 +2,7 @@ import {UserType} from "./userTypes";
 
 export interface ProjectPostType {
     name: string
+    project_name?: string
     deadline: string
     included_revisions?: number
     addDeadline?: number

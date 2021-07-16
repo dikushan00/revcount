@@ -96,7 +96,7 @@ export const MyCorrectionsBox = styled.div`
   align-items: center;
   padding-left: 2.5%;
   width: calc(30px + 188 * ((100vw - 320px) / 1600));
-  position: relative;
+  //position: relative;
 
   &::before,
   &::after {

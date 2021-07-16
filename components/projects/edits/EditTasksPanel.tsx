@@ -32,7 +32,7 @@ type PropsType = {
     type: "addNewEdit" | "changeEdit",
     projectTasks?: TaskType[],
     control?: any,
-    userRole: ProjectRolesType | undefined,
+    userRole?: ProjectRolesType | undefined,
     projectId?: string | string[] | undefined,
     revisionId?: string | string[] | undefined,
     editName?: string | null

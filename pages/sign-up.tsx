@@ -44,16 +44,11 @@ export default function SignUp() {
     const onSubmit = async (data: { first_name: string, username: string, password: string }) => {
 
         let response = await request<SignUpResponseType>("users/register", "post", data, null, false)
-        if (response) {
-            await router.push("/")
-            dispatch(actionsAuth.setNewAuth(response.token, null, response.user_id))
-            dispatch(actionsProfile.setProfile({
-                user_id: response.user_id,
-                email: response.username,
-                avatar: "",
-                first_name: response.first_name
-            }))
+
+        if (response && response?.token) {
+            dispatch(actionsAuth.setNewAuth(response.token, null, null , true))
             localStorage.setItem("token", response.token)
+            await router.push("/")
             window.location.reload();
         }
     }

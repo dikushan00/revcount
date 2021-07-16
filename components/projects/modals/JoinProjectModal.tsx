@@ -40,6 +40,7 @@ export const JoinProjectModal: React.FC<PropsType> = ({hideBlock}) => {
             hoursRate: data.hoursRate
         }).then (response => {
             if (response) {
+                debugger
                 dispatch(actionsProjects.addProject(response))
                 hideBlock()
             }
