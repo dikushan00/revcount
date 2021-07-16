@@ -22,7 +22,6 @@ import {
 import {Toast, useToast} from "../../common/blocks/Toast";
 import {ProjectAPI} from "../../../src/api/ProjectAPI";
 import {ValidationError} from "../../common/form/ValidationError";
-import {router} from "next/client";
 import {useRouter} from "next/router";
 
 type PropsType = {
@@ -53,10 +52,6 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
     const handleCloseModal = () => hideBlock()
 
     const onSubmit = async (data: { name: string, freeEdits: string, deadline: string }) => {
-        // if (!addedEmails.length) {
-        //     setError("User ID field must not be empty")
-        //     return
-        // }
         const invitations = addedEmails.map(email => ({username: email}))
 
         let isDeadlineValid = new Date(data.deadline).getTime() > new Date().getTime()
@@ -68,7 +63,7 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
             name: data.name,
             deadline: data.deadline,
             balance: 0,
-            included_revisions: 0,
+            included_revisions: +data.freeEdits,
             invitations,
         } as ProjectPostType
 
@@ -83,7 +78,7 @@ export const CreateNewProjectModal: React.FC<PropsType> = ({hideBlock}) => {
         })
     }
 
-    const onPressEnterOnInput = (e:KeyboardEventHandler<HTMLInputElement>) => {
+    const onPressEnterOnInput = (e: KeyboardEventHandler<HTMLInputElement>) => {
         //@ts-ignore
         if (e.code === "Enter") {
             //@ts-ignore

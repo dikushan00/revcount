@@ -79,7 +79,6 @@ export const AddMemberToProjectModal: React.FC<PropsType> = ({hideBlock, project
     const sendRequestUsers = async (data: ContactPostType[]) => {
         projectId && ProjectAPI.sendInvitation(+projectId, data).then(response => {
             if (response) {
-                response && dispatch(actionsProjects.addUsersToProject(response))
                 hideBlock()
             }
         }).catch(e => {

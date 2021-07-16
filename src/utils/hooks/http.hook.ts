@@ -32,7 +32,7 @@ export const useHttp = () => {
             setLoading(false)
             return data
         } catch (e) {
-            let errorMessage = e.response.data.message
+            let errorMessage = e.response?.data?.message
             setLoading(false)
             setError(errorMessage || e.message)
             // throw e

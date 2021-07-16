@@ -10,13 +10,23 @@ import {ValidationError} from "../../common/form/ValidationError";
 import {Btn2AllWidth} from "../../styled/buttons/Buttons";
 import axios from "axios";
 import styled from "styled-components";
+import {useToast} from "../../common/blocks/Toast";
+import {EditType} from "../../../src/types/projectTypes";
 
-export const MakePaymentModal: React.FC<{ hideBlock: () => void, handleReserveMoney: () => void, amount: number }>
-    = ({handleReserveMoney, amount: price, hideBlock}) => {
+type PropsType = {
+    hideBlock: () => void,
+    handleReserveMoney: () => void,
+    setRevision: (n: EditType | null) => void,
+    amount: number
+}
+
+export const MakePaymentModal: React.FC<PropsType>
+    = ({handleReserveMoney, amount: price, hideBlock, setRevision}) => {
 
     const balance = useSelector((state: AppStateType) => state.projects.activeProject?.balance)
 
     const {control, handleSubmit, errors} = useForm()
+    const {show} = useToast()
     const modalRef = React.useRef(null)
 
     const [isProcessing, setProcessingTo] = React.useState(false);
@@ -33,7 +43,6 @@ export const MakePaymentModal: React.FC<{ hideBlock: () => void, handleReserveMo
     };
 
     const onSubmit = async (data: { amount: number }) => {
-        debugger
         setProcessingTo(true)
         try {
             const {data: clientSecret} = await axios.post('/api/payment_intents', {
@@ -56,7 +65,7 @@ export const MakePaymentModal: React.FC<{ hideBlock: () => void, handleReserveMo
             }
 
             //@ts-ignore
-            const { error } = await stripe?.confirmCardPayment(clientSecret, {
+            const {error} = await stripe?.confirmCardPayment(clientSecret, {
                 //@ts-ignore
                 payment_method: paymentMethodReq?.paymentMethod?.id
             });
@@ -67,6 +76,9 @@ export const MakePaymentModal: React.FC<{ hideBlock: () => void, handleReserveMo
                 return;
             }
             hideBlock()
+            show("The payment was successful!", "success")
+            //@ts-ignore
+            setRevision(state => ({...state, status: "Performing"}))
             setProcessingTo(false)
         } catch (err) {
             setCheckoutError(err.message);

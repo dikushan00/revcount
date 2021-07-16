@@ -137,7 +137,7 @@ export const PanelEditsItem = styled.li`
 
   &:nth-child(5) {
     width: 100%;
-    margin-top: 20px;
+    //margin-top: 20px;
   }
 `
 export const OfferEdits = styled.div``

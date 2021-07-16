@@ -32,12 +32,14 @@ type PropsType = {
     project: ProjectType | null,
     closePage: () => void
     setOffer: (n: ValidOfferType) => void
+    setRevision: (n: EditType | null) => void
 }
 
 export const EditControlPanel: React.FC<PropsType> = ({
                                                           offer,
                                                           setOffer,
                                                           closePage,
+                                                          setRevision,
                                                           edit,
                                                           project
                                                       }) => {
@@ -54,7 +56,9 @@ export const EditControlPanel: React.FC<PropsType> = ({
                 closePage()
                 setIsPaymentModalShowMode(false)
             }
-        }).then(e => {})
+        }).catch(e => {
+            console.log(e)
+        })
 
     }
     const handleAcceptOffer = async (e: any) => {
@@ -90,6 +94,7 @@ export const EditControlPanel: React.FC<PropsType> = ({
                 setIsPaymentModalShowMode(false)
             }
         }).catch(e => {
+            setError(e.message)
             console.log(e)
         })
     }
@@ -122,8 +127,7 @@ export const EditControlPanel: React.FC<PropsType> = ({
             }
         </ControlEdits>
         {
-            isPaymentModalShowMode &&
-            <MakePaymentModal amount={offer?.amount || 0} handleReserveMoney={handleReserveMoney}
+            isPaymentModalShowMode && <MakePaymentModal setRevision={setRevision} amount={offer?.amount || 0} handleReserveMoney={handleReserveMoney}
                               hideBlock={() => setIsPaymentModalShowMode(false)}/>
         }
     </>
@@ -191,12 +195,12 @@ const DefaultControlPanel: React.FC<DefaultControlPanel> = ({
         }
     </>
 }
+
 const AcceptOfferBlock: React.FC<{
     offer: ValidOfferType | null,
     handleAcceptOffer: (e: any) => Promise<void>,
     handleDeclineOffer: (e: any) => void
 }> = ({offer, handleAcceptOffer, handleDeclineOffer}) => {
-    // const {handleSubmit} = useForm()
     return <OfferEdits>
         <OfferEditsHeader>
             <EditsLabel>Offer</EditsLabel>
@@ -210,6 +214,7 @@ const AcceptOfferBlock: React.FC<{
         </OfferEditsForm>
     </OfferEdits>
 }
+
 const ReservationControlBlock: React.FC<{ offer: ValidOfferType | null, handleReserveMoney: () => void, enablePaymentMode: () => void }> = ({
                                                                                                                                                 offer,
                                                                                                                                                 enablePaymentMode
@@ -268,7 +273,7 @@ export const OfferConditionsBlock: React.FC<{ offer?: ValidOfferType | null, reg
             </div>
             <div className="offer-edits__box offer-edits__box--total">
                 <input ref={register} className="offer-edits__input" type="number" name="balance"
-                       placeholder={offer?.amount.toString()}
+                       placeholder={offer?.amount.toString() || "0"}
                        defaultValue={offer?.amount}/>
                 <div className="offer-edits__designation">$</div>
             </div>

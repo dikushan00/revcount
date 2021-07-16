@@ -8,17 +8,19 @@ import {OfferType} from "../../../../src/types/projectTypes";
 import {OfferEditsAcceptButton} from "../../../styled/buttons/revisionButtons/RevisionsButtons";
 import {ControlEdits, OfferEdits, OfferEditsForm} from "../../../styled/edit/components";
 import {ValidOfferType} from "../../../../pages/projects/[projectId]/revisions/[revisionId]";
+import {useToast} from "../../../common/blocks/Toast";
 
 type PropsType = {
     revisionId: number | undefined,
     setOffer: (n: ValidOfferType) => void
 }
 
-export const ArtistsControlPanel: React.FC<PropsType> = ({revisionId,}) => {
+export const ArtistsControlPanel: React.FC<PropsType> = ({revisionId, setOffer}) => {
 
     const dispatch = useDispatch()
     const {handleSubmit, register} = useForm()
-    const {request} = useHttp()
+    const {request, error, clearError} = useHttp()
+    const {show} = useToast()
 
     const onSubmit = async (data: { days: string, hours: string, balance: string }) => {
         const {days, hours} = data
@@ -39,6 +41,11 @@ export const ArtistsControlPanel: React.FC<PropsType> = ({revisionId,}) => {
             setOffer((state) => ({...state, status: "PENDING"}))
         }
     }
+
+    React.useEffect(() => {
+        error && show(error)
+        return () => clearError()
+    }, [error])
 
     return <ControlEdits>
         <OfferEdits>

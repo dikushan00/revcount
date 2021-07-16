@@ -3,11 +3,10 @@ import {UserType} from "./userTypes";
 export interface ProjectPostType {
     name: string
     deadline: string
-    included_revisions: number
+    included_revisions?: number
     addDeadline?: number
-    freeEdits?: number
     balance: number
-    user_role: ProjectRolesType
+    user_role?: ProjectRolesType
     users?: UserType[],
     revisions?: EditType[],
     invitations: { username: string }[],

@@ -34,30 +34,32 @@ export const EditTasksList: React.FC<PropsType> = ({control, tasks, errors, enab
     return <TaskEditsList className="task-edits__list">
         {
             tasks?.map(task => {
-                return <TaskEditsItem key={task.id}
-                                      className={"task-edits__item " + (task.isEdit ? "task-open" : "")}>
-                    <TaskEditsTop className={"task-edits__top"}>
-                        <TaskEditsNumber className="task-edits__number"/>
-                        {task.isEdit && <EditBox errors={errors} controlRef={control} taskId={task.id}/>}
-                        <TaskEditsBlock className="task-edits__block">
-                            <TaskEditsEdit onClick={() => enableEditMode(task.id)}
-                                           className="task-edits__edit">Edit
-                            </TaskEditsEdit>
-                            <TaskEditsDelete onClick={() => deleteTask(task.id)}
-                                             className="task-edits__delete">Delete
-                            </TaskEditsDelete>
-                        </TaskEditsBlock>
-                    </TaskEditsTop>
-                    <TaskEditsBody className="task-edits__body">
-                        <Controller as={<TaskEditsTextarea placeholder="Describe the task clearly..." />}
-                                    name={`description_${task.id}`}
-                                    rules={{required: true}}
-                                    control={control}
-                                    defaultValue={task?.description || ""}
-                        />
-                        {errors[`description_${task.id}`] && <ValidationError/>}
-                    </TaskEditsBody>
-                </TaskEditsItem>
+                return <>
+                    <TaskEditsItem key={task.id}
+                                   className={"task-edits__item " + (task.isEdit ? "task-open" : "")}>
+                        <TaskEditsTop className={"task-edits__top"}>
+                            <TaskEditsNumber className="task-edits__number"/>
+                            {task.isEdit && <EditBox errors={errors} controlRef={control} taskId={task.id}/>}
+                            <TaskEditsBlock className="task-edits__block">
+                                <TaskEditsEdit onClick={() => enableEditMode(task.id)}
+                                               className="task-edits__edit">Edit
+                                </TaskEditsEdit>
+                                <TaskEditsDelete onClick={() => deleteTask(task.id)}
+                                                 className="task-edits__delete">Delete
+                                </TaskEditsDelete>
+                            </TaskEditsBlock>
+                        </TaskEditsTop>
+                        <TaskEditsBody className="task-edits__body">
+                            <Controller as={<TaskEditsTextarea placeholder="Describe the task clearly..."/>}
+                                        name={`description_${task.id}`}
+                                        rules={{required: true}}
+                                        control={control}
+                                        defaultValue={task?.description || ""}
+                            />
+                        </TaskEditsBody>
+                    </TaskEditsItem>
+                    {errors[`description_${task.id}`] && <ValidationError/>}
+                </>
             })
         }
     </TaskEditsList>

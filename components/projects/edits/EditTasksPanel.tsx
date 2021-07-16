@@ -1,5 +1,5 @@
 import React from 'react';
-import {EditType, TaskType} from "../../../src/types/projectTypes";
+import {EditType, ProjectRolesType, TaskType} from "../../../src/types/projectTypes";
 import {EditTasksList} from "./EditTasksList";
 import {useDispatch, useSelector} from "react-redux";
 import {actionsProjects, defaultTaskObj} from "../../../src/redux/projects-reducer";
@@ -32,7 +32,9 @@ type PropsType = {
     type: "addNewEdit" | "changeEdit",
     projectTasks?: TaskType[],
     control?: any,
+    userRole: ProjectRolesType | undefined,
     projectId?: string | string[] | undefined,
+    revisionId?: string | string[] | undefined,
     editName?: string | null
 }
 
@@ -40,6 +42,8 @@ export const EditTasksPanel: React.FC<PropsType> = ({
                                                         type,
                                                         control,
                                                         editName,
+                                                        userRole,
+                                                        revisionId,
                                                         projectId,
                                                         projectTasks
                                                     }) => {
@@ -128,7 +132,7 @@ export const EditTasksPanel: React.FC<PropsType> = ({
     }
     const onChangeRevisionSubmit = async (obj: any) => {
         let editPost = sortTasks(obj)
-        let response = projectId && await request<EditType>(`projects/${projectId}/revisions`, "patch", editPost)
+        let response = revisionId && await request<EditType>(`revisions/${revisionId}`, "patch", editPost)
         if (response) {
             projectId && dispatch(actionsProjects.addEditToProject(+projectId, response))
             router.push("/projects/" + projectId)
@@ -190,10 +194,10 @@ export const EditTasksPanel: React.FC<PropsType> = ({
                         </TaskEditsHeader>
                         <EditTasksList errors={errors} deleteTask={deleteTask} tasks={tasks} enableEditMode={enableEditMode}
                                        control={changeControl}/>
-                        <TaskEditsInner className="task-edits__inner">
+                        { userRole === "OWNER" && <TaskEditsInner className="task-edits__inner">
                             <TaskEditsButton onClick={addTask}>Add new task <span>+</span></TaskEditsButton>
                             <TaskEditsCorrectionButton type={"submit"}>Save correction</TaskEditsCorrectionButton>
-                        </TaskEditsInner>
+                        </TaskEditsInner>}
                     </form>
                 </TaskEdits>
         }

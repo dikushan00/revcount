@@ -107,13 +107,13 @@ const Edit: React.FC<{ edit: EditType | null, closePage: () => void }> = () => {
                 </EditsButton>
             </EditsHeader>
             <EditProgressBar revision={revision}/>
-            <EditTasksPanel editName={revision?.name} projectId={projectId} projectTasks={revision?.tasks}
+            <EditTasksPanel userRole={project?.user_role} revisionId={revisionId} editName={revision?.name} projectId={projectId} projectTasks={revision?.tasks}
                             type={"changeEdit"}/>
             <EditWorkspaceWindow isOfferExist={!!offer} offer={offer} isOwner={project?.user_role === "OWNER"}
                                  workspace={revision?.workspace} deadline={offer?.deadline}/>
             {
                 project?.user_role === "OWNER"
-                    ? <EditControlPanel setOffer={setOffer} closePage={closePage} offer={offer} project={project}
+                    ? <EditControlPanel setRevision={setRevision} setOffer={setOffer} closePage={closePage} offer={offer} project={project}
                                         edit={revision}/>
                     : project?.user_role === "ARTIST" && revision?.status === "Approval" && !offer &&
                     <ArtistsControlPanel setOffer={setOffer} revisionId={revision?.revision_id}/>

@@ -25,14 +25,14 @@ export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({pro
         {
             imgPath: "/img/projects/free.svg",
             title: "Free edits",
-            field: "freeEdits" as ProjectObjKeysType,
+            field: "included_revisions" as ProjectObjKeysType,
             className: "edits",
             unit: "h.",
             addContent: null
         },
-    ] as { imgPath: string, title: string, field: ProjectObjKeysType, className: string , unit: string, addContent: any}[]
+    ] as { imgPath: string, title: string, field: ProjectObjKeysType, className: string, unit: string, addContent: any }[]
 
-    if (project?.role?.name === "Owner")
+    if (project && project?.user_role === "OWNER")
         data.push(
             {
                 imgPath: "/img/projects/credit-card.svg",
@@ -47,9 +47,23 @@ export const ProjectStatsInfo: React.FC<{ project: ProjectType | null }> = ({pro
         {
             data.map((item, index) => {
                 let fieldItem: any = project && project[item.field]
-                if (item.field === "deadline") {
-                    fieldItem = fieldItem && calculateDaysLeft(fieldItem || 0).days
-                }
+                if (fieldItem)
+                    switch (item.field) {
+                        case "deadline" : {
+                            fieldItem = fieldItem && calculateDaysLeft(fieldItem || 0).days
+                            break
+                        }
+                        case "included_revisions" : {
+                            let splitIncludeRevisions = fieldItem.toString().split(".")
+                            let minutePercent = splitIncludeRevisions[1]
+                            if (minutePercent) {
+                                minutePercent = minutePercent.slice(0, 2)
+                                let percent = +minutePercent * 60 / 100
+                                fieldItem = splitIncludeRevisions[0] + "." + percent
+                            }
+                            break
+                        }
+                    }
                 return <ProjectsListItem key={index} className={item.className}>
                     <ProjectsListIcon>
                         <picture>
